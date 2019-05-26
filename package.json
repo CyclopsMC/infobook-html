@@ -1,0 +1,9 @@
+{
+  "name": "cyclops-infobook-html",
+  "version": "1.0.0",
+  "description": "Output Cyclops infobooks as HTML",
+  "main": "index.js",
+  "repository": "https://github.com/CyclopsMC/infobook-html",
+  "author": "Ruben Taelman",
+  "license": "MIT"
+}
