@@ -3,7 +3,63 @@
   "version": "1.0.0",
   "description": "Output Cyclops infobooks as HTML",
   "main": "index.js",
-  "repository": "https://github.com/CyclopsMC/infobook-html",
-  "author": "Ruben Taelman",
-  "license": "MIT"
+  "repository": "git@github.com:CyclopsMC/infobook-html.git",
+  "bugs": {
+    "url": "https://github.com/CyclopsMC/infobook-html/issues"
+  },
+  "homepage": "https://github.com/CyclopsMC/infobook-html#readme",
+  "author": "Ruben Taelman <rubensworks@gmail.com>",
+  "license": "MIT",
+  "files": [
+    "lib/**/*.d.ts",
+    "lib/**/*.js",
+    "index.d.ts",
+    "index.js"
+  ],
+  "pre-commit": [
+    "build",
+    "lint",
+    "test"
+  ],
+  "jest": {
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "test/tsconfig.json"
+      }
+    },
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "transformIgnorePatterns": [
+      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$"
+    ],
+    "testRegex": "(/test/.*|(\\.|/)(test|spec))\\.ts$",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "collectCoverage": true,
+    "testEnvironment": "node"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.13",
+    "coveralls": "^3.0.3",
+    "jest": "^24.8.0",
+    "manual-git-changelog": "^1.0.1",
+    "pre-commit": "^1.2.2",
+    "ts-jest": "^24.0.2",
+    "tslint": "^5.16.0",
+    "tslint-eslint-rules": "^5.4.0",
+    "typescript": "^3.4.5"
+  },
+  "scripts": {
+    "test": "jest ${1}",
+    "test-watch": "jest ${1} --watch",
+    "coveralls": "jest --coverage && cat ./coverage/lcov.info | coveralls",
+    "lint": "tslint index.ts lib/**/*.ts test/**/*.ts --exclude '**/*.d.ts'",
+    "build": "tsc",
+    "validate": "npm ls",
+    "prepare": "npm run build",
+    "version": "manual-git-changelog onversion"
+  }
 }
