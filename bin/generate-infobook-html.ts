@@ -1,0 +1,24 @@
+import minimist = require("minimist");
+import * as fs from "fs";
+import {InfoBookInitializer} from "../lib/infobook/InfoBookInitializer";
+import {IInfoBook} from "../lib/infobook/IInfoBook";
+
+// Process CLI args
+const args = minimist(process.argv.slice(2));
+if (args.help || args._.length != 1) {
+  process.stdout.write(`generate-cyclops-infobook-html Output Cyclops infobooks as HTML
+Usage:
+  generate-cyclops-infobook-html /path/to/config.json
+Options:
+  --help        print this help message
+`);
+  process.exit(1);
+}
+
+// Create infobook from config
+const config = JSON.parse(fs.readFileSync(args._[0], "utf8"));
+const infoBookInitializer = new InfoBookInitializer(config);
+const infoBook: IInfoBook = infoBookInitializer.initialize();
+
+// Convert info book to HTML
+// TODO
