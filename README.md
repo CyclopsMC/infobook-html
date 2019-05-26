@@ -1,4 +1,4 @@
-# RDF Terms
+# Cyclops Infobook HTML
 
 [![Build Status](https://travis-ci.org/CyclopsMC/infobook-html.svg?branch=master)](https://travis-ci.org/CyclopsMC/infobook-html)
 [![Coverage Status](https://coveralls.io/repos/github/CyclopsMC/infobook-html/badge.svg?branch=master)](https://coveralls.io/github/CyclopsMC/infobook-html?branch=master)
