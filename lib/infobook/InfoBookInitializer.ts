@@ -1,12 +1,16 @@
+import {XmlInfoBookParser} from "../parse/XmlInfoBookParser";
 import {IInfoBook} from "./IInfoBook";
 
 /**
  * InfoBookInitializer is a datastructure for holding information on an info book so that it can be constructed.
  */
 export class InfoBookInitializer {
+
   private readonly baseDir: string;
   private readonly sectionsFile: string;
   private readonly resources: string[];
+
+  private readonly parser: XmlInfoBookParser;
 
   constructor(args: IInfoBookArgs) {
     if (!args.baseDir) {
@@ -22,10 +26,12 @@ export class InfoBookInitializer {
     this.baseDir = args.baseDir;
     this.sectionsFile = args.sectionsFile;
     this.resources = args.resources;
+
+    this.parser = new XmlInfoBookParser();
   }
 
-  public initialize(): IInfoBook {
-    return null; // TODO
+  public async initialize(): Promise<IInfoBook> {
+    return this.parser.parse(this.baseDir + this.sectionsFile); // TODO
   }
 
 }

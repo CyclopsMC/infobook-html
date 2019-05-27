@@ -1,9 +1,11 @@
-import {IInfoParagraph} from "./IInfoParagraph";
+import {IInfoAppendix} from "./IInfoAppendix";
 
 /**
  * Datastructure for an info book section.
  */
 export interface IInfoSection {
+  nameTranslationKey: string;
   subSections: IInfoSection[];
-  paragraphs: IInfoParagraph[];
+  paragraphTranslationKeys: string[];
+  appendix: IInfoAppendix[];
 }

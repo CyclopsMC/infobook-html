@@ -15,10 +15,16 @@ Options:
   process.exit(1);
 }
 
-// Create infobook from config
-const config = JSON.parse(fs.readFileSync(args._[0], "utf8"));
-const infoBookInitializer = new InfoBookInitializer(config);
-const infoBook: IInfoBook = infoBookInitializer.initialize();
+async function create() {
+  // Create infobook from config
+  const config = JSON.parse(fs.readFileSync(args._[0], "utf8"));
+  const infoBookInitializer = new InfoBookInitializer(config);
+  const infoBook: IInfoBook = await infoBookInitializer.initialize();
+  console.log(JSON.stringify(infoBook, null, "  ")); // TODO
+  console.log(infoBook); // TODO
 
 // Convert info book to HTML
 // TODO
+}
+
+create();

@@ -1,5 +1,8 @@
 import {InfoBookInitializer} from "../../lib/infobook/InfoBookInitializer";
 
+// tslint:disable:object-literal-key-quotes
+// tslint:disable:object-literal-sort-keys
+
 describe('InfoBookInitializer', () => {
   describe('when constructing', () => {
     it('should succeed with all required args', () => {
@@ -32,11 +35,46 @@ describe('InfoBookInitializer', () => {
     let initializer: InfoBookInitializer;
 
     beforeEach(() => {
-      initializer = new InfoBookInitializer({ baseDir: "b", sectionsFile: "f", resources: [] });
+      initializer = new InfoBookInitializer(
+        { baseDir: __dirname, sectionsFile: "/assets/infobook.xml", resources: [] });
     });
 
-    it('should return null', () => {
-      return expect(initializer.initialize()).toBe(null);
+    it('should return null', async () => {
+      return expect(await initializer.initialize()).toEqual({
+        'rootSection': {
+          'nameTranslationKey': 'info_book.integrateddynamics.section.main',
+          'subSections': [
+            {
+              'nameTranslationKey': 'info_book.integrateddynamics.introduction',
+              'subSections': [],
+              'paragraphTranslationKeys': [
+                'info_book.integrateddynamics.introduction.text1',
+                'info_book.integrateddynamics.introduction.text2',
+                'info_book.integrateddynamics.introduction.text3',
+                'info_book.integrateddynamics.introduction.text4',
+              ],
+              'appendix': [],
+            },
+            {
+              'nameTranslationKey': 'info_book.integrateddynamics.tutorials',
+              'subSections': [
+                {
+                  'nameTranslationKey': 'info_book.integrateddynamics.tutorials.introduction',
+                  'subSections': [],
+                  'paragraphTranslationKeys': [
+                    'info_book.integrateddynamics.tutorials.introduction.text1',
+                  ],
+                  'appendix': [],
+                },
+              ],
+              'paragraphTranslationKeys': [],
+              'appendix': [],
+            },
+          ],
+          'paragraphTranslationKeys': [],
+          'appendix': [],
+        },
+      });
     });
   });
 });
