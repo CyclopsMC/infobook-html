@@ -5,8 +5,13 @@ html(lang=language)
         title=mainTitle + ' - ' + sectionTitle
     body
         include includes/header.pug
-        h1=sectionTitle
-        ul
-        each val in subSectionDatas
-            li
-                a(href=val.url) !{val.sectionTitle}
+
+        div(class="main-outer")
+            section(class="main")
+                h2=sectionTitle
+                ul
+                each val in subSectionDatas
+                    li
+                        a(href=val.url) !{val.sectionTitle}
+
+        include includes/footer.pug

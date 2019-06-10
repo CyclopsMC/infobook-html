@@ -74,7 +74,7 @@ export class HtmlInfoBookSerializer {
         baseUrl: context.baseUrl,
         breadcrumbs: context.breadcrumbs.concat([{ name: sectionTitle }]),
         language: context.language,
-        mainTitle: 'Title',
+        mainTitle: context.title,
         sectionTitle,
         subSectionDatas,
       });
@@ -94,7 +94,7 @@ export class HtmlInfoBookSerializer {
         baseUrl: context.baseUrl,
         breadcrumbs: context.breadcrumbs.concat([{ name: sectionTitle }]),
         language: context.language,
-        mainTitle: 'Title',
+        mainTitle: context.title,
         sectionParagraphs: section.paragraphTranslationKeys
           .map((key) => context.resourceHandler.getTranslation(key, context.language))
           .map((value) => this.formatString(value)),
@@ -168,4 +168,5 @@ export interface ISerializeContext {
   language?: string;
   path: string;
   resourceHandler: ResourceHandler;
+  title: string;
 }

@@ -5,6 +5,11 @@ html(lang=language)
         title=mainTitle + ' - ' + sectionTitle
     body
         include includes/header.pug
-        h1=sectionTitle
-        each val in sectionParagraphs
-            p !{val}
+
+        div(class="main-outer")
+            section(class="main")
+                h2=sectionTitle
+                each val in sectionParagraphs
+                    p !{val}
+
+        include includes/footer.pug

@@ -35,6 +35,7 @@ async function create() {
     baseUrl: config.baseUrl,
     path: args._[1],
     resourceHandler: resourceLoader.getResourceHandler(),
+    title: config.title,
   });
 }
 
