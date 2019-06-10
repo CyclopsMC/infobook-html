@@ -66,7 +66,7 @@ export class HtmlInfoBookSerializer {
       });
       await fs.writeFile(filePath, fileContents);
 
-      return { filePath, sectionTitle };
+      return { filePath: context.path, sectionTitle };
     } else {
       // Leaf section
       const directory = context.path.substr(0, context.path.lastIndexOf('/'));
