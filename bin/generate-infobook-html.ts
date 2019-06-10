@@ -28,8 +28,6 @@ async function create() {
   // Initialize book
   const infoBookInitializer = new InfoBookInitializer(config);
   const infoBook: IInfoBook = await infoBookInitializer.initialize();
-  // console.log(JSON.stringify(infoBook, null, "  ")); // TODO
-  // console.log(infoBook); // TODO
 
   // Convert info book to HTML
   const infoBookSerializer = new HtmlInfoBookSerializer();

@@ -1,8 +1,10 @@
 doctype html
 html(lang=language)
     head
+        include includes/head.pug
         title=mainTitle + ' - ' + sectionTitle
     body
+        include includes/header.pug
         h1=sectionTitle
         each val in sectionParagraphs
             p !{val}

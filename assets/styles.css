@@ -1,0 +1,9 @@
+.breadcrumbs li {
+    margin: 0;
+    padding: 2px;
+    display: inline-block;
+}
+
+.breadcrumbs li::before {
+    content: "> ";
+}

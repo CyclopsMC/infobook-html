@@ -1,5 +1,6 @@
 import {promises as fs} from "fs";
 import mkdirp = require("mkdirp");
+import {ncp} from "ncp";
 import {join} from "path";
 import {compileFile as compilePug, compileTemplate} from "pug";
 import {promisify} from "util";
@@ -22,29 +23,42 @@ export class HtmlInfoBookSerializer {
 
   public async serialize(infobook: IInfoBook, context: ISerializeContext) {
     await this.ensureDirExists(context.path);
+
+    // Serialize sections in all languages
     for (const language of context.resourceHandler.getLanguages()) {
       const langPath = join(context.path, language);
       await this.ensureDirExists(langPath);
       await this.serializeSection(infobook.rootSection, {
         ...context,
         basePath: context.path,
+        breadcrumbs: [],
         language,
         path: langPath,
       });
     }
+
+    // Serialize assets
+    await promisify(ncp)(__dirname + '/../../assets/', join(context.path, 'assets'));
   }
 
   public async serializeSection(section: IInfoSection, context: ISerializeContext)
     : Promise<{ filePath: string, sectionTitle: string }> {
     if (section.subSections && section.subSections.length > 0) {
       // Navigation section
+      const sectionTitle = this.formatString(context.resourceHandler
+        .getTranslation(section.nameTranslationKey, context.language));
 
       // Serialize subsections
       const subSectionDatas: { url: string, sectionTitle: string }[] = [];
+      const subBreadcrumbs = context.breadcrumbs.concat([{
+        name: sectionTitle,
+        url: this.filePathToUrl(context.path, context.basePath, context.baseUrl),
+      }]);
       for (const subSection of section.subSections) {
         const subSectionData = await this.serializeSection(subSection,
           {
             ...context,
+            breadcrumbs: subBreadcrumbs,
             path: join(context.path, subSection.nameTranslationKey
               .substr(subSection.nameTranslationKey.lastIndexOf('.') + 1)),
           });
@@ -56,9 +70,9 @@ export class HtmlInfoBookSerializer {
 
       // Create index file
       const filePath = join(context.path, 'index.html');
-      const sectionTitle = this.formatString(context.resourceHandler
-        .getTranslation(section.nameTranslationKey, context.language));
       const fileContents = this.templateIndex({
+        baseUrl: context.baseUrl,
+        breadcrumbs: context.breadcrumbs.concat([{ name: sectionTitle }]),
         language: context.language,
         mainTitle: 'Title',
         sectionTitle,
@@ -77,6 +91,8 @@ export class HtmlInfoBookSerializer {
       const sectionTitle = this.formatString(context.resourceHandler
         .getTranslation(section.nameTranslationKey, context.language));
       const fileContents = this.templateSection({
+        baseUrl: context.baseUrl,
+        breadcrumbs: context.breadcrumbs.concat([{ name: sectionTitle }]),
         language: context.language,
         mainTitle: 'Title',
         sectionParagraphs: section.paragraphTranslationKeys
@@ -148,6 +164,7 @@ export class HtmlInfoBookSerializer {
 export interface ISerializeContext {
   baseUrl: string;
   basePath?: string;
+  breadcrumbs?: { url?: string, name: string }[];
   language?: string;
   path: string;
   resourceHandler: ResourceHandler;

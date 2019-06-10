@@ -1,0 +1,8 @@
+div(class="breadcrumbs")
+    ul
+        each val in breadcrumbs
+            if val.url
+                li
+                    a(href=val.url) !{val.name}
+            else
+                li !{val.name}
