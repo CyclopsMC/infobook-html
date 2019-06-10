@@ -1,0 +1,8 @@
+doctype html
+html(lang=language)
+    head
+        title=mainTitle + ' - ' + sectionTitle
+    body
+        h1=sectionTitle
+        each val in sectionParagraphs
+            p !{val}

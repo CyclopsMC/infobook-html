@@ -6,6 +6,13 @@ export class ResourceHandler {
   private readonly translations: {[language: string]: {[key: string]: string}} = {};
 
   /**
+   * @returns {string[]} All available language keys.
+   */
+  public getLanguages(): string[] {
+    return Object.keys(this.translations);
+  }
+
+  /**
    * Add translations for the given language.
    * @param {string} language A language key.
    * @param {{[p: string]: string}} translations A mapping from translation key to translated value.
@@ -22,21 +29,21 @@ export class ResourceHandler {
   }
 
   /**
-   * Collect all translations for the given translation key.
+   * Get the translation for the given key.
    * @param {string} translationKey A translation key.
-   * @returns {{[p: string]: string}} A mapping from language to translated value.
+   * @param {string} languageKey A language key.
+   * @returns {string} A translated value.
    */
-  public getTranslations(translationKey: string): {[lang: string]: string} {
-    const collectedTranslations: {[lang: string]: string} = {};
-
-    for (const language in this.translations) {
-      const entries = this.translations[language];
-      if (entries[translationKey]) {
-        collectedTranslations[language] = entries[translationKey];
+  public getTranslation(translationKey: string, languageKey: string): string {
+    const entries = this.translations[languageKey] || this.translations.en_us;
+    let value = entries[translationKey];
+    if (!value) {
+      value = this.translations.en_us[translationKey];
+      if (!value) {
+        throw new Error(`Could not find translation key ${translationKey} in ${languageKey}`);
       }
     }
-
-    return collectedTranslations;
+    return value;
   }
 
 }
