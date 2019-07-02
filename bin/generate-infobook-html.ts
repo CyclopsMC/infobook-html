@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import minimist = require("minimist");
+import {InfoBookAppendixHandlerImage} from "../lib/infobook/appendix/InfoBookAppendixHandlerImage";
 import {IInfoBook} from "../lib/infobook/IInfoBook";
 import {InfoBookInitializer} from "../lib/infobook/InfoBookInitializer";
 import {ResourceLoader} from "../lib/resource/ResourceLoader";
@@ -25,8 +26,12 @@ async function create() {
   const resourceLoader = new ResourceLoader();
   await resourceLoader.loadAll(config.baseDir, config.resources);
 
-  // Initialize book
+  // Setup infobook loader
   const infoBookInitializer = new InfoBookInitializer(config);
+  infoBookInitializer.registerAppendixHandler('image',
+    new InfoBookAppendixHandlerImage(resourceLoader.getResourceHandler()));
+
+  // Initialize book
   const infoBook: IInfoBook = await infoBookInitializer.initialize();
 
   // Convert info book to HTML

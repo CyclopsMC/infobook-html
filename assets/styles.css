@@ -76,3 +76,12 @@ a {
 a:hover {
     color: #4c4c4c;
 }
+
+.appendix {
+    text-align: center;
+}
+
+.appendix-image {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}

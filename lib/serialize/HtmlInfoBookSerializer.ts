@@ -1,8 +1,9 @@
-import {promises as fs} from "fs";
+import {createWriteStream, promises as fs} from "fs";
 import mkdirp = require("mkdirp");
 import {ncp} from "ncp";
 import {join} from "path";
 import {compileFile as compilePug, compileTemplate} from "pug";
+import {Readable} from "stream";
 import {promisify} from "util";
 import {IInfoBook} from "../infobook/IInfoBook";
 import {IInfoSection} from "../infobook/IInfoSection";
@@ -43,6 +44,14 @@ export class HtmlInfoBookSerializer {
 
   public async serializeSection(section: IInfoSection, context: ISerializeContext)
     : Promise<{ filePath: string, sectionTitle: string }> {
+    // TODO: cleanup
+    const fileWriter = {
+      write: (baseName: string, contents: Readable): string => {
+        contents.pipe(createWriteStream(join(context.basePath, 'assets', baseName)));
+        return context.baseUrl + 'assets/' + baseName;
+      },
+    };
+
     if (section.subSections && section.subSections.length > 0) {
       // Navigation section
       const sectionTitle = this.formatString(context.resourceHandler
@@ -95,6 +104,9 @@ export class HtmlInfoBookSerializer {
         breadcrumbs: context.breadcrumbs.concat([{ name: sectionTitle }]),
         language: context.language,
         mainTitle: context.title,
+        sectionAppendices: section.appendix
+          .filter((appendix) => appendix) // TODO: rm
+          .map((appendix) => appendix.toHtml(fileWriter)),
         sectionParagraphs: section.paragraphTranslationKeys
           .map((key) => context.resourceHandler.getTranslation(key, context.language))
           .map((value) => this.formatString(value)),

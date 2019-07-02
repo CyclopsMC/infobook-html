@@ -11,5 +11,7 @@ html(lang=language)
                 h2=sectionTitle
                 each val in sectionParagraphs
                     p !{val}
+                each val in sectionAppendices
+                    div(class="appendix") !{val}
 
         include includes/footer.pug

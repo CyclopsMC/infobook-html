@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import {parseString} from "xml2js";
+import {IInfoBookAppendixHandler} from "../infobook/appendix/IInfoBookAppendixHandler";
 import {IInfoAppendix} from "../infobook/IInfoAppendix";
 import {IInfoBook} from "../infobook/IInfoBook";
 import {IInfoSection} from "../infobook/IInfoSection";
@@ -8,6 +9,20 @@ import {IInfoSection} from "../infobook/IInfoSection";
  * Parses an XML file into an {@link IInfoBook}.
  */
 export class XmlInfoBookParser {
+
+  private readonly appendixHandlers: {[type: string]: IInfoBookAppendixHandler} = {};
+
+  /**
+   * Register an appendix handler for the given type.
+   * @param {string} type A type string.
+   * @param {IInfoBookAppendixHandler} handler An appendix handler.
+   */
+  public registerAppendixHandler(type: string, handler: IInfoBookAppendixHandler) {
+    if (this.appendixHandlers[type]) {
+      throw new Error(`Tried overwriting an appendix handler for type '${type}'`);
+    }
+    this.appendixHandlers[type] = handler;
+  }
 
   /**
    * Parse the infobook at the given path.
@@ -67,10 +82,16 @@ export class XmlInfoBookParser {
    * @returns {IInfoAppendix} An appendix.
    */
   public jsonToAppendix(data: any): IInfoAppendix {
-    // TODO
-    // console.log(data); // TODO
-    // data.$.type
-    // data._
+    if (!data.$ || !data.$.type) {
+      throw new Error(`No type was found for the appendix ${JSON.stringify(data)}.`);
+    }
+    const type = data.$.type;
+    const handler = this.appendixHandlers[type];
+    if (handler) {
+      return handler.createAppendix(data);
+    }
+    // tslint:disable-next-line:no-console
+    console.error(`Could not find an appendix handler for type '${type}'`);
     return null;
   }
 

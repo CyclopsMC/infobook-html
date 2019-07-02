@@ -73,6 +73,10 @@ export class ResourceLoader {
    * @returns {Promise<void>} A promise resolving when loading is done.
    */
   public async loadAssets(mcmeta: any, modid: string, fullPath: string) {
+    // Set base path
+    this.resourceHandler.setResourcePackBasePath(modid, fullPath);
+
+    // Handle languages
     const langDir = join(fullPath, 'lang');
     if ((await fs.stat(langDir)).isDirectory()) {
       await this.loadAssetsLang(mcmeta, modid, langDir);

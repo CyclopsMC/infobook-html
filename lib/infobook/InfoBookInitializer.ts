@@ -1,4 +1,5 @@
 import {XmlInfoBookParser} from "../parse/XmlInfoBookParser";
+import {IInfoBookAppendixHandler} from "./appendix/IInfoBookAppendixHandler";
 import {IInfoBook} from "./IInfoBook";
 
 /**
@@ -31,7 +32,16 @@ export class InfoBookInitializer {
   }
 
   public async initialize(): Promise<IInfoBook> {
-    return this.parser.parse(this.baseDir + this.sectionsFile); // TODO
+    return this.parser.parse(this.baseDir + this.sectionsFile);
+  }
+
+  /**
+   * Register an appendix handler for the given type.
+   * @param {string} type A type string.
+   * @param {IInfoBookAppendixHandler} handler An appendix handler.
+   */
+  public registerAppendixHandler(type: string, handler: IInfoBookAppendixHandler) {
+    this.parser.registerAppendixHandler(type, handler);
   }
 
 }

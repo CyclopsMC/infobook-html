@@ -5,9 +5,16 @@ import {XmlInfoBookParser} from "../../lib/parse/XmlInfoBookParser";
 
 describe('XmlInfoBookParser', () => {
   let parser: XmlInfoBookParser;
+  let dummyAppendix;
 
   beforeEach(() => {
     parser = new XmlInfoBookParser();
+    parser.registerAppendixHandler('dummy', {
+      createAppendix: () => dummyAppendix,
+    });
+    dummyAppendix = ({
+      toHtml: () => 'abc',
+    });
   });
 
   describe('parse', () => {
@@ -110,8 +117,12 @@ describe('XmlInfoBookParser', () => {
           "p3",
         ],
         appendix: [
-          {},
-          {},
+          {
+            $: { type: "ap1" },
+          },
+          {
+            $: { type: "ap2" },
+          },
         ],
       };
       return expect(parser.jsonToSection(data)).toEqual({
@@ -150,8 +161,21 @@ describe('XmlInfoBookParser', () => {
   });
 
   describe('jsonToAppendix', () => {
-    it('should return null', async () => {
-      return expect(parser.jsonToAppendix({})).toBe(null);
+    it('should error for no $ field', async () => {
+      return expect(() => parser.jsonToAppendix({})).toThrow(new Error('No type was found for the appendix {}.'));
+    });
+
+    it('should error for no type', async () => {
+      return expect(() => parser.jsonToAppendix({ $: {} }))
+        .toThrow(new Error('No type was found for the appendix {"$":{}}.'));
+    });
+
+    it('should return null for an unknown type', async () => {
+      return expect(parser.jsonToAppendix({ $: { type: 'unknown' } })).toBe(null);
+    });
+
+    it('should return an appendix for an image for a known type', async () => {
+      return expect(parser.jsonToAppendix({ $: { type: 'dummy' } })).toBe(dummyAppendix);
     });
   });
 });

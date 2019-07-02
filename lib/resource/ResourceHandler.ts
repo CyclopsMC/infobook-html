@@ -1,9 +1,12 @@
 /**
  * Allows Minecraft resources to be used.
  */
+import {join} from "path";
+
 export class ResourceHandler {
 
   private readonly translations: {[language: string]: {[key: string]: string}} = {};
+  private readonly resourcePackBasePaths: {[resourcePackId: string]: string} = {};
 
   /**
    * @returns {string[]} All available language keys.
@@ -44,6 +47,27 @@ export class ResourceHandler {
       }
     }
     return value;
+  }
+
+  public setResourcePackBasePath(resourcePackId: string, basePath: string) {
+    if (this.resourcePackBasePaths[resourcePackId]) {
+      throw new Error(`Tried overwriting a resource pack base path for '${resourcePackId}'`);
+    }
+    this.resourcePackBasePaths[resourcePackId] = basePath;
+  }
+
+  public expandResourcePath(resourceKey: string): string {
+    const separator = resourceKey.indexOf(':');
+    if (separator < 0) {
+      throw new Error(`Invalid resource key for expansion: ${resourceKey}`);
+    }
+    const resourcePackId = resourceKey.substr(0, separator);
+    const basePath = this.resourcePackBasePaths[resourcePackId];
+    if (!basePath) {
+      throw new Error(`Failed to expand unknown resource pack id for resource path: ${resourceKey}`);
+    }
+    const suffix = resourceKey.substr(separator + 1);
+    return join(basePath, suffix);
   }
 
 }
