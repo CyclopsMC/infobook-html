@@ -11,7 +11,8 @@
   "author": "Ruben Taelman <rubensworks@gmail.com>",
   "license": "MIT",
   "bin": {
-    "generate-cyclops-infobook-html": "bin/generate-infobook-html.js"
+    "generate-cyclops-infobook-html": "bin/generate-infobook-html.js",
+    "generate-mod-metadata": "bin/generate-mod-metadata.js"
   },
   "files": [
     "bin/**/*.d.ts",
@@ -75,12 +76,17 @@
     "@types/mkdirp": "^0.5.2",
     "@types/ncp": "^2.0.1",
     "@types/node": "^12.0.2",
+    "@types/node-fetch": "^2.3.7",
     "@types/pug": "^2.0.4",
+    "@types/rimraf": "^2.0.2",
     "@types/xml2js": "^0.4.4",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
+    "mvn-artifact-download": "^4.0.0",
     "ncp": "^2.0.0",
+    "node-fetch": "^2.6.0",
     "pug": "^2.0.3",
+    "rimraf": "^2.6.3",
     "xml2js": "^0.4.19"
   }
 }

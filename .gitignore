@@ -4,5 +4,9 @@ node_modules
 *.js
 *.js.map
 config.json
+modpack.json
+mods.json
 coverage
 out
+cyclops_registries
+server
