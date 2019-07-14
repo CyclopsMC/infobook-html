@@ -5,6 +5,7 @@ import {ncp} from "ncp";
 import fetch from 'node-fetch';
 import {join} from "path";
 import rimraf = require('rimraf');
+import {Parse} from "unzip";
 import {promisify} from "util";
 
 /**
@@ -134,6 +135,56 @@ export class ModLoader {
   public async copyRegistries(target: string) {
     process.stdout.write('Copying registries...\n');
     await promisify(ncp)(join(this.path, 'cyclops_registries'), target);
+  }
+
+  /**
+   * Extract the Minecraft assets from the server jar
+   */
+  public async extractMinecraftAssets() {
+    process.stdout.write('Extracting minecraft assets...\n');
+
+    if (!fs.existsSync(join(this.path, 'mc_assets'))) {
+      await fs.promises.mkdir(join(this.path, 'mc_assets'));
+    }
+
+    // Find Minecraft jar
+    let jar: string = null;
+    for (const file of await fs.promises.readdir(this.path)) {
+      if (file.startsWith('minecraft_server') && file.endsWith('.jar')) {
+        jar = join(this.path, file);
+      }
+    }
+
+    // Error if no jar was found
+    if (!jar) {
+      throw new Error('Could not find a valid minecraft server in ' + this.path);
+    }
+
+    // Unzip the jar
+    await new Promise((resolve, reject) => {
+      fs.createReadStream(jar)
+        .pipe(Parse())
+        .on('entry', (entry) => {
+          const fileName = entry.path;
+          if (fileName.startsWith('assets/minecraft/lang/en_us.lang')) {
+            entry.pipe(fs.createWriteStream(join(this.path, 'mc_assets', 'en_us.lang')));
+            resolve();
+          } else {
+            entry.autodrain();
+          }
+        })
+        .on('error', reject)
+        .on('end', resolve);
+    });
+  }
+
+  /**
+   * Copy the resulting minecraft asset files to a target path.
+   * @param {string} target A target path.
+   */
+  public async copyMinecraftAssets(target: string) {
+    process.stdout.write('Copying assets...\n');
+    await promisify(ncp)(join(this.path, 'mc_assets'), target);
   }
 
   /**
