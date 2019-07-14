@@ -1,4 +1,4 @@
-import {promises as fs} from "fs";
+import {promises as fs, readFileSync} from "fs";
 import {join} from 'path';
 import {ResourceHandler} from "./ResourceHandler";
 
@@ -18,6 +18,46 @@ export class ResourceLoader {
    */
   public getResourceHandler(): ResourceHandler {
     return this.resourceHandler;
+  }
+
+  /**
+   * Load all icon files from the given path.
+   * @param {string} iconsPath Path to an directory containing icon files.
+   * @returns {Promise<void>} A promise resolving when loading is done.
+   */
+  public async loadIcons(iconsPath: string) {
+    const iconNames = await fs.readdir(iconsPath);
+    for (const iconName of iconNames) {
+      const split = iconName.split("__");
+      const namespace = split[0];
+      const path = split[1];
+      const meta = parseInt(split[2], 10);
+      let nbt = '';
+      if (split.length > 3) {
+        nbt = split.slice(3, split.length).join(":");
+      }
+      this.resourceHandler.addIcon(namespace, path, meta, nbt, join(iconsPath, iconName));
+    }
+  }
+
+  /**
+   * Load all item translation keys from the 'item_translation_keys.json' file.
+   * @param {string} registriesPath A registries path.
+   * @returns {Promise<void>} A promise resolving when loading is done.
+   */
+  public async loadItemTranslationKeys(registriesPath: string) {
+    const registry = JSON.parse(readFileSync(join(registriesPath, 'item_translation_keys.json'), "utf8"));
+    for (const entry of registry.items) {
+      this.resourceHandler.addItemTranslationKey(entry.item, entry.translationKey);
+    }
+  }
+
+  /**
+   * Load all Minecraft assets.
+   * @param {string} assetsPath An assets path.
+   */
+  public async loadMinecraftAssets(assetsPath: string) {
+    await this.loadAssetsLangFile('minecraft', 'en_us', join(assetsPath, 'en_us.lang'));
   }
 
   /**

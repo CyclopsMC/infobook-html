@@ -2,11 +2,80 @@
  * Allows Minecraft resources to be used.
  */
 import {join} from "path";
+import {IItem} from "../infobook/appendix/InfoBookAppendixHandlerCraftingRecipe";
 
 export class ResourceHandler {
 
   private readonly translations: {[language: string]: {[key: string]: string}} = {};
   private readonly resourcePackBasePaths: {[resourcePackId: string]: string} = {};
+  private readonly icons: IItemKeyedRegistry = {};
+  private readonly itemTranslationKeys: IItemKeyedRegistry = {};
+
+  /**
+   * Split an item id like "minecraft:stone" into namespace an path.
+   * @param {string} itemId An item id.
+   * @returns {{namespace: string; path: string}} Namespace and path.
+   */
+  public static splitItemId(itemId: string): { namespace: string, path: string } {
+    const split = itemId.split(':');
+    const namespace = split[0];
+    const path = split[1];
+    return { namespace, path };
+  }
+
+  /**
+   * Add an entry to a {@llink IItemKeyedRegistry}.
+   * @param {string} namespace The namespace.
+   * @param {string} path The path.
+   * @param {number} meta The meta.
+   * @param {string} nbt The NBT. (empty string represents no NBT)
+   * @param {string} value The value.
+   */
+  protected static addItemKeyedRegistryEntry(registry: IItemKeyedRegistry, namespace: string, path: string,
+                                             meta: number, nbt: string, value: string) {
+    let paths = registry[namespace];
+    if (!paths) {
+      paths = registry[namespace] = {};
+    }
+    let metas = paths[path];
+    if (!metas) {
+      metas = paths[path] = {};
+    }
+    let nbts = metas[meta];
+    if (!nbts) {
+      nbts = metas[meta] = {};
+    }
+    nbts[nbt] = value;
+  }
+
+  /**
+   * Get an value from a {@llink IItemKeyedRegistry}.
+   * @param {string} namespace The namespace.
+   * @param {string} path The path.
+   * @param {number} meta The meta.
+   * @param {string} nbt The NBT. (empty string represents no NBT)
+   * @return The value.
+   */
+  protected static getItemKeyedRegistryEntry(registry: IItemKeyedRegistry, namespace: string, path: string,
+                                             meta: number, nbt: string = ''): string {
+    const paths = registry[namespace];
+    if (!paths) {
+      return null;
+    }
+    const metas = paths[path];
+    if (!metas) {
+      return null;
+    }
+    const nbts = metas[meta];
+    if (!nbts) {
+      return null;
+    }
+    let file = nbts[nbt];
+    if (!file && !nbt) {
+      file = nbts[Object.keys(nbts)[0]]; // Take the first NBT-tagged item if none without NBT could be found
+    }
+    return file;
+  }
 
   /**
    * @returns {string[]} All available language keys.
@@ -49,6 +118,11 @@ export class ResourceHandler {
     return value;
   }
 
+  /**
+   * Set the base path for resource keys.
+   * @param {string} resourcePackId A resource pack id.
+   * @param {string} basePath An absolute base path.
+   */
   public setResourcePackBasePath(resourcePackId: string, basePath: string) {
     if (this.resourcePackBasePaths[resourcePackId]) {
       throw new Error(`Tried overwriting a resource pack base path for '${resourcePackId}'`);
@@ -56,6 +130,11 @@ export class ResourceHandler {
     this.resourcePackBasePaths[resourcePackId] = basePath;
   }
 
+  /**
+   * Get the full path corresponding to a resource key.
+   * @param {string} resourceKey A resource key.
+   * @returns {string} A full file path.
+   */
   public expandResourcePath(resourceKey: string): string {
     const separator = resourceKey.indexOf(':');
     if (separator < 0) {
@@ -70,4 +149,52 @@ export class ResourceHandler {
     return join(basePath, suffix);
   }
 
+  /**
+   * Add an icon file.
+   * @param {string} namespace The icon namespace.
+   * @param {string} path The icon path.
+   * @param {number} meta The icon meta.
+   * @param {string} nbt The icon NBT. (empty string represents no NBT)
+   * @param {string} file The icon file path.
+   */
+  public addIcon(namespace: string, path: string, meta: number, nbt: string, file: string) {
+    ResourceHandler.addItemKeyedRegistryEntry(this.icons, namespace, path, meta, nbt, file);
+  }
+
+  /**
+   * Get an icon file.
+   * @param {string} itemId The icon namespace:path.
+   * @param {number} meta The icon meta.
+   * @param {string} nbt The icon NBT. (empty string represents no NBT)
+   * @return The icon file path or null.
+   */
+  public getItemIconFile(itemId: string, meta: number, nbt: string = ''): string {
+    const { namespace, path } = ResourceHandler.splitItemId(itemId);
+    return ResourceHandler.getItemKeyedRegistryEntry(this.icons, namespace, path, meta, nbt);
+  }
+
+  /**
+   * Add an item translation key.
+   * @param {IItem} item An item.
+   * @param {string} file The file path.
+   */
+  public addItemTranslationKey(item: IItem, file: string) {
+    const { namespace, path } = ResourceHandler.splitItemId(item.item);
+    ResourceHandler.addItemKeyedRegistryEntry(this.itemTranslationKeys, namespace, path, item.data, item.nbt, file);
+  }
+
+  /**
+   * Get an item translation key.
+   * @param {IItem} item An item.
+   * @return The translation key or null.
+   */
+  public getItemTranslationKey(item: IItem): string {
+    const { namespace, path } = ResourceHandler.splitItemId(item.item);
+    return ResourceHandler.getItemKeyedRegistryEntry(this.itemTranslationKeys, namespace, path, item.data, item.nbt);
+  }
+
+}
+
+export interface IItemKeyedRegistry {
+  [namespace: string]: {[path: string]: {[meta: number]: {[nbt: string]: string}}};
 }

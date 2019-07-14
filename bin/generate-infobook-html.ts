@@ -22,8 +22,30 @@ async function create() {
   // Create infobook from config
   const config = JSON.parse(fs.readFileSync(args._[0], "utf8"));
 
+  // Check if registries have been generated
+  if (!fs.existsSync('registries')) {
+    process.stderr.write(
+      'Could not find a "registries" folder, make sure to create one with generate-mod-metadata.\n');
+    process.exit(1);
+  }
+  // Check if registries have been generated
+  if (!fs.existsSync('mc_assets')) {
+    process.stderr.write(
+      'Could not find a "mc_assets" folder, make sure to create one with generate-mod-metadata.\n');
+    process.exit(1);
+  }
+  // Check if icons are available
+  if (!fs.existsSync('icons')) {
+    process.stderr.write(
+      'Could not find a "icons" folder, make sure to create one with output from the IconExporter mod.\n');
+    process.exit(1);
+  }
+
   // Read resources
   const resourceLoader = new ResourceLoader();
+  await resourceLoader.loadIcons('icons');
+  await resourceLoader.loadItemTranslationKeys('registries');
+  await resourceLoader.loadMinecraftAssets('mc_assets');
   await resourceLoader.loadAll(config.baseDir, config.resources);
 
   // Setup infobook loader
