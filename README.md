@@ -69,6 +69,14 @@ Before you start this phase, make sure the following files and directories are p
 {
   "baseDir": "/Users/kroeser/Documents/Development/IntegratedDynamics/",
   "baseUrl": "http://localhost:8080/",
+  "colors": {
+    "h": "#16384c",
+    "border": "#3381ad",
+    "border_light": "#49b8f7",
+    "border_muted": "#9fcae3",
+    "main_background": "#e6d6ac",
+    "outer_background": "#09171f"
+  },
   "title": "Integrated Dynamics - On the Dynamics of Integration",
   "sectionsFile": "src/main/resources/assets/integrateddynamics/info/on_the_dynamics_of_integration.xml",
   "resources": [

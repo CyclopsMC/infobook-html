@@ -86,6 +86,7 @@ export class HtmlInfoBookSerializer {
       const fileContents = this.templateIndex({
         baseUrl: context.baseUrl,
         breadcrumbs: context.breadcrumbs.concat([{ name: sectionTitle }]),
+        colors: context.colors,
         language: context.language,
         mainTitle: context.title,
         sectionTitle,
@@ -106,6 +107,7 @@ export class HtmlInfoBookSerializer {
       const fileContents = this.templateSection({
         baseUrl: context.baseUrl,
         breadcrumbs: context.breadcrumbs.concat([{ name: sectionTitle }]),
+        colors: context.colors,
         language: context.language,
         mainTitle: context.title,
         sectionAppendices: section.appendix
@@ -188,4 +190,5 @@ export interface ISerializeContext {
   path: string;
   resourceHandler: ResourceHandler;
   title: string;
+  colors: {[key: string]: string};
 }

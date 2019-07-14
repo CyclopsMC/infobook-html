@@ -64,6 +64,7 @@ async function create() {
   const infoBookSerializer = new HtmlInfoBookSerializer();
   await infoBookSerializer.serialize(infoBook, {
     baseUrl: config.baseUrl,
+    colors: config.colors,
     path: args._[1],
     resourceHandler: resourceLoader.getResourceHandler(),
     title: config.title,

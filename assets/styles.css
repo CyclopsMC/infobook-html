@@ -1,14 +1,14 @@
 body {
     font-family: 'Open Sans', sans-serif;
-    background: #09171f;
+    background: var(--color-outer-background);
     margin: 0;
 }
 
 header {
     font-weight: bolder;
     padding: 10px;
-    background: #3381ad;
-    background-image: linear-gradient(to right, #49b8f7, #49b8f7, #3381ad);
+    background: var(--color-border);
+    background-image: linear-gradient(to right, var(--color-border-light), var(--color-border-light), var(--color-border));
 }
 
 footer {
@@ -26,23 +26,23 @@ footer a:hover {
 }
 
 h1, h2, h3, h4 {
-    color: #16384c;
+    color: var(--color-h);
     font-family: 'Droid Sans', sans-serif;
 }
 
 .breadcrumbs ul {
     margin: 0;
     padding: 0;
-    color: white;
+    color: #d3d3d3;
     font-family: 'Droid Sans', sans-serif;
 }
 
 .breadcrumbs ul li a {
-    color: white;
+    color: #d3d3d3;
 }
 
 .breadcrumbs ul li a:hover {
-    color: #8ee4ff;
+    color: white;
 }
 
 .breadcrumbs li {
@@ -56,7 +56,7 @@ h1, h2, h3, h4 {
 }
 
 .main-outer {
-    background: #e6d6ac;
+    background: var(--color-main-background);
 }
 
 section.main {
@@ -82,7 +82,7 @@ a:hover {
     margin: 5px;
     text-align: center;
     border-radius: 25px;
-    border: solid 2px #3381ad;
+    border: solid 2px var(--color-border);
     display: inline-block;
     padding: 2px;
 }
@@ -90,11 +90,11 @@ a:hover {
 .appendix-header {
     width: 200px;
     display: inline-block;
-    border: solid 2px #3381ad;
+    border: solid 2px var(--color-border);
     border-top: none;
     border-radius: 0 0 25px 25px;
-    background-color: #9fcae3;
-    color: #16384c;
+    background-color: var(--color-border-muted);
+    color: var(--color-h);
     font-weight: bold;
     font-size: 18px;
     font-family: 'Droid Sans', sans-serif;
