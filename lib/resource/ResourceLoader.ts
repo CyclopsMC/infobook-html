@@ -121,6 +121,12 @@ export class ResourceLoader {
     if ((await fs.stat(langDir)).isDirectory()) {
       await this.loadAssetsLang(mcmeta, modid, langDir);
     }
+
+    // Handle advancements
+    const advancementsDir = join(fullPath, 'advancements');
+    if ((await fs.stat(langDir)).isDirectory()) {
+      await this.loadAssetsAdvancements(modid, advancementsDir, '');
+    }
   }
 
   /**
@@ -161,4 +167,41 @@ export class ResourceLoader {
     this.resourceHandler.addTranslations(language, translations);
   }
 
+  /**
+   * Load the advancements within the given folder, recursively.
+   * @param {string} modid A mod id.
+   * @param {string} advancementsDir A folder.
+   * @param {string} idPrefix The prefix to use for advancement id.
+   */
+  public async loadAssetsAdvancements(modid: string, advancementsDir: string, idPrefix: string) {
+    const entries = await fs.readdir(advancementsDir);
+
+    for (const entry of entries) {
+      const entryFullPath = join(advancementsDir, entry);
+      const entryId = idPrefix + '/' + entry;
+      if ((await fs.stat(entryFullPath)).isDirectory()) {
+        await this.loadAssetsAdvancements(modid, entryFullPath, entryId);
+      } else {
+        await this.loadAssetsAdvancement(modid, entryFullPath, entryId);
+      }
+    }
+  }
+
+  /**
+   * Load the advancement in the given file.
+   * @param {string} modid A mod id.
+   * @param {string} advancementsFile A file.
+   * @param {string} id The id of the advancement.
+   */
+  public async loadAssetsAdvancement(modid: string, advancementsFile: string, id: string) {
+    const contents = JSON.parse((await fs.readFile(advancementsFile)).toString('utf8'));
+    const itemIcon = contents.display.icon;
+    const title = contents.display.title.translate;
+    const description = contents.display.description.translate;
+
+    // Remove first slash and '.json' suffix.
+    id = id.substr(1, id.length - 6);
+
+    this.resourceHandler.addAdvancement({ itemIcon, title, description }, modid + ':' + id);
+  }
 }

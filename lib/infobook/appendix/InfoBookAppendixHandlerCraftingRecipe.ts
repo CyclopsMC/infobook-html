@@ -1,9 +1,10 @@
 import * as fs from "fs";
-import {basename, join} from "path";
+import {join} from "path";
 import {compileFile as compilePug, compileTemplate} from "pug";
 import {ResourceHandler} from "../../resource/ResourceHandler";
-import {ISerializeContext} from "../../serialize/HtmlInfoBookSerializer";
+import {HtmlInfoBookSerializer, ISerializeContext} from "../../serialize/HtmlInfoBookSerializer";
 import {IFileWriter, IInfoAppendix} from "../IInfoAppendix";
+import {IItem} from "../IItem";
 import {IInfoBookAppendixHandler} from "./IInfoBookAppendixHandler";
 
 /**
@@ -14,7 +15,6 @@ export class InfoBookAppendixHandlerCraftingRecipe implements IInfoBookAppendixH
   private readonly resourceHandler: ResourceHandler;
   private readonly registry: IRecipeRegistry;
   private readonly templateCraftingRecipe: compileTemplate;
-  private readonly templateItem: compileTemplate;
 
   constructor(resourceHandler: ResourceHandler, registriesPath: string, recipeOverrides: any) {
     this.resourceHandler = resourceHandler;
@@ -23,7 +23,6 @@ export class InfoBookAppendixHandlerCraftingRecipe implements IInfoBookAppendixH
       this.registry = { ... this.registry, ...recipeOverrides };
     }
     this.templateCraftingRecipe = compilePug(__dirname + '/../../../template/appendix/crafting_recipe.pug');
-    this.templateItem = compilePug(__dirname + '/../../../template/appendix/item.pug');
   }
 
   public createAppendix(data: any): IInfoAppendix {
@@ -42,7 +41,7 @@ export class InfoBookAppendixHandlerCraftingRecipe implements IInfoBookAppendixH
 
     return {
       getName: (context) => this.resourceHandler.getTranslation('tile.workbench.name', context.language),
-      toHtml: (context: ISerializeContext, fileWriter: IFileWriter) => {
+      toHtml: (context: ISerializeContext, fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer) => {
         // Prepare input array
         const inputs = "|".repeat(9).split("|").map(() => []);
 
@@ -66,34 +65,18 @@ export class InfoBookAppendixHandlerCraftingRecipe implements IInfoBookAppendixH
             }
             const outputIndex = y * 3 + x;
             for (const item of items) {
-              inputs[outputIndex].push(this.createItemDisplay(context.language, fileWriter, item));
+              inputs[outputIndex].push(serializer.createItemDisplay(this.resourceHandler,
+                context.language, fileWriter, item));
             }
           }
         }
 
-        const output = this.createItemDisplay(context.language, fileWriter, recipe.output);
+        const output = serializer.createItemDisplay(this.resourceHandler,
+          context.language, fileWriter, recipe.output);
 
-        return this.templateCraftingRecipe({inputs, output});
+        return this.templateCraftingRecipe({ inputs, output });
       },
     };
-  }
-
-  public createItemDisplay(language: string, fileWriter: IFileWriter, item: IItem): string {
-    if (item.item === 'minecraft:air') {
-      return '<div class="item">&nbsp;</div>';
-    }
-
-    const icon = this.resourceHandler.getItemIconFile(item.item, item.data);
-    if (!icon) {
-      throw new Error(`Could not find an icon for item ${JSON.stringify(item)}`);
-    }
-    const iconUrl = fileWriter.write('icons/' + basename(icon), fs.createReadStream(icon));
-
-    return this.templateItem({
-      count: item.count || 1,
-      icon: iconUrl,
-      name: this.resourceHandler.getTranslation(this.resourceHandler.getItemTranslationKey(item), language),
-    });
   }
 
 }
@@ -105,11 +88,4 @@ export interface IRecipeRegistry {
     width: number;
     height: number;
   }];
-}
-
-export interface IItem {
-  item: string;
-  data: number;
-  count?: number;
-  nbt?: string;
 }

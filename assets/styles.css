@@ -183,3 +183,49 @@ div.item .item-count {
     vertical-align: middle;
     margin: 10px;
 }
+
+.advancement_rewards {
+    width: 400px;
+}
+
+.advancement_rewards .advancements li {
+    list-style-type: circle;
+}
+
+.advancement_rewards {
+    text-align: left;
+}
+
+.advancement_rewards .advancements .advancement-title {
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.advancement_rewards .advancements .advancement-title::after {
+    content: ": ";
+}
+
+.advancement_rewards .advancements .advancement-description {
+    font-size: 12px;
+}
+
+.advancement_rewards .rewards-string {
+    font-weight: bold;
+}
+
+.advancement_rewards .rewards-string::after {
+    content: ": ";
+}
+
+.advancement_rewards table.rewards {
+    margin: 10px;
+    margin-left:auto;
+    margin-right:auto;
+    vertical-align: middle;
+    border-collapse: collapse;
+}
+
+.advancement_rewards table.rewards td {
+    padding: 0;
+    margin: 0;
+}

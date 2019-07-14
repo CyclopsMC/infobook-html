@@ -1,0 +1,11 @@
+div(class="advancement_rewards")
+    ul(class="advancements")
+        each advancement in advancements
+            li
+                span(class="advancement-title")=advancement.title
+                span(class="advancement-description")=advancement.description
+    span(class="rewards-string")=rewardsString
+    table(class="rewards")
+        tr
+            each reward in rewards
+                td !{reward}

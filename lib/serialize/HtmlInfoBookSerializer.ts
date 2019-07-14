@@ -1,12 +1,14 @@
-import {createWriteStream, promises as fs} from "fs";
+import {createReadStream, createWriteStream, promises as fs} from "fs";
 import mkdirp = require("mkdirp");
 import {ncp} from "ncp";
-import {join} from "path";
+import {basename, join} from "path";
 import {compileFile as compilePug, compileTemplate} from "pug";
 import {Readable} from "stream";
 import {promisify} from "util";
+import {IFileWriter} from "../infobook/IInfoAppendix";
 import {IInfoBook} from "../infobook/IInfoBook";
 import {IInfoSection} from "../infobook/IInfoSection";
+import {IItem} from "../infobook/IItem";
 import {ResourceHandler} from "../resource/ResourceHandler";
 
 /**
@@ -17,11 +19,13 @@ export class HtmlInfoBookSerializer {
   private readonly templateIndex: compileTemplate;
   private readonly templateSection: compileTemplate;
   private readonly appendixWrapper: compileTemplate;
+  private readonly templateItem: compileTemplate;
 
   constructor() {
     this.templateIndex = compilePug(__dirname + '/../../template/index.pug');
     this.templateSection = compilePug(__dirname + '/../../template/section.pug');
     this.appendixWrapper = compilePug(__dirname + '/../../template/appendix/appendix_base.pug');
+    this.templateItem = compilePug(__dirname + '/../../template/appendix/item.pug');
   }
 
   public async serialize(infobook: IInfoBook, context: ISerializeContext) {
@@ -113,7 +117,7 @@ export class HtmlInfoBookSerializer {
         sectionAppendices: section.appendix
           .filter((appendix) => appendix) // TODO: rm
           .map((appendix) => this.appendixWrapper({
-            appendixContents: appendix.toHtml(context, fileWriter),
+            appendixContents: appendix.toHtml(context, fileWriter, this),
             appendixName: appendix.getName ? appendix.getName(context) : null,
           })),
         sectionParagraphs: section.paragraphTranslationKeys
@@ -125,6 +129,25 @@ export class HtmlInfoBookSerializer {
 
       return { filePath, sectionTitle };
     }
+  }
+
+  public createItemDisplay(resourceHandler: ResourceHandler, language: string,
+                           fileWriter: IFileWriter, item: IItem): string {
+    if (item.item === 'minecraft:air') {
+      return '<div class="item">&nbsp;</div>';
+    }
+
+    const icon = resourceHandler.getItemIconFile(item.item, item.data);
+    if (!icon) {
+      throw new Error(`Could not find an icon for item ${JSON.stringify(item)}`);
+    }
+    const iconUrl = fileWriter.write('icons/' + basename(icon), createReadStream(icon));
+
+    return this.templateItem({
+      count: item.count || 1,
+      icon: iconUrl,
+      name: resourceHandler.getTranslation(resourceHandler.getItemTranslationKey(item), language),
+    });
   }
 
   protected async ensureDirExists(dirPath: string) {
@@ -188,6 +211,7 @@ export interface ISerializeContext {
   breadcrumbs?: { url?: string, name: string }[];
   language?: string;
   path: string;
+  modId: string;
   resourceHandler: ResourceHandler;
   title: string;
   colors: {[key: string]: string};

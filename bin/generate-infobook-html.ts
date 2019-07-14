@@ -1,5 +1,8 @@
 import * as fs from "fs";
 import minimist = require("minimist");
+import {
+  InfoBookAppendixHandlerAdvancementRewards,
+} from "../lib/infobook/appendix/InfoBookAppendixHandlerAdvancementRewards";
 import {InfoBookAppendixHandlerCraftingRecipe} from "../lib/infobook/appendix/InfoBookAppendixHandlerCraftingRecipe";
 import {InfoBookAppendixHandlerImage} from "../lib/infobook/appendix/InfoBookAppendixHandlerImage";
 import {IInfoBook} from "../lib/infobook/IInfoBook";
@@ -51,6 +54,8 @@ async function create() {
 
   // Setup infobook loader
   const infoBookInitializer = new InfoBookInitializer(config);
+  infoBookInitializer.registerAppendixHandler('advancement_rewards',
+    new InfoBookAppendixHandlerAdvancementRewards(resourceLoader.getResourceHandler()));
   infoBookInitializer.registerAppendixHandler('crafting_recipe',
     new InfoBookAppendixHandlerCraftingRecipe(resourceLoader.getResourceHandler(),
       'registries', config.recipeOverrides));
@@ -65,6 +70,7 @@ async function create() {
   await infoBookSerializer.serialize(infoBook, {
     baseUrl: config.baseUrl,
     colors: config.colors,
+    modId: config.modId,
     path: args._[1],
     resourceHandler: resourceLoader.getResourceHandler(),
     title: config.title,

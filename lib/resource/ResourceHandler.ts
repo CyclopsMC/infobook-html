@@ -1,15 +1,16 @@
+import {join} from "path";
+import {IItem} from "../infobook/IItem";
+
 /**
  * Allows Minecraft resources to be used.
  */
-import {join} from "path";
-import {IItem} from "../infobook/appendix/InfoBookAppendixHandlerCraftingRecipe";
-
 export class ResourceHandler {
 
   private readonly translations: {[language: string]: {[key: string]: string}} = {};
   private readonly resourcePackBasePaths: {[resourcePackId: string]: string} = {};
   private readonly icons: IItemKeyedRegistry = {};
   private readonly itemTranslationKeys: IItemKeyedRegistry = {};
+  private readonly advancements: {[advancementId: string]: IAdvancement} = {};
 
   /**
    * Split an item id like "minecraft:stone" into namespace an path.
@@ -193,8 +194,39 @@ export class ResourceHandler {
     return ResourceHandler.getItemKeyedRegistryEntry(this.itemTranslationKeys, namespace, path, item.data, item.nbt);
   }
 
+  /**
+   * Add an advancement.
+   * @param {IAdvancement} advancement An advancement.
+   * @param {string} id An advancement id.
+   */
+  public addAdvancement(advancement: IAdvancement, id: string) {
+    if (this.advancements[id]) {
+      throw new Error(`Tried overwriting an advancement for '${id}'`);
+    }
+    this.advancements[id] = advancement;
+  }
+
+  /**
+   * Get an advancement.
+   * @param {string} id An advancement id.
+   * @return The advancement.
+   */
+  public getAdvancement(id: string): IAdvancement {
+    const advancement = this.advancements[id];
+    if (!advancement) {
+      throw new Error(`Could not find an advancement with id '${id}'`);
+    }
+    return advancement;
+  }
+
 }
 
 export interface IItemKeyedRegistry {
   [namespace: string]: {[path: string]: {[meta: number]: {[nbt: string]: string}}};
+}
+
+export interface IAdvancement {
+  itemIcon: IItem;
+  title: string;
+  description: string;
 }

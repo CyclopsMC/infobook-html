@@ -79,6 +79,7 @@ Before you start this phase, make sure the following files and directories are p
   },
   "title": "Integrated Dynamics - On the Dynamics of Integration",
   "sectionsFile": "src/main/resources/assets/integrateddynamics/info/on_the_dynamics_of_integration.xml",
+  "modId": "integrateddynamics",
   "resources": [
     "src/main/resources/"
   ],
