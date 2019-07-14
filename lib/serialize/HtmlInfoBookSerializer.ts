@@ -16,14 +16,18 @@ export class HtmlInfoBookSerializer {
 
   private readonly templateIndex: compileTemplate;
   private readonly templateSection: compileTemplate;
+  private readonly appendixWrapper: compileTemplate;
 
   constructor() {
     this.templateIndex = compilePug(__dirname + '/../../template/index.pug');
     this.templateSection = compilePug(__dirname + '/../../template/section.pug');
+    this.appendixWrapper = compilePug(__dirname + '/../../template/appendix/appendix_base.pug');
   }
 
   public async serialize(infobook: IInfoBook, context: ISerializeContext) {
     await this.ensureDirExists(context.path);
+    await this.ensureDirExists(join(context.path, 'assets'));
+    await this.ensureDirExists(join(context.path, 'assets', 'icons'));
 
     // Serialize sections in all languages
     for (const language of context.resourceHandler.getLanguages()) {
@@ -106,7 +110,10 @@ export class HtmlInfoBookSerializer {
         mainTitle: context.title,
         sectionAppendices: section.appendix
           .filter((appendix) => appendix) // TODO: rm
-          .map((appendix) => appendix.toHtml(fileWriter)),
+          .map((appendix) => this.appendixWrapper({
+            appendixContents: appendix.toHtml(context, fileWriter),
+            appendixName: appendix.getName ? appendix.getName(context) : null,
+          })),
         sectionParagraphs: section.paragraphTranslationKeys
           .map((key) => context.resourceHandler.getTranslation(key, context.language))
           .map((value) => this.formatString(value)),

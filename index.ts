@@ -1,4 +1,5 @@
 export * from "./lib/infobook/appendix/IInfoBookAppendixHandler";
+export * from "./lib/infobook/appendix/InfoBookAppendixHandlerCraftingRecipe";
 export * from "./lib/infobook/appendix/InfoBookAppendixHandlerImage";
 export * from "./lib/infobook/IInfoAppendix";
 export * from "./lib/infobook/IInfoBook";

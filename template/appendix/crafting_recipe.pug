@@ -1,0 +1,43 @@
+div(class="crafting_recipe")
+    table(class="inputs")
+        tr
+            td
+                ul(class="alternatives")
+                    each alt in inputs[0]
+                        li !{alt}
+            td
+                ul(class="alternatives")
+                    each alt in inputs[1]
+                        li !{alt}
+            td
+                ul(class="alternatives")
+                    each alt in inputs[2]
+                        li !{alt}
+        tr
+            td
+                ul(class="alternatives")
+                    each alt in inputs[3]
+                        li !{alt}
+            td
+                ul(class="alternatives")
+                    each alt in inputs[4]
+                        li !{alt}
+            td
+                ul(class="alternatives")
+                    each alt in inputs[5]
+                        li !{alt}
+        tr
+            td
+                ul(class="alternatives")
+                    each alt in inputs[6]
+                        li !{alt}
+            td
+                ul(class="alternatives")
+                    each alt in inputs[7]
+                        li !{alt}
+            td
+                ul(class="alternatives")
+                    each alt in inputs[8]
+                        li !{alt}
+    div(class="arrow") &rarr;
+    div(class="output") !{output}

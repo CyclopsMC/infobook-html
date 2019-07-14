@@ -1,18 +1,14 @@
 body {
     font-family: 'Open Sans', sans-serif;
     background: #09171f;
-    margin: 0px;
+    margin: 0;
 }
 
 header {
-    background: #e6d6ac;
-}
-
-header .inner {
+    font-weight: bolder;
     padding: 10px;
-    margin-left: 10px;
-    background: #9fcae3;
-    border-radius: 25px 0 0 25px;
+    background: #3381ad;
+    background-image: linear-gradient(to right, #49b8f7, #49b8f7, #3381ad);
 }
 
 footer {
@@ -31,17 +27,18 @@ footer a:hover {
 
 h1, h2, h3, h4 {
     color: #16384c;
+    font-family: 'Droid Sans', sans-serif;
 }
 
 .breadcrumbs ul {
     margin: 0;
     padding: 0;
-    background: #3381ad;
-    color: #55c7ff;
+    color: white;
+    font-family: 'Droid Sans', sans-serif;
 }
 
 .breadcrumbs ul li a {
-    color: #55c7ff;
+    color: white;
 }
 
 .breadcrumbs ul li a:hover {
@@ -77,11 +74,112 @@ a:hover {
     color: #4c4c4c;
 }
 
-.appendix {
+.appendix-wrapper {
     text-align: center;
+}
+
+.appendix {
+    margin: 5px;
+    text-align: center;
+    border-radius: 25px;
+    border: solid 2px #3381ad;
+    display: inline-block;
+    padding: 2px;
+}
+
+.appendix-header {
+    width: 200px;
+    display: inline-block;
+    border: solid 2px #3381ad;
+    border-top: none;
+    border-radius: 0 0 25px 25px;
+    background-color: #9fcae3;
+    color: #16384c;
+    font-weight: bold;
+    font-size: 18px;
+    font-family: 'Droid Sans', sans-serif;
+    position: relative;
+    top: -2px;
 }
 
 .appendix-image {
     image-rendering: pixelated;
     image-rendering: crisp-edges;
+    border-radius: 25px;
+    margin: 0;
+    position: relative;
+    top: 1px;
+}
+
+.crafting_recipe table.inputs {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 10px;
+    border-collapse: collapse;
+}
+
+.crafting_recipe table.inputs td {
+    padding: 0;
+}
+
+div.item {
+    padding: 2px;
+    border: 2px solid black;
+    border-right-color: white;
+    border-bottom-color: white;
+    height: 32px;
+    width: 32px;
+    text-align: right;
+}
+
+img.item-icon {
+    width: 32px;
+    height: 32px;
+}
+
+div.item .item-count {
+    color: white;
+    font-weight: bold;
+    position: relative;
+    top: -22px;
+    left: 2px;
+    font-size: 20px;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    font-family: "Courier New", monospace;
+}
+
+.crafting_recipe table.inputs ul {
+    margin: 0;
+    padding: 0;
+}
+
+.crafting_recipe table.inputs ul li {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.crafting_recipe table.inputs ul.alternatives li:not(:first-child) {
+    display: none;
+}
+
+.crafting_recipe table.inputs ul.alternatives-updating li:not(.item-variant-selected) {
+    display: none;
+}
+
+.crafting_recipe .arrow {
+    display: inline-block;
+    margin: 10px;
+    font-weight: bolder;
+    font-size: 50px;
+
+    vertical-align: middle;
+    position: relative;
+    top: -7px;
+}
+
+.crafting_recipe .output {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 10px;
 }

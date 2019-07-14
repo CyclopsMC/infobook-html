@@ -2,13 +2,21 @@
  * Datastructure for an info book appendix.
  */
 import {Readable} from "stream";
+import {ISerializeContext} from "../serialize/HtmlInfoBookSerializer";
 
 export interface IInfoAppendix {
   /**
+   * @param context The serialization context.
+   * @returns {string} The optional appendix type name.
+   */
+  getName?: (context: ISerializeContext) => string;
+
+  /**
+   * @param context The serialization context.
    * @param fileWriter A function that can be called for writing auxiliary files.
    * @returns {string} The HTML representation of this appendix.
    */
-  toHtml(fileWriter: IFileWriter): string;
+  toHtml(context: ISerializeContext, fileWriter: IFileWriter): string;
 }
 
 /**

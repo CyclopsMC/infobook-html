@@ -1,0 +1,9 @@
+div(class="appendix")
+    if appendixIcon || appendixName
+        div(class="appendix-header")
+            if appendixIcon
+                img(class="appendix-type-icon", src=appendixIcon, alt=appendixName)
+            if appendixName
+                span(class="appendix-type-name")=appendixName
+    .
+        !{appendixContents}

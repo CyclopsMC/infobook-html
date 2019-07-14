@@ -1,6 +1,7 @@
 import {createReadStream} from "fs";
 import {basename} from "path";
 import {ResourceHandler} from "../../resource/ResourceHandler";
+import {ISerializeContext} from "../../serialize/HtmlInfoBookSerializer";
 import {IFileWriter, IInfoAppendix} from "../IInfoAppendix";
 import {IInfoBookAppendixHandler} from "./IInfoBookAppendixHandler";
 
@@ -20,7 +21,7 @@ export class InfoBookAppendixHandlerImage implements IInfoBookAppendixHandler {
     const fileName = basename(data._);
     const { width, height } = data.$;
     return {
-      toHtml: (fileWriter: IFileWriter) => {
+      toHtml: (context: ISerializeContext, fileWriter: IFileWriter) => {
         const writtenPath = fileWriter.write(fileName, createReadStream(fullPath));
         return `<canvas class="appendix-image" style="background: url(${
           writtenPath}); width: ${width * 2}px; height: ${height * 2}px; background-size: 512px 512px;"></canvas>`;

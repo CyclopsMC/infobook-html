@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import minimist = require("minimist");
+import {InfoBookAppendixHandlerCraftingRecipe} from "../lib/infobook/appendix/InfoBookAppendixHandlerCraftingRecipe";
 import {InfoBookAppendixHandlerImage} from "../lib/infobook/appendix/InfoBookAppendixHandlerImage";
 import {IInfoBook} from "../lib/infobook/IInfoBook";
 import {InfoBookInitializer} from "../lib/infobook/InfoBookInitializer";
@@ -50,6 +51,9 @@ async function create() {
 
   // Setup infobook loader
   const infoBookInitializer = new InfoBookInitializer(config);
+  infoBookInitializer.registerAppendixHandler('crafting_recipe',
+    new InfoBookAppendixHandlerCraftingRecipe(resourceLoader.getResourceHandler(),
+      'registries', config.recipeOverrides));
   infoBookInitializer.registerAppendixHandler('image',
     new InfoBookAppendixHandlerImage(resourceLoader.getResourceHandler()));
 
