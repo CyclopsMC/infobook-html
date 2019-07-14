@@ -11,6 +11,7 @@ export class ResourceHandler {
   private readonly icons: IItemKeyedRegistry = {};
   private readonly itemTranslationKeys: IItemKeyedRegistry = {};
   private readonly advancements: {[advancementId: string]: IAdvancement} = {};
+  private readonly keybindings: {[keyId: string]: string} = {};
 
   /**
    * Split an item id like "minecraft:stone" into namespace an path.
@@ -217,6 +218,31 @@ export class ResourceHandler {
       throw new Error(`Could not find an advancement with id '${id}'`);
     }
     return advancement;
+  }
+
+  /**
+   * Add an keybinding.
+   * @param {string} id A keybinding id.
+   * @param {string} keybinding An keybinding.
+   */
+  public addKeybinding(id: string, keybinding: string) {
+    if (this.keybindings[id]) {
+      throw new Error(`Tried overwriting an keybinding for '${id}'`);
+    }
+    this.keybindings[id] = keybinding;
+  }
+
+  /**
+   * Get a keybinding.
+   * @param {string} id A keybinding id.
+   * @return The keybinding.
+   */
+  public getKeybinding(id: string): string {
+    const keybinding = this.keybindings[id];
+    if (!keybinding) {
+      throw new Error(`Could not find a keybinding with id '${id}'`);
+    }
+    return keybinding;
   }
 
 }

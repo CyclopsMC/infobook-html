@@ -5,6 +5,7 @@ import {
 } from "../lib/infobook/appendix/InfoBookAppendixHandlerAdvancementRewards";
 import {InfoBookAppendixHandlerCraftingRecipe} from "../lib/infobook/appendix/InfoBookAppendixHandlerCraftingRecipe";
 import {InfoBookAppendixHandlerImage} from "../lib/infobook/appendix/InfoBookAppendixHandlerImage";
+import {InfoBookAppendixHandlerKeybinding} from "../lib/infobook/appendix/InfoBookAppendixHandlerKeybinding";
 import {IInfoBook} from "../lib/infobook/IInfoBook";
 import {InfoBookInitializer} from "../lib/infobook/InfoBookInitializer";
 import {ResourceLoader} from "../lib/resource/ResourceLoader";
@@ -50,6 +51,7 @@ async function create() {
   await resourceLoader.loadIcons('icons');
   await resourceLoader.loadItemTranslationKeys('registries');
   await resourceLoader.loadMinecraftAssets('mc_assets');
+  await resourceLoader.loadKeybindings(config.keybindings);
   await resourceLoader.loadAll(config.baseDir, config.resources);
 
   // Setup infobook loader
@@ -61,6 +63,8 @@ async function create() {
       'registries', config.recipeOverrides));
   infoBookInitializer.registerAppendixHandler('image',
     new InfoBookAppendixHandlerImage(resourceLoader.getResourceHandler()));
+  infoBookInitializer.registerAppendixHandler('keybinding',
+    new InfoBookAppendixHandlerKeybinding(resourceLoader.getResourceHandler()));
 
   // Initialize book
   const infoBook: IInfoBook = await infoBookInitializer.initialize();

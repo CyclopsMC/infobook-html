@@ -229,3 +229,15 @@ div.item .item-count {
     padding: 0;
     margin: 0;
 }
+
+.keybinding {
+    width: 400px;
+}
+
+.keybinding .name {
+    font-weight: bold;
+}
+
+.keybinding .key {
+    font-size: 20px;
+}

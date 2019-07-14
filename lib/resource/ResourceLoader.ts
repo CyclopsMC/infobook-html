@@ -204,4 +204,14 @@ export class ResourceLoader {
 
     this.resourceHandler.addAdvancement({ itemIcon, title, description }, modid + ':' + id);
   }
+
+  /**
+   * Load the given keybindings.
+   * @param {{[p: string]: string}} keybindings Keybindings.
+   */
+  public loadKeybindings(keybindings: {[key: string]: string}) {
+    for (const key in keybindings) {
+      this.resourceHandler.addKeybinding(key, keybindings[key]);
+    }
+  }
 }
