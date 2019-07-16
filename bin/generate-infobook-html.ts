@@ -11,6 +11,7 @@ import {IInfoBook} from "../lib/infobook/IInfoBook";
 import {InfoBookInitializer} from "../lib/infobook/InfoBookInitializer";
 import {ResourceLoader} from "../lib/resource/ResourceLoader";
 import {HtmlInfoBookSerializer} from "../lib/serialize/HtmlInfoBookSerializer";
+import {join} from "path";
 
 // Process CLI args
 const args = minimist(process.argv.slice(2));
@@ -71,12 +72,13 @@ async function create() {
   const infoBook: IInfoBook = await infoBookInitializer.initialize();
 
   // Convert info book to HTML
+  const path = args._[1];
   const infoBookSerializer = new HtmlInfoBookSerializer();
   await infoBookSerializer.serialize(infoBook, {
     baseUrl: config.baseUrl,
     colors: config.colors,
     modId: config.modId,
-    path: args._[1],
+    path,
     resourceHandler: resourceLoader.getResourceHandler(),
     title: config.title,
   });

@@ -134,6 +134,9 @@ export class ModLoader {
    */
   public async copyRegistries(target: string) {
     process.stdout.write('Copying registries...\n');
+    if (!fs.existsSync(join(this.path, 'cyclops_registries'))) {
+      await fs.promises.mkdir(join(this.path, 'cyclops_registries'));
+    }
     await promisify(ncp)(join(this.path, 'cyclops_registries'), target);
   }
 
