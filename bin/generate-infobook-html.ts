@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import * as fs from "fs";
 import minimist = require("minimist");
+import {join} from "path";
 import {
   InfoBookAppendixHandlerAdvancementRewards,
 } from "../lib/infobook/appendix/InfoBookAppendixHandlerAdvancementRewards";
@@ -66,6 +67,14 @@ async function create() {
     new InfoBookAppendixHandlerImage(resourceLoader.getResourceHandler()));
   infoBookInitializer.registerAppendixHandler('keybinding',
     new InfoBookAppendixHandlerKeybinding(resourceLoader.getResourceHandler()));
+
+  // Load plugins
+  if (config.plugins) {
+    for (const pluginPath of config.plugins) {
+      require(join(process.cwd(), pluginPath))
+        .load(infoBookInitializer, resourceLoader, config);
+    }
+  }
 
   // Initialize book
   const infoBook: IInfoBook = await infoBookInitializer.initialize();

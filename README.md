@@ -94,6 +94,25 @@ Before you start this phase, make sure the following files and directories are p
 This phase can be started by executing `generate-cyclops-infobook-html config.json /output`.
 Afterwards, the contents of `/output` can be hosted on any Web server.
 
+### Plugins
+
+Optionally, plugins can be loaded to for example add support for non-default appendix handlers.
+
+This can be done by implementing [`IInfobookPlugin`](https://github.com/CyclopsMC/infobook-html/blob/master/lib/infobook/IInfobookPlugin.ts),
+and exporting an instance of it via a JavaScript file.
+
+Next, the plugin can be loaded when generating HTML by adding the following to your `config.json` file:
+
+```json
+{
+  "plugins": [
+    "path/to/instance.js"
+  ],
+}
+```
+
+Example: [Integrated Dynamics plugin](https://github.com/CyclopsMC/infobook-html-integrateddynamics)
+
 ## License
 This software is written by [Ruben Taelman](http://rubensworks.net/).
 

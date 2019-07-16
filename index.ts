@@ -5,6 +5,7 @@ export * from "./lib/infobook/appendix/InfoBookAppendixHandlerImage";
 export * from "./lib/infobook/appendix/InfoBookAppendixHandlerKeybinding";
 export * from "./lib/infobook/IInfoAppendix";
 export * from "./lib/infobook/IInfoBook";
+export * from "./lib/infobook/IInfobookPlugin";
 export * from "./lib/infobook/IInfoSection";
 export * from "./lib/infobook/IItem";
 export * from "./lib/infobook/InfoBookInitializer";
