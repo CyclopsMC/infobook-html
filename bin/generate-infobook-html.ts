@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import * as fs from "fs";
 import minimist = require("minimist");
 import {
