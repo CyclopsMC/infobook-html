@@ -132,9 +132,9 @@ export class HtmlInfoBookSerializer {
   }
 
   public createItemDisplay(resourceHandler: ResourceHandler, language: string,
-                           fileWriter: IFileWriter, item: IItem): string {
+                           fileWriter: IFileWriter, item: IItem, slot: boolean): string {
     if (item.item === 'minecraft:air') {
-      return '<div class="item">&nbsp;</div>';
+      return slot ? '<div class="item item-slot">&nbsp;</div>' : '<div class="item">&nbsp;</div>';
     }
 
     const icon = resourceHandler.getItemIconFile(item.item, item.data);
@@ -147,6 +147,7 @@ export class HtmlInfoBookSerializer {
       count: item.count || 1,
       icon: iconUrl,
       name: resourceHandler.getTranslation(resourceHandler.getItemTranslationKey(item), language),
+      slot,
     });
   }
 

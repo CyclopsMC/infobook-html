@@ -1,4 +1,4 @@
-div(class="item")
+div(class=(slot ? "item item-slot" : "item"))
     img(src=icon, alt=name, title=name, class="item-icon")
     if count !== 1
         span(class="item-count")=count

@@ -111,6 +111,14 @@ a:hover {
     top: 1px;
 }
 
+.appendix-icon {
+    position: relative;
+    top: 25px;
+    left: 157px;
+    margin-bottom: -36px;
+    z-index: 10;
+}
+
 .crafting_recipe table.inputs {
     display: inline-block;
     vertical-align: middle;
@@ -124,12 +132,15 @@ a:hover {
 
 div.item {
     padding: 2px;
-    border: 2px solid black;
-    border-right-color: white;
-    border-bottom-color: white;
     height: 32px;
     width: 32px;
     text-align: right;
+}
+
+div.item-slot {
+    border: 2px solid black;
+    border-right-color: white;
+    border-bottom-color: white;
 }
 
 img.item-icon {
