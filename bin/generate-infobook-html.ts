@@ -52,6 +52,7 @@ async function create() {
   const resourceLoader = new ResourceLoader();
   await resourceLoader.loadIcons('icons');
   await resourceLoader.loadItemTranslationKeys('registries');
+  await resourceLoader.loadFluidTranslationKeys('registries');
   await resourceLoader.loadMinecraftAssets('mc_assets');
   await resourceLoader.loadKeybindings(config.keybindings);
   await resourceLoader.loadAll(config.baseDir, config.resources);

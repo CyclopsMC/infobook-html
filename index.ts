@@ -3,6 +3,7 @@ export * from "./lib/infobook/appendix/InfoBookAppendixHandlerAdvancementRewards
 export * from "./lib/infobook/appendix/InfoBookAppendixHandlerCraftingRecipe";
 export * from "./lib/infobook/appendix/InfoBookAppendixHandlerImage";
 export * from "./lib/infobook/appendix/InfoBookAppendixHandlerKeybinding";
+export * from "./lib/infobook/IFluid";
 export * from "./lib/infobook/IInfoAppendix";
 export * from "./lib/infobook/IInfoBook";
 export * from "./lib/infobook/IInfobookPlugin";

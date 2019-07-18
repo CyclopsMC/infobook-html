@@ -1,4 +1,5 @@
 import {join} from "path";
+import {IFluid} from "../infobook/IFluid";
 import {IItem} from "../infobook/IItem";
 
 /**
@@ -8,8 +9,10 @@ export class ResourceHandler {
 
   private readonly translations: {[language: string]: {[key: string]: string}} = {};
   private readonly resourcePackBasePaths: {[resourcePackId: string]: string} = {};
-  private readonly icons: IItemKeyedRegistry = {};
+  private readonly iconsItem: IItemKeyedRegistry = {};
   private readonly itemTranslationKeys: IItemKeyedRegistry = {};
+  private readonly iconsFluid: {[fluidName: string]: string} = {};
+  private readonly fluidTranslationKeys: {[fluidName: string]: string} = {};
   private readonly advancements: {[advancementId: string]: IAdvancement} = {};
   private readonly keybindings: {[keyId: string]: string} = {};
 
@@ -152,19 +155,19 @@ export class ResourceHandler {
   }
 
   /**
-   * Add an icon file.
+   * Add an item icon file.
    * @param {string} namespace The icon namespace.
    * @param {string} path The icon path.
    * @param {number} meta The icon meta.
    * @param {string} nbt The icon NBT. (empty string represents no NBT)
    * @param {string} file The icon file path.
    */
-  public addIcon(namespace: string, path: string, meta: number, nbt: string, file: string) {
-    ResourceHandler.addItemKeyedRegistryEntry(this.icons, namespace, path, meta, nbt, file);
+  public addItemIcon(namespace: string, path: string, meta: number, nbt: string, file: string) {
+    ResourceHandler.addItemKeyedRegistryEntry(this.iconsItem, namespace, path, meta, nbt, file);
   }
 
   /**
-   * Get an icon file.
+   * Get an item icon file.
    * @param {string} itemId The icon namespace:path.
    * @param {number} meta The icon meta.
    * @param {string} nbt The icon NBT. (empty string represents no NBT)
@@ -172,17 +175,36 @@ export class ResourceHandler {
    */
   public getItemIconFile(itemId: string, meta: number, nbt: string = ''): string {
     const { namespace, path } = ResourceHandler.splitItemId(itemId);
-    return ResourceHandler.getItemKeyedRegistryEntry(this.icons, namespace, path, meta, nbt);
+    return ResourceHandler.getItemKeyedRegistryEntry(this.iconsItem, namespace, path, meta, nbt);
+  }
+
+  /**
+   * Add a fluid icon file.
+   * @param {string} fluidName The fluid name.
+   * @param {string} file The icon file path.
+   */
+  public addFluidIcon(fluidName: string, file: string) {
+    this.iconsFluid[fluidName] = file;
+  }
+
+  /**
+   * Get a fluid icon file.
+   * @param {string} fluidName The fluid name.
+   * @return The icon file path or null.
+   */
+  public getFluidIconFile(fluidName: string): string {
+    return this.iconsFluid[fluidName];
   }
 
   /**
    * Add an item translation key.
    * @param {IItem} item An item.
-   * @param {string} file The file path.
+   * @param {string} translationKey The translation key.
    */
-  public addItemTranslationKey(item: IItem, file: string) {
+  public addItemTranslationKey(item: IItem, translationKey: string) {
     const { namespace, path } = ResourceHandler.splitItemId(item.item);
-    ResourceHandler.addItemKeyedRegistryEntry(this.itemTranslationKeys, namespace, path, item.data, item.nbt, file);
+    ResourceHandler.addItemKeyedRegistryEntry(this.itemTranslationKeys, namespace, path, item.data, item.nbt,
+      translationKey);
   }
 
   /**
@@ -193,6 +215,24 @@ export class ResourceHandler {
   public getItemTranslationKey(item: IItem): string {
     const { namespace, path } = ResourceHandler.splitItemId(item.item);
     return ResourceHandler.getItemKeyedRegistryEntry(this.itemTranslationKeys, namespace, path, item.data, item.nbt);
+  }
+
+  /**
+   * Add an fluid translation key.
+   * @param {IFluid} fluid An fluid.
+   * @param {string} translationKey The translation key.
+   */
+  public addFluidTranslationKey(fluid: IFluid, translationKey: string) {
+    this.fluidTranslationKeys[fluid.fluid] = translationKey;
+  }
+
+  /**
+   * Get an fluid translation key.
+   * @param {IFluid} fluid An fluid.
+   * @return The translation key or null.
+   */
+  public getFluidTranslationKey(fluid: IFluid): string {
+    return this.fluidTranslationKeys[fluid.fluid];
   }
 
   /**

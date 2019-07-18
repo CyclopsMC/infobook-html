@@ -113,8 +113,8 @@ a:hover {
 
 .appendix-icon {
     position: relative;
-    top: 25px;
-    left: 157px;
+    top: 21px;
+    left: 145px;
     margin-bottom: -36px;
     z-index: 10;
 }
@@ -131,7 +131,6 @@ a:hover {
 }
 
 div.item {
-    padding: 2px;
     height: 32px;
     width: 32px;
     text-align: right;

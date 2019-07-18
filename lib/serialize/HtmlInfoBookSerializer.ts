@@ -5,6 +5,7 @@ import {basename, join} from "path";
 import {compileFile as compilePug, compileTemplate} from "pug";
 import {Readable} from "stream";
 import {promisify} from "util";
+import {IFluid} from "../infobook/IFluid";
 import {IFileWriter} from "../infobook/IInfoAppendix";
 import {IInfoBook} from "../infobook/IInfoBook";
 import {IInfoSection} from "../infobook/IInfoSection";
@@ -147,6 +148,22 @@ export class HtmlInfoBookSerializer {
       count: item.count || 1,
       icon: iconUrl,
       name: resourceHandler.getTranslation(resourceHandler.getItemTranslationKey(item), language),
+      slot,
+    });
+  }
+
+  public createFluidDisplay(resourceHandler: ResourceHandler, language: string,
+                            fileWriter: IFileWriter, fluid: IFluid, slot: boolean): string {
+    const icon = resourceHandler.getFluidIconFile(fluid.fluid);
+    if (!icon) {
+      throw new Error(`Could not find an icon for fluid ${JSON.stringify(fluid)}`);
+    }
+    const iconUrl = fileWriter.write('icons/' + basename(icon), createReadStream(icon));
+
+    return this.templateItem({
+      count: fluid.amount || 1,
+      icon: iconUrl,
+      name: resourceHandler.getTranslation(resourceHandler.getFluidTranslationKey(fluid), language),
       slot,
     });
   }

@@ -28,15 +28,20 @@ export class ResourceLoader {
   public async loadIcons(iconsPath: string) {
     const iconNames = await fs.readdir(iconsPath);
     for (const iconName of iconNames) {
-      const split = iconName.split("__");
-      const namespace = split[0];
-      const path = split[1];
-      const meta = parseInt(split[2], 10);
-      let nbt = '';
-      if (split.length > 3) {
-        nbt = split.slice(3, split.length).join(":");
+      const iconFile = join(iconsPath, iconName);
+      if (iconName.startsWith('fluid__')) {
+        this.resourceHandler.addFluidIcon(iconName.substring(7, iconName.length - 4), iconFile);
+      } else {
+        const split = iconName.split("__");
+        const namespace = split[0];
+        const path = split[1];
+        const meta = parseInt(split[2], 10);
+        let nbt = '';
+        if (split.length > 3) {
+          nbt = split.slice(3, split.length).join(":");
+        }
+        this.resourceHandler.addItemIcon(namespace, path, meta, nbt, iconFile);
       }
-      this.resourceHandler.addIcon(namespace, path, meta, nbt, join(iconsPath, iconName));
     }
   }
 
@@ -49,6 +54,18 @@ export class ResourceLoader {
     const registry = JSON.parse(readFileSync(join(registriesPath, 'item_translation_keys.json'), "utf8"));
     for (const entry of registry.items) {
       this.resourceHandler.addItemTranslationKey(entry.item, entry.translationKey);
+    }
+  }
+
+  /**
+   * Load all fluid translation keys from the 'fluid_translation_keys.json' file.
+   * @param {string} registriesPath A registries path.
+   * @returns {Promise<void>} A promise resolving when loading is done.
+   */
+  public async loadFluidTranslationKeys(registriesPath: string) {
+    const registry = JSON.parse(readFileSync(join(registriesPath, 'fluid_translation_keys.json'), "utf8"));
+    for (const entry of registry.fluids) {
+      this.resourceHandler.addFluidTranslationKey(entry.fluid, entry.translationKey);
     }
   }
 
