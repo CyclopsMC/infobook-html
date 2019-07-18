@@ -63,7 +63,8 @@ export class XmlInfoBookParser {
       nameTranslationKey: data.$.name,
       subSections: (data.section || []).map((subData: any) => this.jsonToSection(subData)),
       paragraphTranslationKeys: (data.paragraph || []).map((subData: any) => this.jsonToParagraph(subData)),
-      appendix: (data.appendix || []).map((subData: any) => this.jsonToAppendix(subData)),
+      appendix: ((data.appendix || []).concat(data.appendix_list || []))
+        .map((subData: any) => this.jsonToAppendix(subData)),
     };
   }
 
@@ -82,10 +83,10 @@ export class XmlInfoBookParser {
    * @returns {IInfoAppendix} An appendix.
    */
   public jsonToAppendix(data: any): IInfoAppendix {
-    if (!data.$ || !data.$.type) {
-      throw new Error(`No type was found for the appendix ${JSON.stringify(data)}.`);
+    if (!data.$ || (!data.$.type && !data.$.factory)) {
+      throw new Error(`No type or factory was found for the appendix ${JSON.stringify(data)}.`);
     }
-    const type = data.$.type;
+    const type = data.$.type || data.$.factory;
     const handler = this.appendixHandlers[type];
     if (handler) {
       return handler.createAppendix(data);

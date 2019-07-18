@@ -162,12 +162,13 @@ describe('XmlInfoBookParser', () => {
 
   describe('jsonToAppendix', () => {
     it('should error for no $ field', async () => {
-      return expect(() => parser.jsonToAppendix({})).toThrow(new Error('No type was found for the appendix {}.'));
+      return expect(() => parser.jsonToAppendix({}))
+        .toThrow(new Error('No type or factory was found for the appendix {}.'));
     });
 
     it('should error for no type', async () => {
       return expect(() => parser.jsonToAppendix({ $: {} }))
-        .toThrow(new Error('No type was found for the appendix {"$":{}}.'));
+        .toThrow(new Error('No type or factory was found for the appendix {"$":{}}.'));
     });
 
     it('should return null for an unknown type', async () => {
