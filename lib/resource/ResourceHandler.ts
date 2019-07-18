@@ -7,6 +7,11 @@ import {IItem} from "../infobook/IItem";
  */
 export class ResourceHandler {
 
+  private static readonly TRANSLATION_DEFAULTS: {[key: string]: string} = {
+    'fluid.tile.lava': 'Lava',
+    'fluid.tile.water': 'Water',
+  };
+
   private readonly translations: {[language: string]: {[key: string]: string}} = {};
   private readonly resourcePackBasePaths: {[resourcePackId: string]: string} = {};
   private readonly iconsItem: IItemKeyedRegistry = {};
@@ -115,7 +120,7 @@ export class ResourceHandler {
     const entries = this.translations[languageKey] || this.translations.en_us;
     let value = entries[translationKey];
     if (!value) {
-      value = this.translations.en_us[translationKey];
+      value = this.translations.en_us[translationKey] || ResourceHandler.TRANSLATION_DEFAULTS[translationKey];
       if (!value) {
         throw new Error(`Could not find translation key ${translationKey} in ${languageKey}`);
       }
