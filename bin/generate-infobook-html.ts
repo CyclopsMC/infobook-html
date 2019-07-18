@@ -9,9 +9,10 @@ import {InfoBookAppendixHandlerCraftingRecipe} from "../lib/infobook/appendix/In
 import {InfoBookAppendixHandlerImage} from "../lib/infobook/appendix/InfoBookAppendixHandlerImage";
 import {InfoBookAppendixHandlerKeybinding} from "../lib/infobook/appendix/InfoBookAppendixHandlerKeybinding";
 import {IInfoBook} from "../lib/infobook/IInfoBook";
+import {IInfobookPlugin} from "../lib/infobook/IInfobookPlugin";
 import {InfoBookInitializer} from "../lib/infobook/InfoBookInitializer";
 import {ResourceLoader} from "../lib/resource/ResourceLoader";
-import {HtmlInfoBookSerializer} from "../lib/serialize/HtmlInfoBookSerializer";
+import {HtmlInfoBookSerializer, ISerializeContext} from "../lib/serialize/HtmlInfoBookSerializer";
 
 // Process CLI args
 const args = minimist(process.argv.slice(2));
@@ -70,10 +71,18 @@ async function create() {
     new InfoBookAppendixHandlerKeybinding(resourceLoader.getResourceHandler()));
 
   // Load plugins
+  const assetsPaths = [];
+  const headSuffixGetters: ((context: ISerializeContext) => string)[] = [];
   if (config.plugins) {
     for (const pluginPath of config.plugins) {
-      require(join(process.cwd(), pluginPath))
-        .load(infoBookInitializer, resourceLoader, config);
+      const plugin: IInfobookPlugin = require(join(process.cwd(), pluginPath));
+      plugin.load(infoBookInitializer, resourceLoader, config);
+      if (plugin.assetsPath) {
+        assetsPaths.push(plugin.assetsPath);
+      }
+      if (plugin.getHeadSuffix) {
+        headSuffixGetters.push(plugin.getHeadSuffix);
+      }
     }
   }
 
@@ -89,11 +98,12 @@ async function create() {
   await infoBookSerializer.serialize(infoBook, {
     baseUrl: config.baseUrl,
     colors: config.colors,
+    headSuffixGetters,
     modId: config.modId,
     path,
     resourceHandler: resourceLoader.getResourceHandler(),
     title: config.title,
-  });
+  }, assetsPaths);
 }
 
 create();

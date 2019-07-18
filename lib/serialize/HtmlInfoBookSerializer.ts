@@ -29,7 +29,7 @@ export class HtmlInfoBookSerializer {
     this.templateItem = compilePug(__dirname + '/../../template/appendix/item.pug');
   }
 
-  public async serialize(infobook: IInfoBook, context: ISerializeContext) {
+  public async serialize(infobook: IInfoBook, context: ISerializeContext, assetsPaths: string[]) {
     await this.ensureDirExists(context.path);
     await this.ensureDirExists(join(context.path, 'assets'));
     await this.ensureDirExists(join(context.path, 'assets', 'icons'));
@@ -49,6 +49,9 @@ export class HtmlInfoBookSerializer {
 
     // Serialize assets
     await promisify(ncp)(__dirname + '/../../assets/', join(context.path, 'assets'));
+    for (const assetsPath of assetsPaths) {
+      await promisify(ncp)(assetsPath, join(context.path, 'assets'));
+    }
   }
 
   public async serializeSection(section: IInfoSection, context: ISerializeContext)
@@ -92,6 +95,7 @@ export class HtmlInfoBookSerializer {
         baseUrl: context.baseUrl,
         breadcrumbs: context.breadcrumbs.concat([{ name: sectionTitle }]),
         colors: context.colors,
+        headSuffix: context.headSuffixGetters.map((g) => g(context)).join(''),
         language: context.language,
         mainTitle: context.title,
         sectionTitle,
@@ -113,6 +117,7 @@ export class HtmlInfoBookSerializer {
         baseUrl: context.baseUrl,
         breadcrumbs: context.breadcrumbs.concat([{ name: sectionTitle }]),
         colors: context.colors,
+        headSuffix: context.headSuffixGetters.map((g) => g(context)).join(''),
         language: context.language,
         mainTitle: context.title,
         sectionAppendices: section.appendix
@@ -161,7 +166,7 @@ export class HtmlInfoBookSerializer {
     const iconUrl = fileWriter.write('icons/' + basename(icon), createReadStream(icon));
 
     return this.templateItem({
-      count: fluid.amount || 1,
+      count: (fluid.amount || 1),
       icon: iconUrl,
       name: resourceHandler.getTranslation(resourceHandler.getFluidTranslationKey(fluid), language),
       slot,
@@ -233,4 +238,5 @@ export interface ISerializeContext {
   resourceHandler: ResourceHandler;
   title: string;
   colors: {[key: string]: string};
+  headSuffixGetters: ((context: ISerializeContext) => string)[];
 }
