@@ -74,6 +74,10 @@ a:hover {
     color: #4c4c4c;
 }
 
+hr {
+    color: var(--color-border);
+}
+
 .appendix-wrapper {
     text-align: center;
 }
