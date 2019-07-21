@@ -241,6 +241,7 @@ ul.alternatives-updating li:not(.item-variant-selected) {
 
 .advancement_rewards .rewards-string {
     font-weight: bold;
+    font-size: 12px;
 }
 
 .advancement_rewards .rewards-string::after {
