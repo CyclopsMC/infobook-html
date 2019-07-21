@@ -175,18 +175,6 @@ export class HtmlInfoBookSerializer {
     });
   }
 
-  protected async ensureDirExists(dirPath: string) {
-    let fstat;
-    try {
-      fstat = await fs.stat(dirPath);
-    } catch (e) {
-      await promisify(mkdirp)(dirPath);
-    }
-    if (fstat && !fstat.isDirectory() && fstat.isFile()) {
-      throw new Error(`Could not serialize to a file, must be a directory.`);
-    }
-  }
-
   /**
    * Convert Minecraft formatting codes to HTML formats.
    *
@@ -195,7 +183,7 @@ export class HtmlInfoBookSerializer {
    * @param {string} value A string value that can contain multiple formatting codes.
    * @returns {string} The re-formatted string value.
    */
-  protected formatString(value: string): string {
+  public formatString(value: string): string {
     // Convert '&' to '§'
     value = value.replace(/&/g, '§');
 
@@ -222,6 +210,18 @@ export class HtmlInfoBookSerializer {
     value = value.replace(/§f([^§]*)§0/g, '<span style="color: #FFFFFF">$1</span>');
 
     return value;
+  }
+
+  protected async ensureDirExists(dirPath: string) {
+    let fstat;
+    try {
+      fstat = await fs.stat(dirPath);
+    } catch (e) {
+      await promisify(mkdirp)(dirPath);
+    }
+    if (fstat && !fstat.isDirectory() && fstat.isFile()) {
+      throw new Error(`Could not serialize to a file, must be a directory.`);
+    }
   }
 
   protected filePathToUrl(filePath: string, basePath: string, baseUrl: string) {
