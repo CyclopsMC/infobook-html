@@ -262,7 +262,8 @@ ul.alternatives-updating li:not(.item-variant-selected) {
 }
 
 .keybinding {
-    width: 400px;
+    width: 300px;
+    font-size: 12px;
 }
 
 .keybinding .name {
@@ -270,5 +271,5 @@ ul.alternatives-updating li:not(.item-variant-selected) {
 }
 
 .keybinding .key {
-    font-size: 20px;
+    font-size: 14px;
 }
