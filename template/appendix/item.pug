@@ -1,4 +1,8 @@
 div(class=(slot ? "item item-slot" : "item"))
     img(src=icon, alt=name, title=name, class="item-icon")
+    if annotation
+        span(class="item-annotation")
+            .
+                !{annotation}
     if count !== 1
         span(class="item-count")=count

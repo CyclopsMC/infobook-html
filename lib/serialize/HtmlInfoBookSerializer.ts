@@ -138,7 +138,8 @@ export class HtmlInfoBookSerializer {
   }
 
   public createItemDisplay(resourceHandler: ResourceHandler, language: string,
-                           fileWriter: IFileWriter, item: IItem, slot: boolean): string {
+                           fileWriter: IFileWriter, item: IItem, slot: boolean,
+                           annotation: string = ''): string {
     if (item.item === 'minecraft:air') {
       return slot ? '<div class="item item-slot">&nbsp;</div>' : '<div class="item">&nbsp;</div>';
     }
@@ -150,6 +151,7 @@ export class HtmlInfoBookSerializer {
     const iconUrl = fileWriter.write('icons/' + basename(icon), createReadStream(icon));
 
     return this.templateItem({
+      annotation,
       count: item.count || 1,
       icon: iconUrl,
       name: resourceHandler.getTranslation(resourceHandler.getItemTranslationKey(item), language),
