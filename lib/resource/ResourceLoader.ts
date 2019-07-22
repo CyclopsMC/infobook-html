@@ -70,23 +70,13 @@ export class ResourceLoader {
   }
 
   /**
-   * Load all Minecraft assets.
-   * @param {string} assetsPath An assets path.
-   */
-  public async loadMinecraftAssets(assetsPath: string) {
-    await this.loadAssetsLangFile('minecraft', 'en_us', join(assetsPath, 'en_us.lang'));
-  }
-
-  /**
    * Load all resources within the given paths.
    * @param {string} baseDir A base directory.
    * @param {string[]} paths An array of paths to traverse to look for resources.
    * @returns {Promise<void>} A promise resolving when loading is done.
    */
-  public async loadAll(baseDir: string, paths: string[]) {
-    for (const path of paths) {
-      await this.load(join(baseDir, path));
-    }
+  public async loadAll(baseDir: string, path: string) {
+    await this.load(join(baseDir, path));
   }
 
   /**
@@ -101,59 +91,48 @@ export class ResourceLoader {
     const entries = await fs.readdir(fullPath);
 
     // Look for a valid pack
-    let foundPack: boolean = false;
-    for (const entry of entries) {
-      if (entry === 'mcmod.info') {
-        // TODO: we may want to add some checks here
-        const mcmeta = JSON.parse((await fs.readFile(join(fullPath, entry))).toString('utf8'));
-        const modid = mcmeta[0].modid;
-        foundPack = true;
-        await this.loadAssets(mcmeta, modid, join(fullPath, 'assets', modid));
-      }
-    }
-
-    // Iterate further if no pack was detected
-    if (!foundPack) {
-      for (const entry of entries) {
-        if ((await fs.stat(join(fullPath, entry))).isDirectory()) {
-          await this.load(join(fullPath, entry));
-        }
+    for (const modid of entries) {
+      const modPath = join(fullPath, modid);
+      if ((await fs.stat(modPath)).isDirectory()) {
+        await this.loadAssets(modid, modPath);
       }
     }
   }
 
   /**
    * Load the assets of the given pack.
-   * @param mcmeta Mcmeta file contents.
    * @param {string} modid A mod id.
    * @param {string} fullPath The full path of the pack.
    * @returns {Promise<void>} A promise resolving when loading is done.
    */
-  public async loadAssets(mcmeta: any, modid: string, fullPath: string) {
+  public async loadAssets(modid: string, fullPath: string) {
     // Set base path
     this.resourceHandler.setResourcePackBasePath(modid, fullPath);
 
     // Handle languages
     const langDir = join(fullPath, 'lang');
     if ((await fs.stat(langDir)).isDirectory()) {
-      await this.loadAssetsLang(mcmeta, modid, langDir);
+      await this.loadAssetsLang(modid, langDir);
     }
 
     // Handle advancements
     const advancementsDir = join(fullPath, 'advancements');
-    if ((await fs.stat(langDir)).isDirectory()) {
-      await this.loadAssetsAdvancements(modid, advancementsDir, '');
+    try {
+      if ((await fs.stat(langDir)).isDirectory()) {
+        await this.loadAssetsAdvancements(modid, advancementsDir, '');
+      }
+    } catch (e) {
+      // Ignore mods without advancements
     }
   }
 
   /**
    * Load the language file within the given language folder.
-   * @param mcmeta Mcmeta file contents.
    * @param {string} modid A mod id.
    * @param {string} langDir The full language directory path.
    * @returns {Promise<void>} A promise resolving when loading is done.
    */
-  public async loadAssetsLang(mcmeta: any, modid: string, langDir: string) {
+  public async loadAssetsLang(modid: string, langDir: string) {
     const entries = await fs.readdir(langDir);
     for (const entry of entries) {
       const language = entry.substring(0, entry.indexOf('.'));

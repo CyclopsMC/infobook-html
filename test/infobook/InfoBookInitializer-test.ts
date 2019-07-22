@@ -24,11 +24,6 @@ describe('InfoBookInitializer', () => {
       return expect(() => new InfoBookInitializer(<any> { baseDir: "b", resources: [] }))
         .toThrow(new Error('Missing sectionsFile field for infobook construction'));
     });
-
-    it('should fail without resources arg', () => {
-      return expect(() => new InfoBookInitializer(<any> { baseDir: "b", sectionsFile: "f" }))
-        .toThrow(new Error('Missing resources array for infobook construction'));
-    });
   });
 
   describe('initialize', () => {

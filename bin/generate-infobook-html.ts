@@ -37,9 +37,9 @@ async function create() {
     process.exit(1);
   }
   // Check if registries have been generated
-  if (!fs.existsSync('mc_assets')) {
+  if (!fs.existsSync('mod_assets')) {
     process.stderr.write(
-      'Could not find a "mc_assets" folder, make sure to create one with generate-mod-metadata.\n');
+      'Could not find a "mod_assets" folder, make sure to create one with generate-mod-metadata.\n');
     process.exit(1);
   }
   // Check if icons are available
@@ -54,9 +54,8 @@ async function create() {
   await resourceLoader.loadIcons('icons');
   await resourceLoader.loadItemTranslationKeys('registries');
   await resourceLoader.loadFluidTranslationKeys('registries');
-  await resourceLoader.loadMinecraftAssets('mc_assets');
   await resourceLoader.loadKeybindings(config.keybindings);
-  await resourceLoader.loadAll(config.baseDir, config.resources);
+  await resourceLoader.loadAll(process.cwd(), 'mod_assets');
 
   // Setup infobook loader
   const infoBookInitializer = new InfoBookInitializer(config);

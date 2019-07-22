@@ -9,7 +9,6 @@ export class InfoBookInitializer {
 
   private readonly baseDir: string;
   private readonly sectionsFile: string;
-  private readonly resources: string[];
 
   private readonly parser: XmlInfoBookParser;
 
@@ -20,13 +19,9 @@ export class InfoBookInitializer {
     if (!args.sectionsFile) {
       throw new Error('Missing sectionsFile field for infobook construction');
     }
-    if (!args.resources) {
-      throw new Error('Missing resources array for infobook construction');
-    }
 
     this.baseDir = args.baseDir;
     this.sectionsFile = args.sectionsFile;
-    this.resources = args.resources;
 
     this.parser = new XmlInfoBookParser();
   }

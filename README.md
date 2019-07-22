@@ -62,7 +62,7 @@ Before you start this phase, make sure the following files and directories are p
 
 * `registries/crafting_recipe.json`: All crafting recipes. _(Generated in Metadata Generation)_
 * `registries/item_translation_keys.json`: A mapping from all items to translation keys. _(Generated in Metadata Generation)_
-* `mc_assets/en_us.lang` The Minecraft translation file. _(Generated in Metadata Generation)_
+* `mod_assets/` The mod asset files extracting from the mod jars. _(Generated in Metadata Generation)_
 * `config.json`: A configuration file with the following contents:
 
 ```json
@@ -80,9 +80,6 @@ Before you start this phase, make sure the following files and directories are p
   "title": "Integrated Dynamics - On the Dynamics of Integration",
   "sectionsFile": "src/main/resources/assets/integrateddynamics/info/on_the_dynamics_of_integration.xml",
   "modId": "integrateddynamics",
-  "resources": [
-    "src/main/resources/"
-  ],
   "keybindings": {
     "key.integrateddynamics.logic_programmer_focus_search": "Alt + F",
     "key.integrateddynamics.logic_programmer_open_rename": "Alt + R"

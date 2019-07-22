@@ -79,8 +79,8 @@
     "@types/node-fetch": "^2.3.7",
     "@types/pug": "^2.0.4",
     "@types/rimraf": "^2.0.2",
-    "@types/unzip": "^0.1.1",
     "@types/xml2js": "^0.4.4",
+    "@types/yauzl": "^2.9.1",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
     "mvn-artifact-download": "^4.0.0",
@@ -88,7 +88,7 @@
     "node-fetch": "^2.6.0",
     "pug": "^2.0.3",
     "rimraf": "^2.6.3",
-    "unzip": "^0.1.11",
-    "xml2js": "^0.4.19"
+    "xml2js": "^0.4.19",
+    "yauzl": "^2.10.0"
   }
 }

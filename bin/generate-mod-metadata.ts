@@ -29,7 +29,11 @@ async function run(command: string, configPath: string) {
     break;
   case 'extractmc':
     await modLoader.extractMinecraftAssets();
-    await modLoader.copyMinecraftAssets(join(process.cwd(), 'mc_assets'));
+    await modLoader.copyModAssets(join(process.cwd(), 'mod_assets'));
+    break;
+  case 'extractmods':
+    await modLoader.extractModsAssets();
+    await modLoader.copyModAssets(join(process.cwd(), 'mod_assets'));
     break;
   case 'generate':
     if (!modLoader.isForgeInstalled()) {
@@ -42,7 +46,8 @@ async function run(command: string, configPath: string) {
     await modLoader.startServer();
     await modLoader.copyRegistries(join(process.cwd(), 'registries'));
     await modLoader.extractMinecraftAssets();
-    await modLoader.copyMinecraftAssets(join(process.cwd(), 'mc_assets'));
+    await modLoader.extractModsAssets();
+    await modLoader.copyModAssets(join(process.cwd(), 'mod_assets'));
     break;
   default:
     printUsage();
@@ -53,7 +58,7 @@ async function run(command: string, configPath: string) {
 function printUsage() {
   process.stdout.write(`generate-mod-metadata Download Forge and mods, starts a headless server, and generates metadata
 Usage:
-  generate-mod-metadata /path/to/modpack.json (generate|clean|cleanmods|extractmc)
+  generate-mod-metadata /path/to/modpack.json (generate|clean|cleanmods|extractmc|extractmods)
 Options:
   --help        print this help message
 `);
