@@ -2,7 +2,8 @@ import {createReadStream} from "fs";
 import {basename} from "path";
 import {ResourceHandler} from "../../resource/ResourceHandler";
 import {ISerializeContext} from "../../serialize/HtmlInfoBookSerializer";
-import {IFileWriter, IInfoAppendix} from "../IInfoAppendix";
+import {IFileWriter} from "../IFileWriter";
+import {IInfoAppendix} from "../IInfoAppendix";
 import {IInfoBookAppendixHandler} from "./IInfoBookAppendixHandler";
 
 /**

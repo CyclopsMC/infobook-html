@@ -1,7 +1,8 @@
 import {compileFile as compilePug, compileTemplate} from "pug";
 import {IAdvancement, ResourceHandler} from "../../resource/ResourceHandler";
 import {HtmlInfoBookSerializer, ISerializeContext} from "../../serialize/HtmlInfoBookSerializer";
-import {IFileWriter, IInfoAppendix} from "../IInfoAppendix";
+import {IFileWriter} from "../IFileWriter";
+import {IInfoAppendix} from "../IInfoAppendix";
 import {IItem} from "../IItem";
 import {IInfoBookAppendixHandler} from "./IInfoBookAppendixHandler";
 

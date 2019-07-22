@@ -1,12 +1,12 @@
-import {createReadStream, createWriteStream, promises as fs} from "fs";
+import {createReadStream, promises as fs} from "fs";
 import mkdirp = require("mkdirp");
 import {ncp} from "ncp";
 import {basename, join} from "path";
 import {compileFile as compilePug, compileTemplate} from "pug";
-import {Readable} from "stream";
 import {promisify} from "util";
+import {FileWriter} from "../infobook/FileWriter";
+import {IFileWriter} from "../infobook/IFileWriter";
 import {IFluid} from "../infobook/IFluid";
-import {IFileWriter} from "../infobook/IInfoAppendix";
 import {IInfoBook} from "../infobook/IInfoBook";
 import {IInfoSection} from "../infobook/IInfoSection";
 import {IItem} from "../infobook/IItem";
@@ -56,13 +56,7 @@ export class HtmlInfoBookSerializer {
 
   public async serializeSection(section: IInfoSection, context: ISerializeContext)
     : Promise<{ filePath: string, sectionTitle: string }> {
-    // TODO: cleanup
-    const fileWriter = {
-      write: (baseName: string, contents: Readable): string => {
-        contents.pipe(createWriteStream(join(context.basePath, 'assets', baseName)));
-        return context.baseUrl + 'assets/' + baseName;
-      },
-    };
+    const fileWriter = new FileWriter(context);
 
     if (section.subSections && section.subSections.length > 0) {
       // Navigation section
