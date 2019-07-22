@@ -62,6 +62,7 @@ Before you start this phase, make sure the following files and directories are p
 
 * `registries/crafting_recipe.json`: All crafting recipes. _(Generated in Metadata Generation)_
 * `registries/item_translation_keys.json`: A mapping from all items to translation keys. _(Generated in Metadata Generation)_
+* `registries/fluid_translation_keys.json`: A mapping from all items to translation keys. _(Generated in Metadata Generation)_
 * `mod_assets/` The mod asset files extracting from the mod jars. _(Generated in Metadata Generation)_
 * `config.json`: A configuration file with the following contents:
 
