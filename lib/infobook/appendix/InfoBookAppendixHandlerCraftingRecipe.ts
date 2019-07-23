@@ -66,17 +66,17 @@ export class InfoBookAppendixHandlerCraftingRecipe implements IInfoBookAppendixH
             }
             const outputIndex = y * 3 + x;
             for (const item of items) {
-              inputs[outputIndex].push(serializer.createItemDisplay(this.resourceHandler,
-                context.language, fileWriter, item, true));
+              inputs[outputIndex].push(serializer.createItemDisplay(this.resourceHandler, context,
+                fileWriter, item, true));
             }
           }
         }
 
-        const output = serializer.createItemDisplay(this.resourceHandler,
-          context.language, fileWriter, recipe.output, true);
+        const output = serializer.createItemDisplay(this.resourceHandler, context,
+          fileWriter, recipe.output, true);
 
-        const appendixIcon = serializer.createItemDisplay(this.resourceHandler,
-          context.language, fileWriter, { item: 'minecraft:crafting_table', data: 0 }, false);
+        const appendixIcon = serializer.createItemDisplay(this.resourceHandler, context,
+          fileWriter, { item: 'minecraft:crafting_table', data: 0 }, false);
 
         return this.templateCraftingRecipe({ inputs, output, appendixIcon });
       },

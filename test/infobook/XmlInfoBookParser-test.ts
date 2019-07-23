@@ -38,6 +38,7 @@ describe('XmlInfoBookParser', () => {
                 'info_book.integrateddynamics.introduction.text4',
               ],
               'appendix': [],
+              'tags': [],
             },
             {
               'nameTranslationKey': 'info_book.integrateddynamics.tutorials',
@@ -49,14 +50,17 @@ describe('XmlInfoBookParser', () => {
                     'info_book.integrateddynamics.tutorials.introduction.text1',
                   ],
                   'appendix': [],
+                  'tags': ['abc'],
                 },
               ],
               'paragraphTranslationKeys': [],
               'appendix': [],
+              'tags': [],
             },
           ],
           'paragraphTranslationKeys': [],
           'appendix': [],
+          'tags': [],
         },
       });
     });
@@ -74,6 +78,7 @@ describe('XmlInfoBookParser', () => {
           subSections: [],
           paragraphTranslationKeys: [],
           appendix: [],
+          tags: [],
         },
       });
     });
@@ -97,6 +102,7 @@ describe('XmlInfoBookParser', () => {
         subSections: [],
         paragraphTranslationKeys: [],
         appendix: [],
+        tags: [],
       });
     });
 
@@ -124,6 +130,9 @@ describe('XmlInfoBookParser', () => {
             $: { type: "ap2" },
           },
         ],
+        tag: [
+          'abc',
+        ],
       };
       return expect(parser.jsonToSection(data)).toEqual({
         nameTranslationKey: "abc",
@@ -133,12 +142,14 @@ describe('XmlInfoBookParser', () => {
             subSections: [],
             paragraphTranslationKeys: [],
             appendix: [],
+            tags: [],
           },
           {
             nameTranslationKey: "a_2",
             subSections: [],
             paragraphTranslationKeys: [],
             appendix: [],
+            tags: [],
           },
         ],
         paragraphTranslationKeys: [
@@ -150,6 +161,7 @@ describe('XmlInfoBookParser', () => {
           null,
           null,
         ],
+        tags: ['abc'],
       });
     });
   });

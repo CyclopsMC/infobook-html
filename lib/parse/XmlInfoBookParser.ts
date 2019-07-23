@@ -65,6 +65,7 @@ export class XmlInfoBookParser {
       paragraphTranslationKeys: (data.paragraph || []).map((subData: any) => this.jsonToParagraph(subData)),
       appendix: ((data.appendix || []).concat(data.appendix_list || []))
         .map((subData: any) => this.jsonToAppendix(subData)),
+      tags: data.tag || [],
     };
   }
 

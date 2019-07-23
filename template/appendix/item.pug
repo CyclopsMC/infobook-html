@@ -1,5 +1,11 @@
-div(class=(slot ? "item item-slot" : "item"))
+mixin icon
     img(src=icon, alt=name, title=name, class="item-icon")
+div(class=(slot ? "item item-slot" : "item"))
+    if link
+        a(href=link, target=linkTarget)
+            +icon
+    else
+        +icon
     if annotation
         span(class="item-annotation")
             .

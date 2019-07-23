@@ -53,6 +53,7 @@ export class HtmlInfoBookSerializer {
                                      language: string, langPath: string): Promise<ISectionIndex> {
     const sectionIndex: ISectionIndex = {
       linkedPagesList: [],
+      tags: {},
       urlIndex: {},
     };
     let pageIndex: number = 0;
@@ -62,11 +63,17 @@ export class HtmlInfoBookSerializer {
       breadcrumbs: [],
       language,
       path: langPath,
-    }, async ({ index, sectionTitle, fileUrl, breadcrumbs }) => {
+    }, async ({ index, section, sectionTitle, fileUrl, breadcrumbs }) => {
       if (!index) {
         sectionIndex.urlIndex[fileUrl] = pageIndex++;
         const name = breadcrumbs.slice(1).map((b) => b.name).join(' / ');
         sectionIndex.linkedPagesList.push({ name, url: fileUrl });
+        for (let tag of section.tags) {
+          if (tag.indexOf(':') < 0) {
+            tag = contextRoot.modId + ':' + tag;
+          }
+          sectionIndex.tags[tag] = fileUrl;
+        }
       }
     });
     return sectionIndex;
@@ -80,6 +87,7 @@ export class HtmlInfoBookSerializer {
       breadcrumbs: [],
       language,
       path: langPath,
+      sectionIndex,
     }, async ({ index, breadcrumbs, context, section, sectionTitle, subSectionDatas, filePath, fileUrl }) => {
       if (index) {
         // Create index file
@@ -180,7 +188,22 @@ export class HtmlInfoBookSerializer {
     }
   }
 
-  public createItemDisplay(resourceHandler: ResourceHandler, language: string,
+  public createResourceLink(resourceHandler: ResourceHandler, context: ISerializeContext, resource: string,
+                            translationKey: string): { link: string, linkTarget: string } {
+    let link;
+    let linkTarget;
+    if (resource.startsWith('minecraft:')) {
+      link = 'https://minecraft.gamepedia.com/' + resourceHandler.getTranslation(
+        translationKey, 'en_us').replace(/ /g, '_');
+      linkTarget = '_blank';
+    } else if (context.sectionIndex.tags[resource]) {
+      link = context.sectionIndex.tags[resource];
+    }
+
+    return { link, linkTarget };
+  }
+
+  public createItemDisplay(resourceHandler: ResourceHandler, context: ISerializeContext,
                            fileWriter: IFileWriter, item: IItem, slot: boolean,
                            annotation: string = ''): string {
     if (item.item === 'minecraft:air') {
@@ -193,16 +216,21 @@ export class HtmlInfoBookSerializer {
     }
     const iconUrl = fileWriter.write('icons/' + basename(icon), createReadStream(icon));
 
+    const { link, linkTarget } = this.createResourceLink(resourceHandler, context, item.item,
+      resourceHandler.getItemTranslationKey(item));
+
     return this.templateItem({
       annotation,
       count: item.count || 1,
       icon: iconUrl,
-      name: resourceHandler.getTranslation(resourceHandler.getItemTranslationKey(item), language),
+      link,
+      linkTarget,
+      name: resourceHandler.getTranslation(resourceHandler.getItemTranslationKey(item), context.language),
       slot,
     });
   }
 
-  public createFluidDisplay(resourceHandler: ResourceHandler, language: string,
+  public createFluidDisplay(resourceHandler: ResourceHandler, context: ISerializeContext,
                             fileWriter: IFileWriter, fluid: IFluid, slot: boolean): string {
     const icon = resourceHandler.getFluidIconFile(fluid.fluid);
     if (!icon) {
@@ -210,12 +238,25 @@ export class HtmlInfoBookSerializer {
     }
     const iconUrl = fileWriter.write('icons/' + basename(icon), createReadStream(icon));
 
+    const { link, linkTarget } = this.createResourceLink(resourceHandler, context, this.tagFluid(context, fluid.fluid),
+      resourceHandler.getFluidTranslationKey(fluid));
+
     return this.templateItem({
       count: (fluid.amount || 1),
       icon: iconUrl,
-      name: resourceHandler.getTranslation(resourceHandler.getFluidTranslationKey(fluid), language),
+      link,
+      linkTarget,
+      name: resourceHandler.getTranslation(resourceHandler.getFluidTranslationKey(fluid), context.language),
       slot,
     });
+  }
+
+  public tagFluid(context: ISerializeContext, fluidName: string): string {
+    if (fluidName === 'water' || fluidName === 'lava') {
+      return 'minecraft:' + fluidName;
+    } else {
+      return context.modId + ':' + fluidName;
+    }
   }
 
   /**
@@ -284,6 +325,7 @@ export interface ISerializeContext {
   title: string;
   colors: {[key: string]: string};
   headSuffixGetters: ((context: ISerializeContext) => string)[];
+  sectionIndex?: ISectionIndex;
 }
 
 export interface ISectionCallbackArgs {
@@ -306,4 +348,8 @@ export interface ISectionIndex {
    * Mapping from url to page index within linkedPagesList.
    */
   urlIndex: {[url: string]: number};
+  /**
+   * Mapping from tag to page URL.
+   */
+  tags: {[tag: string]: string};
 }

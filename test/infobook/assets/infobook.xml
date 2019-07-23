@@ -9,6 +9,7 @@
 
     <section name="info_book.integrateddynamics.tutorials">
         <section name="info_book.integrateddynamics.tutorials.introduction">
+            <tag>abc</tag>
             <paragraph>info_book.integrateddynamics.tutorials.introduction.text1</paragraph>
         </section>
     </section>

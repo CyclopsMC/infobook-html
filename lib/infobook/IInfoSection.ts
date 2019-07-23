@@ -8,4 +8,5 @@ export interface IInfoSection {
   subSections: IInfoSection[];
   paragraphTranslationKeys: string[];
   appendix: IInfoAppendix[];
+  tags: string[];
 }

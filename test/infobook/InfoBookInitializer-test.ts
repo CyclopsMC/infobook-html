@@ -49,6 +49,7 @@ describe('InfoBookInitializer', () => {
                 'info_book.integrateddynamics.introduction.text4',
               ],
               'appendix': [],
+              'tags': [],
             },
             {
               'nameTranslationKey': 'info_book.integrateddynamics.tutorials',
@@ -60,14 +61,17 @@ describe('InfoBookInitializer', () => {
                     'info_book.integrateddynamics.tutorials.introduction.text1',
                   ],
                   'appendix': [],
+                  'tags': ['abc'],
                 },
               ],
               'paragraphTranslationKeys': [],
               'appendix': [],
+              'tags': [],
             },
           ],
           'paragraphTranslationKeys': [],
           'appendix': [],
+          'tags': [],
         },
       });
     });
