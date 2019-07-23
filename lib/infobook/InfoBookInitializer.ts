@@ -7,27 +7,22 @@ import {IInfoBook} from "./IInfoBook";
  */
 export class InfoBookInitializer {
 
-  private readonly baseDir: string;
   private readonly sectionsFile: string;
 
   private readonly parser: XmlInfoBookParser;
 
   constructor(args: IInfoBookArgs) {
-    if (!args.baseDir) {
-      throw new Error('Missing baseDir field for infobook construction');
-    }
     if (!args.sectionsFile) {
       throw new Error('Missing sectionsFile field for infobook construction');
     }
 
-    this.baseDir = args.baseDir;
     this.sectionsFile = args.sectionsFile;
 
     this.parser = new XmlInfoBookParser();
   }
 
   public async initialize(): Promise<IInfoBook> {
-    return this.parser.parse(this.baseDir + this.sectionsFile);
+    return this.parser.parse(this.sectionsFile);
   }
 
   /**
@@ -42,7 +37,6 @@ export class InfoBookInitializer {
 }
 
 export interface IInfoBookArgs {
-  baseDir: string;
   sectionsFile: string;
   resources: string[];
 }

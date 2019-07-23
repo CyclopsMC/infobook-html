@@ -68,7 +68,6 @@ Before you start this phase, make sure the following files and directories are p
 
 ```json
 {
-  "baseDir": "/Users/kroeser/Documents/Development/IntegratedDynamics/",
   "baseUrl": "/",
   "colors": {
     "h": "#16384c",
@@ -79,7 +78,7 @@ Before you start this phase, make sure the following files and directories are p
     "outer_background": "#09171f"
   },
   "title": "Integrated Dynamics - On the Dynamics of Integration",
-  "sectionsFile": "src/main/resources/assets/integrateddynamics/info/on_the_dynamics_of_integration.xml",
+  "sectionsFile": "mod_assets/integrateddynamics/info/on_the_dynamics_of_integration.xml",
   "modId": "integrateddynamics",
   "keybindings": {
     "key.integrateddynamics.logic_programmer_focus_search": "Alt + F",
