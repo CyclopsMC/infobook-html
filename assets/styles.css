@@ -78,6 +78,26 @@ hr {
     color: var(--color-border);
 }
 
+.page-controls {
+    margin-top: 10px;
+    border-top: solid 1px var(--color-border);
+    text-align: center;
+}
+
+.page-controls .next,
+.page-controls .previous {
+    font-size: 14px;
+    margin: 8px;
+}
+
+.page-controls .next::after {
+    content: ' >>';
+}
+
+.page-controls .previous::before {
+    content: '<< ';
+}
+
 .appendix-wrapper {
     text-align: center;
 }

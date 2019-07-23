@@ -69,7 +69,7 @@ Before you start this phase, make sure the following files and directories are p
 ```json
 {
   "baseDir": "/Users/kroeser/Documents/Development/IntegratedDynamics/",
-  "baseUrl": "http://localhost:8080/",
+  "baseUrl": "/",
   "colors": {
     "h": "#16384c",
     "border": "#3381ad",

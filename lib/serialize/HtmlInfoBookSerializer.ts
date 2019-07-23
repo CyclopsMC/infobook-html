@@ -38,13 +38,8 @@ export class HtmlInfoBookSerializer {
     for (const language of context.resourceHandler.getLanguages()) {
       const langPath = join(context.path, language);
       await this.ensureDirExists(langPath);
-      await this.serializeSection(infobook.rootSection, {
-        ...context,
-        basePath: context.path,
-        breadcrumbs: [],
-        language,
-        path: langPath,
-      });
+      const sectionIndex = await this.serializeSectionIndex(infobook, context, language, langPath);
+      await this.serializeSectionFiles(infobook, context, language, langPath, sectionIndex);
     }
 
     // Serialize assets
@@ -54,20 +49,102 @@ export class HtmlInfoBookSerializer {
     }
   }
 
-  public async serializeSection(section: IInfoSection, context: ISerializeContext)
+  public async serializeSectionIndex(infobook: IInfoBook, contextRoot: ISerializeContext,
+                                     language: string, langPath: string): Promise<ISectionIndex> {
+    const sectionIndex: ISectionIndex = {
+      linkedPagesList: [],
+      urlIndex: {},
+    };
+    let pageIndex: number = 0;
+    await this.serializeSection(infobook.rootSection, {
+      ...contextRoot,
+      basePath: contextRoot.path,
+      breadcrumbs: [],
+      language,
+      path: langPath,
+    }, async ({ index, sectionTitle, fileUrl, breadcrumbs }) => {
+      if (!index) {
+        sectionIndex.urlIndex[fileUrl] = pageIndex++;
+        const name = breadcrumbs.slice(1).map((b) => b.name).join(' / ');
+        sectionIndex.linkedPagesList.push({ name, url: fileUrl });
+      }
+    });
+    return sectionIndex;
+  }
+
+  public async serializeSectionFiles(infobook: IInfoBook, contextRoot: ISerializeContext,
+                                     language: string, langPath: string, sectionIndex: ISectionIndex) {
+    await this.serializeSection(infobook.rootSection, {
+      ...contextRoot,
+      basePath: contextRoot.path,
+      breadcrumbs: [],
+      language,
+      path: langPath,
+    }, async ({ index, breadcrumbs, context, section, sectionTitle, subSectionDatas, filePath, fileUrl }) => {
+      if (index) {
+        // Create index file
+        const fileContents = this.templateIndex({
+          baseUrl: context.baseUrl,
+          breadcrumbs,
+          colors: context.colors,
+          headSuffix: context.headSuffixGetters.map((g) => g(context)).join(''),
+          language: context.language,
+          mainTitle: context.title,
+          sectionTitle,
+          subSectionDatas,
+        });
+        await fs.writeFile(filePath, fileContents);
+      } else {
+        // Determine next/previous page based on the index
+        const pageIndex = sectionIndex.urlIndex[fileUrl];
+        const nextPage = pageIndex < sectionIndex.linkedPagesList.length
+          ? sectionIndex.linkedPagesList[pageIndex + 1] : null;
+        const previousPage = pageIndex > 0
+          ? sectionIndex.linkedPagesList[pageIndex - 1] : null;
+
+        // Create leaf file
+        const fileWriter = new FileWriter(context);
+        const fileContents = this.templateSection({
+          baseUrl: context.baseUrl,
+          breadcrumbs,
+          colors: context.colors,
+          headSuffix: context.headSuffixGetters.map((g) => g(context)).join(''),
+          language: context.language,
+          mainTitle: context.title,
+          nextPage,
+          previousPage,
+          sectionAppendices: section.appendix
+            .filter((appendix) => appendix) // TODO: rm
+            .map((appendix) => this.appendixWrapper({
+              appendixContents: appendix.toHtml(context, fileWriter, this),
+              appendixName: appendix.getName ? appendix.getName(context) : null,
+            })),
+          sectionParagraphs: section.paragraphTranslationKeys
+            .map((key) => context.resourceHandler.getTranslation(key, context.language))
+            .map((value) => this.formatString(value)),
+          sectionTitle,
+        });
+        await fs.writeFile(filePath, fileContents);
+      }
+    });
+  }
+
+  public async serializeSection(section: IInfoSection, context: ISerializeContext,
+                                onSection: (args: ISectionCallbackArgs) => Promise<void>)
     : Promise<{ filePath: string, sectionTitle: string }> {
-    const fileWriter = new FileWriter(context);
+    const sectionTitle = this.formatString(context.resourceHandler
+      .getTranslation(section.nameTranslationKey, context.language));
+    const breadcrumbs = context.breadcrumbs.concat([{ name: sectionTitle }]);
 
     if (section.subSections && section.subSections.length > 0) {
       // Navigation section
-      const sectionTitle = this.formatString(context.resourceHandler
-        .getTranslation(section.nameTranslationKey, context.language));
 
       // Serialize subsections
       const subSectionDatas: { url: string, sectionTitle: string }[] = [];
+      const fileUrl = this.filePathToUrl(context.path, context.basePath, context.baseUrl);
       const subBreadcrumbs = context.breadcrumbs.concat([{
         name: sectionTitle,
-        url: this.filePathToUrl(context.path, context.basePath, context.baseUrl),
+        url: fileUrl,
       }]);
       for (const subSection of section.subSections) {
         const subSectionData = await this.serializeSection(subSection,
@@ -76,26 +153,15 @@ export class HtmlInfoBookSerializer {
             breadcrumbs: subBreadcrumbs,
             path: join(context.path, subSection.nameTranslationKey
               .substr(subSection.nameTranslationKey.lastIndexOf('.') + 1)),
-          });
+          }, onSection);
         subSectionDatas.push({
           ...subSectionData,
           url: this.filePathToUrl(subSectionData.filePath, context.basePath, context.baseUrl),
         });
       }
 
-      // Create index file
       const filePath = join(context.path, 'index.html');
-      const fileContents = this.templateIndex({
-        baseUrl: context.baseUrl,
-        breadcrumbs: context.breadcrumbs.concat([{ name: sectionTitle }]),
-        colors: context.colors,
-        headSuffix: context.headSuffixGetters.map((g) => g(context)).join(''),
-        language: context.language,
-        mainTitle: context.title,
-        sectionTitle,
-        subSectionDatas,
-      });
-      await fs.writeFile(filePath, fileContents);
+      await onSection({ index: true, breadcrumbs, context, sectionTitle, section, subSectionDatas, filePath, fileUrl });
 
       return { filePath: context.path, sectionTitle };
     } else {
@@ -103,29 +169,12 @@ export class HtmlInfoBookSerializer {
       const directory = context.path.substr(0, context.path.lastIndexOf('/'));
       await this.ensureDirExists(directory);
 
-      // Create leaf file
+      // Handle leaf file
       const filePath = context.path + '.html';
-      const sectionTitle = this.formatString(context.resourceHandler
-        .getTranslation(section.nameTranslationKey, context.language));
-      const fileContents = this.templateSection({
-        baseUrl: context.baseUrl,
-        breadcrumbs: context.breadcrumbs.concat([{ name: sectionTitle }]),
-        colors: context.colors,
-        headSuffix: context.headSuffixGetters.map((g) => g(context)).join(''),
-        language: context.language,
-        mainTitle: context.title,
-        sectionAppendices: section.appendix
-          .filter((appendix) => appendix) // TODO: rm
-          .map((appendix) => this.appendixWrapper({
-            appendixContents: appendix.toHtml(context, fileWriter, this),
-            appendixName: appendix.getName ? appendix.getName(context) : null,
-          })),
-        sectionParagraphs: section.paragraphTranslationKeys
-          .map((key) => context.resourceHandler.getTranslation(key, context.language))
-          .map((value) => this.formatString(value)),
-        sectionTitle,
-      });
-      await fs.writeFile(filePath, fileContents);
+      const fileUrl = this.filePathToUrl(filePath, context.basePath, context.baseUrl);
+
+      await onSection(
+        { index: false, breadcrumbs, context, sectionTitle, section, subSectionDatas: [], filePath, fileUrl });
 
       return { filePath, sectionTitle };
     }
@@ -235,4 +284,26 @@ export interface ISerializeContext {
   title: string;
   colors: {[key: string]: string};
   headSuffixGetters: ((context: ISerializeContext) => string)[];
+}
+
+export interface ISectionCallbackArgs {
+  index: boolean;
+  breadcrumbs?: { url?: string, name: string }[];
+  context: ISerializeContext;
+  sectionTitle: string;
+  section: IInfoSection;
+  subSectionDatas: { url: string, sectionTitle: string }[];
+  filePath: string;
+  fileUrl: string;
+}
+
+export interface ISectionIndex {
+  /**
+   * The array of pages, with defined order.
+   */
+  linkedPagesList: { name: string, url: string }[];
+  /**
+   * Mapping from url to page index within linkedPagesList.
+   */
+  urlIndex: {[url: string]: number};
 }
