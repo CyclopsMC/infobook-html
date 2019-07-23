@@ -111,8 +111,12 @@ export class ResourceLoader {
 
     // Handle languages
     const langDir = join(fullPath, 'lang');
-    if ((await fs.stat(langDir)).isDirectory()) {
-      await this.loadAssetsLang(modid, langDir);
+    try {
+      if ((await fs.stat(langDir)).isDirectory()) {
+        await this.loadAssetsLang(modid, langDir);
+      }
+    } catch (e) {
+      // Ignore mods without language files
     }
 
     // Handle advancements
