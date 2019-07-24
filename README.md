@@ -79,6 +79,20 @@ Before you start this phase, make sure the following files and directories are p
   },
   "title": "Integrated Dynamics - On the Dynamics of Integration",
   "sectionsFile": "mod_assets/integrateddynamics/info/on_the_dynamics_of_integration.xml",
+  "injectSections": {
+    "info_book.integrateddynamics.manual": [
+      {
+        "sectionsFile": "mod_assets/integratedtunnels/info/tunnels_info.xml",
+        "modId": "integratedtunnels"
+      }
+    ],
+    "info_book.integrateddynamics.tutorials": [
+      {
+        "sectionsFile": "mod_assets/integratedtunnels/info/tunnels_tutorials.xml",
+        "modId": "integratedtunnels"
+      }
+    ]
+  },
   "modId": "integrateddynamics",
   "keybindings": {
     "key.integrateddynamics.logic_programmer_focus_search": "Alt + F",

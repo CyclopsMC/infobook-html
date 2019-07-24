@@ -47,7 +47,7 @@ export class InfoBookAppendixHandlerAdvancementRewards implements IInfoBookAppen
         const rewards = rewardsData
           .map((reward) => serializer.createItemDisplay(
             this.resourceHandler, context, fileWriter, reward, true));
-        const rewardsString = this.resourceHandler.getTranslation(`gui.${context.modId}.rewards`, context.language);
+        const rewardsString = this.resourceHandler.getTranslation(`gui.cyclopscore.rewards`, context.language);
         return this.templateAdvancementRewards({ advancements, rewards, rewardsString });
       },
     };

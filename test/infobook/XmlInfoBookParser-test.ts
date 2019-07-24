@@ -19,12 +19,12 @@ describe('XmlInfoBookParser', () => {
 
   describe('parse', () => {
     it('should reject for an invalid path', async () => {
-      return expect(parser.parse(__dirname + "/assets/unknown.xml")).rejects
+      return expect(parser.parse(__dirname + "/assets/unknown.xml", 'mod')).rejects
         .toThrow(new Error(`ENOENT: no such file or directory, open '${__dirname}/assets/unknown.xml'`));
     });
 
     it('should resolve for a valid path', async () => {
-      return expect(await parser.parse(__dirname + '/assets/infobook.xml')).toEqual({
+      return expect(await parser.parse(__dirname + '/assets/infobook.xml', 'mod')).toEqual({
         'rootSection': {
           'nameTranslationKey': 'info_book.integrateddynamics.section.main',
           'subSections': [
@@ -38,6 +38,7 @@ describe('XmlInfoBookParser', () => {
                 'info_book.integrateddynamics.introduction.text4',
               ],
               'appendix': [],
+              'modId': 'mod',
               'tags': [],
             },
             {
@@ -50,17 +51,105 @@ describe('XmlInfoBookParser', () => {
                     'info_book.integrateddynamics.tutorials.introduction.text1',
                   ],
                   'appendix': [],
+                  'modId': 'mod',
                   'tags': ['abc'],
                 },
               ],
               'paragraphTranslationKeys': [],
               'appendix': [],
+              'modId': 'mod',
               'tags': [],
             },
           ],
           'paragraphTranslationKeys': [],
           'appendix': [],
+          'modId': 'mod',
           'tags': [],
+        },
+        'sections': {
+          'info_book.integrateddynamics.section.main': {
+            'nameTranslationKey': 'info_book.integrateddynamics.section.main',
+            'subSections': [
+              {
+                'nameTranslationKey': 'info_book.integrateddynamics.introduction',
+                'subSections': [],
+                'paragraphTranslationKeys': [
+                  'info_book.integrateddynamics.introduction.text1',
+                  'info_book.integrateddynamics.introduction.text2',
+                  'info_book.integrateddynamics.introduction.text3',
+                  'info_book.integrateddynamics.introduction.text4',
+                ],
+                'appendix': [],
+                'modId': 'mod',
+                'tags': [],
+              },
+              {
+                'nameTranslationKey': 'info_book.integrateddynamics.tutorials',
+                'subSections': [
+                  {
+                    'nameTranslationKey': 'info_book.integrateddynamics.tutorials.introduction',
+                    'subSections': [],
+                    'paragraphTranslationKeys': [
+                      'info_book.integrateddynamics.tutorials.introduction.text1',
+                    ],
+                    'appendix': [],
+                    'modId': 'mod',
+                    'tags': ['abc'],
+                  },
+                ],
+                'paragraphTranslationKeys': [],
+                'appendix': [],
+                'modId': 'mod',
+                'tags': [],
+              },
+            ],
+            'paragraphTranslationKeys': [],
+            'appendix': [],
+            'modId': 'mod',
+            'tags': [],
+          },
+          'info_book.integrateddynamics.introduction': {
+            'nameTranslationKey': 'info_book.integrateddynamics.introduction',
+            'subSections': [],
+            'paragraphTranslationKeys': [
+              'info_book.integrateddynamics.introduction.text1',
+              'info_book.integrateddynamics.introduction.text2',
+              'info_book.integrateddynamics.introduction.text3',
+              'info_book.integrateddynamics.introduction.text4',
+            ],
+            'appendix': [],
+            'modId': 'mod',
+            'tags': [],
+          },
+          'info_book.integrateddynamics.tutorials': {
+            'nameTranslationKey': 'info_book.integrateddynamics.tutorials',
+            'subSections': [
+              {
+                'nameTranslationKey': 'info_book.integrateddynamics.tutorials.introduction',
+                'subSections': [],
+                'paragraphTranslationKeys': [
+                  'info_book.integrateddynamics.tutorials.introduction.text1',
+                ],
+                'appendix': [],
+                'modId': 'mod',
+                'tags': ['abc'],
+              },
+            ],
+            'paragraphTranslationKeys': [],
+            'appendix': [],
+            'modId': 'mod',
+            'tags': [],
+          },
+          'info_book.integrateddynamics.tutorials.introduction': {
+            'nameTranslationKey': 'info_book.integrateddynamics.tutorials.introduction',
+            'subSections': [],
+            'paragraphTranslationKeys': [
+              'info_book.integrateddynamics.tutorials.introduction.text1',
+            ],
+            'appendix': [],
+            'modId': 'mod',
+            'tags': ['abc'],
+          },
         },
       });
     });
@@ -72,13 +161,24 @@ describe('XmlInfoBookParser', () => {
         section: {
           $: { name: "abc" },
         },
-      })).toEqual({
+      }, 'mod')).toEqual({
         rootSection: {
           nameTranslationKey: "abc",
           subSections: [],
           paragraphTranslationKeys: [],
           appendix: [],
+          modId: 'mod',
           tags: [],
+        },
+        sections: {
+          abc: {
+            nameTranslationKey: "abc",
+            subSections: [],
+            paragraphTranslationKeys: [],
+            appendix: [],
+            modId: 'mod',
+            tags: [],
+          },
         },
       });
     });
@@ -88,7 +188,7 @@ describe('XmlInfoBookParser', () => {
         blabla: {
           $: { name: "abc" },
         },
-      })).toThrow(new Error('No valid root section was found.'));
+      }, 'mod')).toThrow(new Error('No valid root section was found.'));
     });
   });
 
@@ -97,12 +197,24 @@ describe('XmlInfoBookParser', () => {
       const data = {
         $: { name: "abc" },
       };
-      return expect(parser.jsonToSection(data)).toEqual({
+      const sections = {};
+      expect(parser.jsonToSection(data, sections, 'mod')).toEqual({
         nameTranslationKey: "abc",
         subSections: [],
         paragraphTranslationKeys: [],
         appendix: [],
+        modId: 'mod',
         tags: [],
+      });
+      expect(sections).toEqual({
+        abc: {
+          nameTranslationKey: "abc",
+          subSections: [],
+          paragraphTranslationKeys: [],
+          appendix: [],
+          modId: 'mod',
+          tags: [],
+        },
       });
     });
 
@@ -134,7 +246,8 @@ describe('XmlInfoBookParser', () => {
           'abc',
         ],
       };
-      return expect(parser.jsonToSection(data)).toEqual({
+      const sections = {};
+      expect(parser.jsonToSection(data, sections, 'mod')).toEqual({
         nameTranslationKey: "abc",
         subSections: [
           {
@@ -142,6 +255,7 @@ describe('XmlInfoBookParser', () => {
             subSections: [],
             paragraphTranslationKeys: [],
             appendix: [],
+            modId: 'mod',
             tags: [],
           },
           {
@@ -149,6 +263,7 @@ describe('XmlInfoBookParser', () => {
             subSections: [],
             paragraphTranslationKeys: [],
             appendix: [],
+            modId: 'mod',
             tags: [],
           },
         ],
@@ -161,7 +276,58 @@ describe('XmlInfoBookParser', () => {
           null,
           null,
         ],
+        modId: 'mod',
         tags: ['abc'],
+      });
+      expect(sections).toEqual({
+        abc: {
+          nameTranslationKey: "abc",
+          subSections: [
+            {
+              nameTranslationKey: "a_1",
+              subSections: [],
+              paragraphTranslationKeys: [],
+              appendix: [],
+              modId: 'mod',
+              tags: [],
+            },
+            {
+              nameTranslationKey: "a_2",
+              subSections: [],
+              paragraphTranslationKeys: [],
+              appendix: [],
+              modId: 'mod',
+              tags: [],
+            },
+          ],
+          paragraphTranslationKeys: [
+            "p1",
+            "p2",
+            "p3",
+          ],
+          appendix: [
+            null,
+            null,
+          ],
+          modId: 'mod',
+          tags: ['abc'],
+        },
+        a_1: {
+          nameTranslationKey: "a_1",
+          subSections: [],
+          paragraphTranslationKeys: [],
+          appendix: [],
+          modId: 'mod',
+          tags: [],
+        },
+        a_2: {
+          nameTranslationKey: "a_2",
+          subSections: [],
+          paragraphTranslationKeys: [],
+          appendix: [],
+          modId: 'mod',
+          tags: [],
+        },
       });
     });
   });
@@ -174,21 +340,21 @@ describe('XmlInfoBookParser', () => {
 
   describe('jsonToAppendix', () => {
     it('should error for no $ field', async () => {
-      return expect(() => parser.jsonToAppendix({}))
+      return expect(() => parser.jsonToAppendix({}, 'mod'))
         .toThrow(new Error('No type or factory was found for the appendix {}.'));
     });
 
     it('should error for no type', async () => {
-      return expect(() => parser.jsonToAppendix({ $: {} }))
+      return expect(() => parser.jsonToAppendix({ $: {} }, 'mod'))
         .toThrow(new Error('No type or factory was found for the appendix {"$":{}}.'));
     });
 
     it('should return null for an unknown type', async () => {
-      return expect(parser.jsonToAppendix({ $: { type: 'unknown' } })).toBe(null);
+      return expect(parser.jsonToAppendix({ $: { type: 'unknown' } }, 'mod')).toBe(null);
     });
 
     it('should return an appendix for an image for a known type', async () => {
-      return expect(parser.jsonToAppendix({ $: { type: 'dummy' } })).toBe(dummyAppendix);
+      return expect(parser.jsonToAppendix({ $: { type: 'dummy' } }, 'mod')).toBe(dummyAppendix);
     });
   });
 });

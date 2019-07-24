@@ -144,6 +144,16 @@ export class HtmlInfoBookSerializer {
       .getTranslation(section.nameTranslationKey, context.language));
     const breadcrumbs = context.breadcrumbs.concat([{ name: sectionTitle }]);
 
+    // Go in a subfolder when we are handling a different mod
+    if (section.modId !== context.modId) {
+      await this.ensureDirExists(join(context.path, section.modId));
+      context = {
+        ...context,
+        modId: section.modId,
+        path: join(context.path, section.modId),
+      };
+    }
+
     if (section.subSections && section.subSections.length > 0) {
       // Navigation section
 

@@ -27,15 +27,16 @@ export class XmlInfoBookParser {
   /**
    * Parse the infobook at the given path.
    * @param {string} path A path.
+   * @param {string} modId The owning mod.
    * @returns {Promise<IInfoBook>} Promise resolving to an infobook.
    */
-  public parse(path: string): Promise<IInfoBook> {
+  public parse(path: string, modId: string): Promise<IInfoBook> {
     return new Promise((resolve, reject) => {
       parseString(fs.readFileSync(path), (error, data) => {
         if (error) {
           return reject(error);
         }
-        return resolve(this.jsonToInfoBook(data));
+        return resolve(this.jsonToInfoBook(data, modId));
       });
     });
   }
@@ -43,11 +44,13 @@ export class XmlInfoBookParser {
   /**
    * Convert a data object to an infobook.
    * @param data A data object.
+   * @param {string} modId The owning mod.
    * @returns {IInfoBook} An infobook.
    */
-  public jsonToInfoBook(data: any): IInfoBook {
+  public jsonToInfoBook(data: any, modId: string): IInfoBook {
     if (data.section) {
-      return { rootSection: this.jsonToSection(data.section) };
+      const sections: {[id: string]: IInfoSection} = {};
+      return { rootSection: this.jsonToSection(data.section, sections, modId), sections };
     }
     throw new Error('No valid root section was found.');
   }
@@ -55,18 +58,23 @@ export class XmlInfoBookParser {
   /**
    * Convert a data object to a section.
    * @param data A data object.
+   * @param sections The sections index to store the index into.
+   * @param {string} modId The owning mod.
    * @returns {IInfoSection} A section.
    */
-  public jsonToSection(data: any): IInfoSection {
+  public jsonToSection(data: any, sections: {[id: string]: IInfoSection}, modId: string): IInfoSection {
     // tslint:disable:object-literal-sort-keys
-    return {
+    const section = {
       nameTranslationKey: data.$.name,
-      subSections: (data.section || []).map((subData: any) => this.jsonToSection(subData)),
+      subSections: (data.section || []).map((subData: any) => this.jsonToSection(subData, sections, modId)),
       paragraphTranslationKeys: (data.paragraph || []).map((subData: any) => this.jsonToParagraph(subData)),
       appendix: ((data.appendix || []).concat(data.appendix_list || []))
-        .map((subData: any) => this.jsonToAppendix(subData)),
+        .map((subData: any) => this.jsonToAppendix(subData, modId)),
       tags: data.tag || [],
+      modId,
     };
+    sections[section.nameTranslationKey] = section;
+    return section;
   }
 
   /**
@@ -81,16 +89,17 @@ export class XmlInfoBookParser {
   /**
    * Convert a data object to an appendix.
    * @param data A data object.
+   * @param {string} modId The owning mod.
    * @returns {IInfoAppendix} An appendix.
    */
-  public jsonToAppendix(data: any): IInfoAppendix {
+  public jsonToAppendix(data: any, modId: string): IInfoAppendix {
     if (!data.$ || (!data.$.type && !data.$.factory)) {
       throw new Error(`No type or factory was found for the appendix ${JSON.stringify(data)}.`);
     }
     const type = data.$.type || data.$.factory;
     const handler = this.appendixHandlers[type];
     if (handler) {
-      return handler.createAppendix(data);
+      return handler.createAppendix(data, modId);
     }
     // tslint:disable-next-line:no-console
     console.error(`Could not find an appendix handler for type '${type}'`);

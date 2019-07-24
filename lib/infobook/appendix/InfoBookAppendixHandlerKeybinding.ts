@@ -21,7 +21,7 @@ export class InfoBookAppendixHandlerKeybinding implements IInfoBookAppendixHandl
     const id = data._;
     const key = this.resourceHandler.getKeybinding(id);
     return {
-      getName: (context) => this.resourceHandler.getTranslation(`gui.${context.modId}.keybinding`, context.language),
+      getName: (context) => this.resourceHandler.getTranslation(`infobook.cyclopscore.keybinding`, context.language),
       toHtml: (context: ISerializeContext) => {
         const name = this.resourceHandler.getTranslation(id, context.language);
         return this.templateKeybinding({ name, key });
