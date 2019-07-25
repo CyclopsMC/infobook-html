@@ -16,14 +16,17 @@ export class InfoBookAppendixHandlerCraftingRecipe implements IInfoBookAppendixH
   private readonly resourceHandler: ResourceHandler;
   private readonly registry: IRecipeRegistry;
   private readonly registryTagged: {[tag: string]: IRecipe[]};
+  private readonly recipePredefineds: IRecipePredefineds;
   private readonly templateCraftingRecipe: compileTemplate;
 
-  constructor(resourceHandler: ResourceHandler, registriesPath: string, recipeOverrides: any) {
+  constructor(resourceHandler: ResourceHandler, registriesPath: string, recipeOverrides: any,
+              recipePredefineds: IRecipePredefineds) {
     this.resourceHandler = resourceHandler;
     this.registry = JSON.parse(fs.readFileSync(join(registriesPath, 'crafting_recipe.json'), "utf8"));
     if (recipeOverrides) {
       this.registry = { ... this.registry, ...recipeOverrides };
     }
+    this.recipePredefineds = recipePredefineds;
     this.registryTagged = {};
     for (const recipeId in this.registry) {
       for (const recipe of this.registry[recipeId]) {
@@ -44,7 +47,12 @@ export class InfoBookAppendixHandlerCraftingRecipe implements IInfoBookAppendixH
     // const meta = data.$.meta || 0;
     // const count = data.$.count || 1;
     const outputName = data._;
-    const recipes = this.registry[outputName] || this.registryTagged['crafting_recipe:' + outputName];
+    let recipes;
+    if (data.$.predefined) {
+      recipes = [this.recipePredefineds[outputName]];
+    } else {
+      recipes = this.registry[outputName] || this.registryTagged['crafting_recipe:' + outputName];
+    }
     if (!recipes) {
       throw new Error(`Could not find any recipe for ${outputName}`);
     }
@@ -108,4 +116,8 @@ export interface IRecipe {
   width: number;
   height: number;
   tags: string[];
+}
+
+export interface IRecipePredefineds {
+  [id: string]: IRecipe;
 }

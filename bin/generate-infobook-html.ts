@@ -63,7 +63,7 @@ async function create() {
     new InfoBookAppendixHandlerAdvancementRewards(resourceLoader.getResourceHandler()));
   infoBookInitializer.registerAppendixHandler('crafting_recipe',
     new InfoBookAppendixHandlerCraftingRecipe(resourceLoader.getResourceHandler(),
-      'registries', config.recipeOverrides));
+      'registries', config.recipeOverrides, config.recipePredefineds));
   infoBookInitializer.registerAppendixHandler('image',
     new InfoBookAppendixHandlerImage(resourceLoader.getResourceHandler()));
   infoBookInitializer.registerAppendixHandler('keybinding',

@@ -111,7 +111,8 @@ Before you start this phase, make sure the following files and directories are p
     "key.integrateddynamics.logic_programmer_focus_search": "Alt + F",
     "key.integrateddynamics.logic_programmer_open_rename": "Alt + R"
   },
-  "recipeOverrides": {}
+  "recipeOverrides": {},
+  "recipePredefineds": {}
 }
 ```
 
