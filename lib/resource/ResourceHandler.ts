@@ -81,7 +81,7 @@ export class ResourceHandler {
       return null;
     }
     let file = nbts[nbt];
-    if (!file && !nbt) {
+    if (!file) {
       file = nbts[Object.keys(nbts)[0]]; // Take the first NBT-tagged item if none without NBT could be found
     }
     return file;

@@ -253,8 +253,11 @@ export class HtmlInfoBookSerializer {
     }
     const iconUrl = fileWriter.write('icons/' + basename(icon), createReadStream(icon));
 
-    const { link, linkTarget } = this.createResourceLink(resourceHandler, context, item.item,
-      resourceHandler.getItemTranslationKey(item));
+    const key = resourceHandler.getItemTranslationKey(item);
+    if (!key) {
+      throw new Error(`Could not find translation key for item ${JSON.stringify(item)}`);
+    }
+    const { link, linkTarget } = this.createResourceLink(resourceHandler, context, item.item, key);
 
     return this.templateItem({
       ...context,
@@ -276,8 +279,12 @@ export class HtmlInfoBookSerializer {
     }
     const iconUrl = fileWriter.write('icons/' + basename(icon), createReadStream(icon));
 
+    const key = resourceHandler.getFluidTranslationKey(fluid);
+    if (!key) {
+      throw new Error(`Could not find translation key for fluid ${JSON.stringify(fluid)}`);
+    }
     const { link, linkTarget } = this.createResourceLink(resourceHandler, context, this.tagFluid(context, fluid.fluid),
-      resourceHandler.getFluidTranslationKey(fluid));
+      key);
 
     return this.templateItem({
       ...context,
