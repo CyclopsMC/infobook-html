@@ -22,6 +22,8 @@ export class HtmlInfoBookSerializer {
   private readonly appendixWrapper: compileTemplate;
   private readonly templateItem: compileTemplate;
 
+  private fileWriter: IFileWriter;
+
   constructor() {
     this.templateIndex = compilePug(__dirname + '/../../template/index.pug');
     this.templateSection = compilePug(__dirname + '/../../template/section.pug');
@@ -30,6 +32,13 @@ export class HtmlInfoBookSerializer {
   }
 
   public async serialize(infobook: IInfoBook, context: ISerializeContext, assetsPaths: string[]) {
+    context = {
+      ...context,
+      basePath: context.path,
+      breadcrumbs: [],
+    };
+    this.fileWriter = new FileWriter(context);
+
     await this.ensureDirExists(context.path);
     await this.ensureDirExists(join(context.path, 'assets'));
     await this.ensureDirExists(join(context.path, 'assets', 'icons'));
@@ -59,8 +68,6 @@ export class HtmlInfoBookSerializer {
     let pageIndex: number = 0;
     await this.serializeSection(infobook.rootSection, {
       ...contextRoot,
-      basePath: contextRoot.path,
-      breadcrumbs: [],
       language,
       path: langPath,
     }, async ({ index, section, sectionTitle, fileUrl, breadcrumbs }) => {
@@ -83,8 +90,6 @@ export class HtmlInfoBookSerializer {
                                      language: string, langPath: string, sectionIndex: ISectionIndex) {
     await this.serializeSection(infobook.rootSection, {
       ...contextRoot,
-      basePath: contextRoot.path,
-      breadcrumbs: [],
       language,
       path: langPath,
       sectionIndex,
@@ -111,7 +116,6 @@ export class HtmlInfoBookSerializer {
           ? sectionIndex.linkedPagesList[pageIndex - 1] : null;
 
         // Create leaf file
-        const fileWriter = new FileWriter(context);
         const fileContents = this.templateSection({
           baseUrl: context.baseUrl,
           breadcrumbs,
@@ -124,7 +128,7 @@ export class HtmlInfoBookSerializer {
           sectionAppendices: section.appendix
             .filter((appendix) => appendix) // TODO: rm
             .map((appendix) => this.appendixWrapper({
-              appendixContents: appendix.toHtml(context, fileWriter, this),
+              appendixContents: appendix.toHtml(context, this.fileWriter, this),
               appendixName: appendix.getName ? appendix.getName(context) : null,
             })),
           sectionParagraphs: section.paragraphTranslationKeys
