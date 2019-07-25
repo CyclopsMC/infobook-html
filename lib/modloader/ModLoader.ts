@@ -1,6 +1,6 @@
 import {ChildProcess, exec} from "child_process";
-import * as fs from "fs";
 import {createWriteStream} from "fs";
+import * as fs from "fs";
 import download from 'mvn-artifact-download';
 import {ncp} from "ncp";
 import fetch from 'node-fetch';
@@ -14,7 +14,7 @@ import {Entry, open as openZip, ZipFile} from "yauzl";
  */
 export class ModLoader {
 
-  private readonly mods: { artifact: string, repo: string }[];
+  private readonly mods: IMod[];
   private readonly path: string;
   private readonly versionForge: string;
   private readonly versionMinecraft: string;
@@ -89,8 +89,27 @@ export class ModLoader {
       await fs.promises.mkdir(modsDir);
     }
     for (const mod of this.mods) {
-      process.stdout.write(`  - ${mod.artifact} from ${mod.repo}...\n`);
-      await download(mod.artifact, modsDir, mod.repo);
+      if (mod.type === 'curseforge') {
+        const fileName = `${mod.artifact}-${mod.version}.jar`;
+        process.stdout.write(`  - ${fileName} from CurseForge...\n`);
+        const url = `https://minecraft.curseforge.com/api/maven/${mod.project}/${mod.artifact
+          .replace(/-/g, '/')}/${fileName}`;
+        const response = await fetch(url);
+        if (response.status !== 200) {
+          throw new Error(response.statusText + ' on ' + url);
+        }
+        await new Promise((resolve, reject) => {
+          response.body
+            .on('error', reject)
+            .on('end', resolve)
+            .pipe(fs.createWriteStream(join(modsDir, fileName)));
+        });
+      } else if (mod.type === 'maven') {
+        process.stdout.write(`  - ${mod.artifact} from ${mod.repo}...\n`);
+        await download(mod.artifact, modsDir, mod.repo);
+      } else {
+        throw new Error('Unknown mod type ' + (<any> mod).type);
+      }
     }
   }
 
@@ -270,8 +289,23 @@ export class ModLoader {
 }
 
 export interface IModLoaderArgs {
-  mods: { artifact: string, repo: string }[];
+  mods: IMod[];
   path: string;
   versionForge: string;
   versionMinecraft: string;
+}
+
+export type IMod = IModMaven | IModCurseforge;
+
+export interface IModMaven {
+  type: 'maven';
+  artifact: string;
+  repo: string;
+}
+
+export interface IModCurseforge {
+  type: 'curseforge';
+  project: string;
+  artifact: string;
+  version: string;
 }
