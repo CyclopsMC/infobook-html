@@ -103,6 +103,7 @@ async function create() {
     baseUrl: config.baseUrl,
     bookName: config.bookName,
     colors: config.colors,
+    googleAdsense: config.googleAdsense,
     googleAnalytics: config.googleAnalytics,
     headSuffixGetters,
     modId: config.modId,

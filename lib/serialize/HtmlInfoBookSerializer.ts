@@ -1,9 +1,10 @@
 import {createReadStream, promises as fs} from "fs";
 import mkdirp = require("mkdirp");
 import {ncp} from "ncp";
-import {basename, dirname, join, sep} from "path";
+import {basename, join} from "path";
 import {compileFile as compilePug, compileTemplate} from "pug";
 import {promisify} from "util";
+import {InfoBookAppendixAd} from "../infobook/appendix/InfoBookAppendixAd";
 import {FileWriter} from "../infobook/FileWriter";
 import {IFileWriter} from "../infobook/IFileWriter";
 import {IFluid} from "../infobook/IFluid";
@@ -125,6 +126,12 @@ export class HtmlInfoBookSerializer {
         const previousPage = pageIndex > 0
           ? sectionIndex.linkedPagesList[pageIndex - 1] : null;
 
+        // Prepend ad appendix if enabled
+        const appendices = section.appendix;
+        if (context.googleAdsense) {
+          appendices.unshift(new InfoBookAppendixAd());
+        }
+
         // Create leaf file
         const fileContents = this.templateSection({
           ...context,
@@ -133,12 +140,19 @@ export class HtmlInfoBookSerializer {
           languages,
           nextPage,
           previousPage,
-          sectionAppendices: section.appendix
+          sectionAppendices: appendices
             .filter((appendix) => appendix) // TODO: rm
-            .map((appendix) => this.appendixWrapper({
-              appendixContents: appendix.toHtml(context, this.fileWriter, this),
-              appendixName: appendix.getName ? appendix.getName(context) : null,
-            })),
+            .map((appendix) => {
+              const appendixContents = appendix.toHtml(context, this.fileWriter, this);
+              if (appendix.skipWrapper) {
+                return appendixContents;
+              } else {
+                return this.appendixWrapper({
+                  appendixContents,
+                  appendixName: appendix.getName ? appendix.getName(context) : null,
+                });
+              }
+            }),
           sectionParagraphs: section.paragraphTranslationKeys
             .map((key) => context.resourceHandler.getTranslation(key, context.language))
             .map((value) => this.formatString(value)),
@@ -359,6 +373,7 @@ export interface ISerializeContext {
   bookName: string;
   mods: string[];
   googleAnalytics: string;
+  googleAdsense: { client: string, format: string, slot: string };
 }
 
 export interface ISectionCallbackArgs {

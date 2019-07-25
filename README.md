@@ -74,6 +74,11 @@ Before you start this phase, make sure the following files and directories are p
 {
   "baseUrl": "/",
   "googleAnalytics": "UA-???????-??",
+  "googleAdsense": {
+    "client": "ca-pub-?",
+    "slot": "?",
+    "format": "auto"
+  },
   "colors": {
     "h": "#16384c",
     "border": "#3381ad",

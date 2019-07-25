@@ -6,6 +6,10 @@ import {IFileWriter} from "./IFileWriter";
  */
 export interface IInfoAppendix {
   /**
+   * If this appendix should not be wrapped inside a box.
+   */
+  skipWrapper?: boolean;
+  /**
    * @param context The serialization context.
    * @returns {string} The optional appendix type name.
    */
