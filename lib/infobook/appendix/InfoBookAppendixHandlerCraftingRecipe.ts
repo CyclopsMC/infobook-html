@@ -15,6 +15,7 @@ export class InfoBookAppendixHandlerCraftingRecipe implements IInfoBookAppendixH
 
   private readonly resourceHandler: ResourceHandler;
   private readonly registry: IRecipeRegistry;
+  private readonly registryTagged: {[tag: string]: IRecipe[]};
   private readonly templateCraftingRecipe: compileTemplate;
 
   constructor(resourceHandler: ResourceHandler, registriesPath: string, recipeOverrides: any) {
@@ -22,6 +23,18 @@ export class InfoBookAppendixHandlerCraftingRecipe implements IInfoBookAppendixH
     this.registry = JSON.parse(fs.readFileSync(join(registriesPath, 'crafting_recipe.json'), "utf8"));
     if (recipeOverrides) {
       this.registry = { ... this.registry, ...recipeOverrides };
+    }
+    this.registryTagged = {};
+    for (const recipeId in this.registry) {
+      for (const recipe of this.registry[recipeId]) {
+        for (const tag of recipe.tags) {
+          let recipes = this.registryTagged[tag];
+          if (!recipes) {
+            recipes = this.registryTagged[tag] = [];
+          }
+          recipes.push(recipe);
+        }
+      }
     }
     this.templateCraftingRecipe = compilePug(__dirname + '/../../../template/appendix/crafting_recipe.pug');
   }
@@ -31,7 +44,7 @@ export class InfoBookAppendixHandlerCraftingRecipe implements IInfoBookAppendixH
     // const meta = data.$.meta || 0;
     // const count = data.$.count || 1;
     const outputName = data._;
-    const recipes = this.registry[outputName];
+    const recipes = this.registry[outputName] || this.registryTagged['crafting_recipe:' + outputName];
     if (!recipes) {
       throw new Error(`Could not find any recipe for ${outputName}`);
     }
@@ -86,10 +99,13 @@ export class InfoBookAppendixHandlerCraftingRecipe implements IInfoBookAppendixH
 }
 
 export interface IRecipeRegistry {
-  [id: string]: [{
-    input: IItem[][];
-    output: IItem;
-    width: number;
-    height: number;
-  }];
+  [id: string]: [IRecipe];
+}
+
+export interface IRecipe {
+  input: IItem[][];
+  output: IItem;
+  width: number;
+  height: number;
+  tags: string[];
 }
