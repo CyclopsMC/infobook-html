@@ -109,17 +109,10 @@ export class HtmlInfoBookSerializer {
       if (index) {
         // Create index file
         const fileContents = this.templateIndex({
-          baseUrl: context.baseUrl,
-          bookName: context.bookName,
+          ...context,
           breadcrumbs,
-          colors: context.colors,
           headSuffix: context.headSuffixGetters.map((g) => g(context)).join(''),
-          language: context.language,
           languages,
-          modName: context.modName,
-          modUrl: context.modUrl,
-          mods: context.mods,
-          root: context.root,
           sectionTitle,
           subSectionDatas,
         });
@@ -134,19 +127,12 @@ export class HtmlInfoBookSerializer {
 
         // Create leaf file
         const fileContents = this.templateSection({
-          baseUrl: context.baseUrl,
-          bookName: context.bookName,
+          ...context,
           breadcrumbs,
-          colors: context.colors,
           headSuffix: context.headSuffixGetters.map((g) => g(context)).join(''),
-          language: context.language,
           languages,
-          modName: context.modName,
-          modUrl: context.modUrl,
-          mods: context.mods,
           nextPage,
           previousPage,
-          root: context.root,
           sectionAppendices: section.appendix
             .filter((appendix) => appendix) // TODO: rm
             .map((appendix) => this.appendixWrapper({
@@ -372,6 +358,7 @@ export interface ISerializeContext {
   modUrl: string;
   bookName: string;
   mods: string[];
+  googleAnalytics: string;
 }
 
 export interface ISectionCallbackArgs {

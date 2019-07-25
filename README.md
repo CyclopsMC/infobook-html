@@ -73,6 +73,7 @@ Before you start this phase, make sure the following files and directories are p
 ```json
 {
   "baseUrl": "/",
+  "googleAnalytics": "UA-???????-??",
   "colors": {
     "h": "#16384c",
     "border": "#3381ad",
