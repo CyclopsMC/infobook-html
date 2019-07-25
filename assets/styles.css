@@ -30,6 +30,16 @@ h1, h2, h3, h4 {
     font-family: 'Droid Sans', sans-serif;
 }
 
+.root-info {
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+.root-info ul li {
+    list-style-type: circle;
+    font-size: 14px;
+}
+
 .breadcrumbs ul {
     margin: 0;
     padding: 0;

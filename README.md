@@ -81,7 +81,10 @@ Before you start this phase, make sure the following files and directories are p
     "main_background": "#e6d6ac",
     "outer_background": "#09171f"
   },
-  "title": "Integrated Dynamics - On the Dynamics of Integration",
+  "modId": "integrateddynamics",
+  "modName": "Integrated Dynamics",
+  "modUrl": "https://www.curseforge.com/minecraft/mc-mods/integrated-dynamics",
+  "bookName": "On the Dynamics of Integration",
   "sectionsFile": "mod_assets/integrateddynamics/info/on_the_dynamics_of_integration.xml",
   "injectSections": {
     "info_book.integrateddynamics.manual": [
@@ -97,7 +100,6 @@ Before you start this phase, make sure the following files and directories are p
       }
     ]
   },
-  "modId": "integrateddynamics",
   "keybindings": {
     "key.integrateddynamics.logic_programmer_focus_search": "Alt + F",
     "key.integrateddynamics.logic_programmer_open_rename": "Alt + R"

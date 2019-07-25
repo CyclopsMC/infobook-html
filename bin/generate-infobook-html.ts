@@ -85,6 +85,11 @@ async function create() {
     }
   }
 
+  // Find all available mods
+  const mods: string[] = (await fs.promises.readdir('server/mods'))
+    .filter((mod) => mod.endsWith('.jar'))
+    .map((mod) => mod.substr(0, mod.length - 4));
+
   // Initialize book
   const infoBook: IInfoBook = await infoBookInitializer.initialize(resourceLoader.getResourceHandler());
 
@@ -96,12 +101,16 @@ async function create() {
   const infoBookSerializer = new HtmlInfoBookSerializer();
   await infoBookSerializer.serialize(infoBook, {
     baseUrl: config.baseUrl,
+    bookName: config.bookName,
     colors: config.colors,
     headSuffixGetters,
     modId: config.modId,
+    modName: config.modName,
+    modUrl: config.modUrl,
+    mods,
     path,
     resourceHandler: resourceLoader.getResourceHandler(),
-    title: config.title,
+    root: true,
   }, assetsPaths);
 }
 

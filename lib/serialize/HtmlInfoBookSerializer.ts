@@ -110,12 +110,16 @@ export class HtmlInfoBookSerializer {
         // Create index file
         const fileContents = this.templateIndex({
           baseUrl: context.baseUrl,
+          bookName: context.bookName,
           breadcrumbs,
           colors: context.colors,
           headSuffix: context.headSuffixGetters.map((g) => g(context)).join(''),
           language: context.language,
           languages,
-          mainTitle: context.title,
+          modName: context.modName,
+          modUrl: context.modUrl,
+          mods: context.mods,
+          root: context.root,
           sectionTitle,
           subSectionDatas,
         });
@@ -131,14 +135,18 @@ export class HtmlInfoBookSerializer {
         // Create leaf file
         const fileContents = this.templateSection({
           baseUrl: context.baseUrl,
+          bookName: context.bookName,
           breadcrumbs,
           colors: context.colors,
           headSuffix: context.headSuffixGetters.map((g) => g(context)).join(''),
           language: context.language,
           languages,
-          mainTitle: context.title,
+          modName: context.modName,
+          modUrl: context.modUrl,
+          mods: context.mods,
           nextPage,
           previousPage,
+          root: context.root,
           sectionAppendices: section.appendix
             .filter((appendix) => appendix) // TODO: rm
             .map((appendix) => this.appendixWrapper({
@@ -189,6 +197,7 @@ export class HtmlInfoBookSerializer {
             breadcrumbs: subBreadcrumbs,
             path: join(context.path, subSection.nameTranslationKey
               .substr(subSection.nameTranslationKey.lastIndexOf('.') + 1)),
+            root: false,
           }, onSection);
         subSectionDatas.push({
           ...subSectionData,
@@ -355,10 +364,14 @@ export interface ISerializeContext {
   path: string;
   modId: string;
   resourceHandler: ResourceHandler;
-  title: string;
   colors: {[key: string]: string};
   headSuffixGetters: ((context: ISerializeContext) => string)[];
   sectionIndex?: ISectionIndex;
+  root: boolean;
+  modName: string;
+  modUrl: string;
+  bookName: string;
+  mods: string[];
 }
 
 export interface ISectionCallbackArgs {
