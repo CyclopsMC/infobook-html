@@ -1,0 +1,7 @@
+div(class="tag_index")
+    ul
+        each link in links
+            li
+                .
+                    !{link.icon}
+                a(href=link.url)=link.name

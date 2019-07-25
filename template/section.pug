@@ -8,7 +8,7 @@ html(lang=language)
 
         div(class="main-outer")
             section(class="main")
-                h2=sectionTitle
+                h2 !{sectionTitle}
                 each val in sectionParagraphs
                     p !{val}
                 each val in sectionAppendices

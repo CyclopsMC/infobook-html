@@ -1,6 +1,9 @@
 import {XmlInfoBookParser} from "../parse/XmlInfoBookParser";
+import {ResourceHandler} from "../resource/ResourceHandler";
 import {IInfoBookAppendixHandler} from "./appendix/IInfoBookAppendixHandler";
+import {InfoBookAppendixTagIndex} from "./appendix/InfoBookAppendixTagIndex";
 import {IInfoBook} from "./IInfoBook";
+import {IInfoSection} from "./IInfoSection";
 
 /**
  * InfoBookInitializer is a datastructure for holding information on an info book so that it can be constructed.
@@ -28,8 +31,11 @@ export class InfoBookInitializer {
     this.parser = new XmlInfoBookParser();
   }
 
-  public async initialize(): Promise<IInfoBook> {
+  public async initialize(resourceHandler: ResourceHandler): Promise<IInfoBook> {
+    // Initialize the main book
     const infoBook = await this.parser.parse(this.sectionsFile, this.modId);
+
+    // Inject sections
     for (const sectionId in this.injectSections) {
       const section = infoBook.sections[sectionId];
       if (!section) {
@@ -43,6 +49,20 @@ export class InfoBookInitializer {
         }
       }
     }
+
+    // Create tag index section
+    const nameTranslationKey = 'info_book.' + this.modId + '.tag_index';
+    const indexSection: IInfoSection = {
+      appendix: [new InfoBookAppendixTagIndex(resourceHandler)],
+      modId: this.modId,
+      nameTranslationKey,
+      paragraphTranslationKeys: [],
+      subSections: [],
+      tags: [],
+    };
+    infoBook.rootSection.subSections.push(indexSection);
+    infoBook.sections[nameTranslationKey] = indexSection;
+
     return infoBook;
   }
 

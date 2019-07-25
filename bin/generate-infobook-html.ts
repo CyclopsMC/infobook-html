@@ -86,7 +86,7 @@ async function create() {
   }
 
   // Initialize book
-  const infoBook: IInfoBook = await infoBookInitializer.initialize();
+  const infoBook: IInfoBook = await infoBookInitializer.initialize(resourceLoader.getResourceHandler());
 
   // Convert info book to HTML
   let path = args._[1];

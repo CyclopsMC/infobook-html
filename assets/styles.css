@@ -297,3 +297,23 @@ ul.alternatives-updating li:not(.item-variant-selected) {
 .keybinding .key {
     font-size: 14px;
 }
+
+.tag_index {
+    width: 300px;
+    text-align: left;
+}
+
+.tag_index .item {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+.tag_index ul {
+    padding: 0;
+    margin-left: 2px;
+}
+
+.tag_index li {
+    list-style-type: none;
+}

@@ -35,7 +35,7 @@ describe('InfoBookInitializer', () => {
     });
 
     it('should return', async () => {
-      return expect(await initializer.initialize()).toEqual({
+      return expect(await initializer.initialize(null)).toMatchObject({
         'rootSection': {
           'nameTranslationKey': 'info_book.integrateddynamics.section.main',
           'subSections': [
@@ -70,6 +70,14 @@ describe('InfoBookInitializer', () => {
               'appendix': [],
               'modId': 'mod',
               'tags': [],
+            },
+            {
+              'appendix': [{}],
+              'modId': 'mod',
+              'nameTranslationKey': 'info_book.mod.tag_index',
+              paragraphTranslationKeys: [],
+              subSections: [],
+              tags: [],
             },
           ],
           'paragraphTranslationKeys': [],
@@ -112,6 +120,14 @@ describe('InfoBookInitializer', () => {
                 'appendix': [],
                 'modId': 'mod',
                 'tags': [],
+              },
+              {
+                'appendix': [{}],
+                'modId': 'mod',
+                'nameTranslationKey': 'info_book.mod.tag_index',
+                paragraphTranslationKeys: [],
+                subSections: [],
+                tags: [],
               },
             ],
             'paragraphTranslationKeys': [],
@@ -160,6 +176,14 @@ describe('InfoBookInitializer', () => {
             'appendix': [],
             'modId': 'mod',
             'tags': ['abc'],
+          },
+          'info_book.mod.tag_index' : {
+            'appendix': [{}],
+            'modId': 'mod',
+            'nameTranslationKey': 'info_book.mod.tag_index',
+            paragraphTranslationKeys: [],
+            subSections: [],
+            tags: [],
           },
         },
       });

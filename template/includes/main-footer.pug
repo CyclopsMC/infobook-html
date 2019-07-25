@@ -1,5 +1,5 @@
 div(class="page-controls")
     if previousPage
-        a(href=previousPage.url, class="previous")=previousPage.name
+        a(href=previousPage.url, class="previous") !{previousPage.name}
     if nextPage
-        a(href=nextPage.url, class="next")=nextPage.name
+        a(href=nextPage.url, class="next") !{nextPage.name}
