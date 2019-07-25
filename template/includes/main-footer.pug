@@ -5,8 +5,8 @@ div(class="page-controls")
         a(href=nextPage.url, class="next") !{nextPage.name}
 
 if root
-    div(class="root-info")
-        p This is the Web-version of the <strong>#{bookName}</strong> book, which is part of the <a href="!{modUrl}"><strong>#{modName}</strong></a> mod for Minecraft.
+    div(class="root-info", about=modUrl, typeof="schema:VideoGame")
+        p This is the Web-version of the <strong property="schema:associatedMedia" resource="/">#{bookName}</strong> book, which is part of the <a href="!{modUrl}"><strong property="schema:name">#{modName}</strong></a> mod for Minecraft.
         p All information in this Web book is based on the default configuration of this mod, and may be different from ingame experience depending on your configuration.
         p This Web book was generated with the following mods:
         ul

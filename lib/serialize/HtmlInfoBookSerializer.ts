@@ -257,6 +257,7 @@ export class HtmlInfoBookSerializer {
       resourceHandler.getItemTranslationKey(item));
 
     return this.templateItem({
+      ...context,
       annotation,
       count: item.count || 1,
       icon: iconUrl,
@@ -279,6 +280,7 @@ export class HtmlInfoBookSerializer {
       resourceHandler.getFluidTranslationKey(fluid));
 
     return this.templateItem({
+      ...context,
       count: (fluid.amount || 1),
       icon: iconUrl,
       link,
@@ -374,6 +376,7 @@ export interface ISerializeContext {
   mods: string[];
   googleAnalytics: string;
   googleAdsense: { client: string, format: string, slot: string };
+  icon: string;
 }
 
 export interface ISectionCallbackArgs {

@@ -3,7 +3,7 @@ html(lang=language)
     head
         include includes/head.pug
         title=modName + ' - ' + bookName + ' - ' + sectionTitle
-    body
+    body(vocab=baseUrl)
         include includes/header.pug
 
         div(class="main-outer")

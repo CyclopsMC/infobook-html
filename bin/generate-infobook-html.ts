@@ -100,15 +100,8 @@ async function create() {
   }
   const infoBookSerializer = new HtmlInfoBookSerializer();
   await infoBookSerializer.serialize(infoBook, {
-    baseUrl: config.baseUrl,
-    bookName: config.bookName,
-    colors: config.colors,
-    googleAdsense: config.googleAdsense,
-    googleAnalytics: config.googleAnalytics,
+    ...config,
     headSuffixGetters,
-    modId: config.modId,
-    modName: config.modName,
-    modUrl: config.modUrl,
     mods,
     path,
     resourceHandler: resourceLoader.getResourceHandler(),

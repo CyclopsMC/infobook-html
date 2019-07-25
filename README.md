@@ -87,6 +87,7 @@ Before you start this phase, make sure the following files and directories are p
     "main_background": "#e6d6ac",
     "outer_background": "#09171f"
   },
+  "icon": "https://media.forgecdn.net/attachments/70/844/logo.png",
   "modId": "integrateddynamics",
   "modName": "Integrated Dynamics",
   "modUrl": "https://www.curseforge.com/minecraft/mc-mods/integrated-dynamics",

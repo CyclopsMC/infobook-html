@@ -11,6 +11,11 @@ style(type="text/css")
 <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet" type="text/css" />
 <link href="https://fonts.googleapis.com/css?family=Droid+Sans&display=swap" rel="stylesheet" type="text/css" />
 <link rel="stylesheet" href="#{baseUrl}assets/styles.css">
+<meta name="description" content="Web-version of the #{bookName} book, from the #{modName} mod for Minecraft" />
+<link rel="foaf:maker schema:author" href="https://www.rubensworks.net/#me" />
+if icon
+    <meta property="og:image foaf:img foaf:logo schema:image" href="#{icon}"/>
+    <link rel="shortcut icon" type="image/png" href="#{icon}" />
 if googleAnalytics
     include google-analytics.pug
 .

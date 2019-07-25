@@ -1,6 +1,6 @@
-div(class="crafting_recipe")
-    div(class="appendix-icon") !{appendixIcon}
-    table(class="inputs")
+div(class="crafting_recipe", typeof="schema:Action", property="schema:potentialAction")
+    div(class="appendix-icon", rel="schema:instrument") !{appendixIcon}
+    table(class="inputs", rel="schema:item")
         tr
             td
                 ul(class="alternatives")
@@ -41,4 +41,4 @@ div(class="crafting_recipe")
                     each alt in inputs[8]
                         li !{alt}
     div(class="arrow") &rarr;
-    div(class="output") !{output}
+    div(class="output", rel="schema:result") !{output}

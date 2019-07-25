@@ -1,6 +1,10 @@
 mixin icon
     img(src=icon, alt=name, title=name, class="item-icon")
-div(class=(slot ? "item item-slot" : "item"))
+- var itemUrl = (linkTarget ? link : ('#' + name.replace(/ /g, '_')) )
+div(class=(slot ? "item item-slot" : "item"), typeof=itemUrl)
+    meta(about=itemUrl, property="schema:gameItem", resource=modUrl)
+    meta(about=itemUrl, property="schema:name", content=name)
+    meta(about=itemUrl, property="schema:image", resource=icon)
     if link
         a(href=link, target=linkTarget)
             +icon
@@ -11,4 +15,4 @@ div(class=(slot ? "item item-slot" : "item"))
             .
                 !{annotation}
     if count !== 1
-        span(class="item-count")=count
+        span(class="item-count", property="schema:amount", datatype="xsd:integer")=count
