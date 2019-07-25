@@ -49,7 +49,11 @@ export class InfoBookAppendixHandlerCraftingRecipe implements IInfoBookAppendixH
     const outputName = data._;
     let recipes;
     if (data.$.predefined) {
-      recipes = [this.recipePredefineds[outputName]];
+      const predefined = this.recipePredefineds[outputName];
+      if (!predefined) {
+        throw new Error(`Could not find any predefined recipe for ${outputName}`);
+      }
+      recipes = [predefined];
     } else {
       recipes = this.registry[outputName] || this.registryTagged['crafting_recipe:' + outputName];
     }
