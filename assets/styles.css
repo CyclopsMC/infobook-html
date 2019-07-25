@@ -55,6 +55,28 @@ h1, h2, h3, h4 {
     content: "> ";
 }
 
+.languages ul {
+    float: right;
+    margin: 0;
+    padding: 0;
+    color: #d3d3d3;
+    font-family: 'Droid Sans', sans-serif;
+}
+
+.languages ul li a {
+    color: #d3d3d3;
+}
+
+.languages ul li a:hover {
+    color: white;
+}
+
+.languages li {
+    padding: 5px;
+    display: inline-block;
+    font-size: 10px;
+}
+
 .main-outer {
     background: var(--color-main-background);
 }

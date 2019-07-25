@@ -100,6 +100,7 @@ export class ResourceHandler {
    * @param {{[p: string]: string}} translations A mapping from translation key to translated value.
    */
   public addTranslations(language: string, translations: {[key: string]: string}) {
+    language = language.toLowerCase();
     const existingTranslations = this.translations[language];
     if (!existingTranslations) {
       this.translations[language] = translations;

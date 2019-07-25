@@ -1,6 +1,12 @@
 header
     h1=mainTitle
 
+div(class="languages")
+    ul
+        each lang in languages
+            li
+                a(href=lang.url) !{lang.name}
+
 div(class="breadcrumbs")
     ul
         each val in breadcrumbs

@@ -1,7 +1,7 @@
 import {createReadStream, promises as fs} from "fs";
 import mkdirp = require("mkdirp");
 import {ncp} from "ncp";
-import {basename, join} from "path";
+import {basename, dirname, join, sep} from "path";
 import {compileFile as compilePug, compileTemplate} from "pug";
 import {promisify} from "util";
 import {FileWriter} from "../infobook/FileWriter";
@@ -45,7 +45,7 @@ export class HtmlInfoBookSerializer {
 
     // Serialize sections in all languages
     for (const language of context.resourceHandler.getLanguages()) {
-      const langPath = join(context.path, language);
+      const langPath = this.getLanguagePath(language, context.path);
       await this.ensureDirExists(langPath);
       const sectionIndex = await this.serializeSectionIndex(infobook, context, language, langPath);
       await this.serializeSectionFiles(infobook, context, language, langPath, sectionIndex);
@@ -94,6 +94,18 @@ export class HtmlInfoBookSerializer {
       path: langPath,
       sectionIndex,
     }, async ({ index, breadcrumbs, context, section, sectionTitle, subSectionDatas, filePath, fileUrl }) => {
+      // Create links to this page in other languages
+      const languages: { url: string, name: string }[] = [];
+      for (const name of contextRoot.resourceHandler.getLanguages()) {
+        const baseFilePath = filePath.substr(join(contextRoot.basePath, this.getLanguagePath(language)).length);
+        const languageFilePath = join(this.getLanguagePath(name), baseFilePath);
+        let url = this.filePathToUrl(languageFilePath, contextRoot.basePath, context.baseUrl);
+        if (url[0] !== '/') {
+          url = '/' + url;
+        }
+        languages.push({ name, url });
+      }
+
       if (index) {
         // Create index file
         const fileContents = this.templateIndex({
@@ -102,6 +114,7 @@ export class HtmlInfoBookSerializer {
           colors: context.colors,
           headSuffix: context.headSuffixGetters.map((g) => g(context)).join(''),
           language: context.language,
+          languages,
           mainTitle: context.title,
           sectionTitle,
           subSectionDatas,
@@ -122,6 +135,7 @@ export class HtmlInfoBookSerializer {
           colors: context.colors,
           headSuffix: context.headSuffixGetters.map((g) => g(context)).join(''),
           language: context.language,
+          languages,
           mainTitle: context.title,
           nextPage,
           previousPage,
@@ -271,6 +285,11 @@ export class HtmlInfoBookSerializer {
     } else {
       return context.modId + ':' + fluidName;
     }
+  }
+
+  public getLanguagePath(language: string, path?: string): string {
+    path = path || '';
+    return language === 'en_us' ? path : join(path, '_lang', language);
   }
 
   /**
