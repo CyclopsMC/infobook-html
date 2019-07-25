@@ -65,4 +65,8 @@ Options:
   process.exit(1);
 }
 
-run(args._[1], args._[0]);
+run(args._[1], args._[0]).catch((e) => {
+  // tslint:disable-next-line:no-console
+  console.error(e);
+  process.exit(1);
+});
