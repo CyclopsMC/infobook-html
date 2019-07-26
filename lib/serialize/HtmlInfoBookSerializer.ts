@@ -128,7 +128,7 @@ export class HtmlInfoBookSerializer {
 
         // Prepend ad appendix if enabled
         const appendices = section.appendix;
-        if (context.googleAdsense) {
+        if (context.googleAdsense && language === 'en_us') {
           appendices.unshift(new InfoBookAppendixAd());
         }
 
