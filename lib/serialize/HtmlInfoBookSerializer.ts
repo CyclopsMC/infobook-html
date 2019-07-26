@@ -323,9 +323,11 @@ export class HtmlInfoBookSerializer {
     value = value.replace(/&/g, '§');
 
     // Formats to HTML
+    value = value.replace(/§l§n([^§]*)§r/g, '<strong><u>$1</u></strong>');
     value = value.replace(/§l([^§]*)§r/g, '<strong>$1</strong>');
     value = value.replace(/§n([^§]*)§r/g, '<u>$1</u>');
     value = value.replace(/§o([^§]*)§r/g, '<em>$1</em>');
+    value = value.replace(/§N/g, '<br />');
 
     // Colors to HTML
     value = value.replace(/§1([^§]*)§0/g, '<span style="color: #0000AA">$1</span>');
