@@ -266,7 +266,16 @@ ul.alternatives-updating li:not(.item-variant-selected) {
     z-index: 10;
 }
 
-.crafting_recipe {
+.appendix .furnace_recipe .appendix-icon {
+    position: relative;
+    top: 10px;
+    left: 133px;
+    margin-bottom: -28px;
+    z-index: 10;
+}
+
+.crafting_recipe,
+.furnace_recipe {
     width: 300px;
 }
 

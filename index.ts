@@ -2,6 +2,7 @@ export * from "./lib/infobook/appendix/IInfoBookAppendixHandler";
 export * from "./lib/infobook/appendix/InfoBookAppendixAd";
 export * from "./lib/infobook/appendix/InfoBookAppendixHandlerAdvancementRewards";
 export * from "./lib/infobook/appendix/InfoBookAppendixHandlerCraftingRecipe";
+export * from "./lib/infobook/appendix/InfoBookAppendixHandlerFurnaceRecipe";
 export * from "./lib/infobook/appendix/InfoBookAppendixHandlerImage";
 export * from "./lib/infobook/appendix/InfoBookAppendixHandlerKeybinding";
 export * from "./lib/infobook/appendix/InfoBookAppendixTagIndex";
