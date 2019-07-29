@@ -1,6 +1,27 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.1.0"></a>
+## [v1.1.0](https://github.com/CyclopsMC/infobook-html/compare/v1.0.1...v1.1.0) - 2019-07-29
+
+### Added
+* [Add furnace recipe handler](https://github.com/CyclopsMC/infobook-html/commit/7b6f2728c47283ed4c2e7a29da17a59af91be8bd)
+* [Add support for combined formatting codes and newlines](https://github.com/CyclopsMC/infobook-html/commit/47a857e5a42465fa27c08ad0473065118cfa6fac)
+* [Add support for predefined crafting recipes](https://github.com/CyclopsMC/infobook-html/commit/ecc794b36be7cdb2e7835723d62e729e9d89a629)
+
+### Fixed
+* [Fix item icons not being selected based on nbt](https://github.com/CyclopsMC/infobook-html/commit/1fe8f2938af881cc1a8911ccce4dafeaf6a9e25f)
+* [Fix too many ad blocks being added](https://github.com/CyclopsMC/infobook-html/commit/5db0b9321116c710ced4cb9a6bcbfb2de0224324)
+
+### Changed
+* [Make page controls slightly smaller](https://github.com/CyclopsMC/infobook-html/commit/c2bd0167b93eeab8e8feb343e5e3f8a0634c8379)
+* [Add support for multiple crafting recipes](https://github.com/CyclopsMC/infobook-html/commit/232f4c293564c818ce73b278b665282f12a7e4d7)
+* [Make templateItem field public](https://github.com/CyclopsMC/infobook-html/commit/dd22d9bbfa3ac6d2b7e9aa6c3eb2e98d91e45556)
+* [Throw error when translation keys are not found](https://github.com/CyclopsMC/infobook-html/commit/904c82275a84a3027b25660c0d87581d16decd43)
+* [Throw error if predefined is not found](https://github.com/CyclopsMC/infobook-html/commit/43cac0f927e5f8c5dbc05312e6008fe7ea96b345)
+* [Handle tagged crafting recipes](https://github.com/CyclopsMC/infobook-html/commit/d6d2dc821a868e790bc229da035c546a5b3e8ade)
+* [Exit with non-zero exit code on error](https://github.com/CyclopsMC/infobook-html/commit/33e3ef8fee72fc72d5608ddb865c53c91b24f59c)
+
 <a name="v1.0.1"></a>
 ## [v1.0.1](https://github.com/CyclopsMC/infobook-html/compare/v1.0.0...v1.0.1) - 2019-07-25
 
