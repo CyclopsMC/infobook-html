@@ -43,11 +43,11 @@ export class InfoBookAppendixHandlerCraftingRecipe implements IInfoBookAppendixH
   }
 
   public createAppendix(data: any): IInfoAppendix {
-    const index = data.$.index || 0;
+    let index = data.$.index || 0;
     // const meta = data.$.meta || 0;
     // const count = data.$.count || 1;
     const outputName = data._;
-    let recipes;
+    let recipes: IRecipe[];
     if (data.$.predefined) {
       const predefined = this.recipePredefineds[outputName];
       if (!predefined) {
@@ -55,57 +55,68 @@ export class InfoBookAppendixHandlerCraftingRecipe implements IInfoBookAppendixH
       }
       recipes = [predefined];
     } else {
-      recipes = this.registry[outputName] || this.registryTagged['crafting_recipe:' + outputName];
+      recipes = this.registry[outputName];
+      if (!recipes) {
+        recipes = this.registryTagged['crafting_recipe:' + outputName];
+        index = -1;
+      }
     }
     if (!recipes) {
       throw new Error(`Could not find any recipe for ${outputName}`);
     }
-    if (index >= recipes.length) {
-      throw new Error(`Could not find recipe ${index} for ${outputName} that only has ${recipes.length} recipes.`);
+    if (index > -1) {
+      if (index >= recipes.length) {
+        throw new Error(`Could not find recipe ${index} for ${outputName} that only has ${recipes.length} recipes.`);
+      }
+      recipes = [recipes[index]];
     }
-    const recipe = recipes[index];
 
     return {
       getName: (context) => this.resourceHandler.getTranslation('tile.workbench.name', context.language),
       toHtml: (context: ISerializeContext, fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer) => {
-        // Prepare input array
-        const inputs = "|".repeat(9).split("|").map(() => []);
-
-        // Define custom dimensions for shapeless recipes
-        if (!recipe.width || !recipe.height) {
-          recipe.width = recipe.height = Math.sqrt(recipe.input.length);
-        }
-
-        // Format items in  grid
-        for (let x = 0; x < 3; x++) {
-          for (let y = 0; y < 3; y++) {
-            let items: IItem[];
-            if (x < recipe.width && y < recipe.height) {
-              const inputIndex = y * recipe.width + x;
-              items = recipe.input[inputIndex] || [];
-            } else {
-              items = [];
-            }
-            if (!items.length) {
-              items.push({ item: 'minecraft:air', data: 0 });
-            }
-            const outputIndex = y * 3 + x;
-            for (const item of items) {
-              inputs[outputIndex].push(serializer.createItemDisplay(this.resourceHandler, context,
-                fileWriter, item, true));
-            }
-          }
-        }
-
-        const output = serializer.createItemDisplay(this.resourceHandler, context,
-          fileWriter, recipe.output, true);
-
-        const appendixIcon = serializer.createItemDisplay(this.resourceHandler, context,
-          fileWriter, { item: 'minecraft:crafting_table', data: 0 }, false);
-
-        return this.templateCraftingRecipe({ inputs, output, appendixIcon });
+        return recipes.map((recipe) => this.serializeRecipe(recipe, context, fileWriter, serializer)).join('<hr />');
       },
     };
+  }
+
+  protected serializeRecipe(recipe: IRecipe, context: ISerializeContext,
+                            fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer) {
+    // Prepare input array
+    const inputs = "|".repeat(9).split("|").map(() => []);
+
+    // Define custom dimensions for shapeless recipes
+    if (!recipe.width || !recipe.height) {
+      recipe.width = recipe.height = Math.sqrt(recipe.input.length);
+    }
+
+    // Format items in  grid
+    for (let x = 0; x < 3; x++) {
+      for (let y = 0; y < 3; y++) {
+        let items: IItem[];
+        if (x < recipe.width && y < recipe.height) {
+          const inputIndex = y * recipe.width + x;
+          items = recipe.input[inputIndex] || [];
+        } else {
+          items = [];
+        }
+        if (!items.length) {
+          items.push({ item: 'minecraft:air', data: 0 });
+        }
+        const outputIndex = y * 3 + x;
+        for (const item of items) {
+          inputs[outputIndex].push(serializer.createItemDisplay(this.resourceHandler, context,
+            fileWriter, item, true));
+        }
+      }
+    }
+
+    const output = serializer.createItemDisplay(this.resourceHandler, context,
+      fileWriter, recipe.output, true);
+
+    const appendixIcon = serializer.createItemDisplay(this.resourceHandler, context,
+      fileWriter, { item: 'minecraft:crafting_table', data: 0 }, false);
+
+    return this.templateCraftingRecipe({ inputs, output, appendixIcon });
   }
 
 }
