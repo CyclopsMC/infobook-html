@@ -39,6 +39,7 @@ export class ResourceLoader {
         let nbt = '';
         if (split.length > 3) {
           nbt = split.slice(3, split.length).join(":");
+          nbt = nbt.substr(0, nbt.length - 4);
         }
         this.resourceHandler.addItemIcon(namespace, path, meta, nbt, iconFile);
       }
