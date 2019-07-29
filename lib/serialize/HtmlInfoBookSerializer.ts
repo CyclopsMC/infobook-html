@@ -18,10 +18,10 @@ import {ResourceHandler} from "../resource/ResourceHandler";
  */
 export class HtmlInfoBookSerializer {
 
+  public readonly templateItem: compileTemplate;
   private readonly templateIndex: compileTemplate;
   private readonly templateSection: compileTemplate;
   private readonly appendixWrapper: compileTemplate;
-  private readonly templateItem: compileTemplate;
 
   private fileWriter: IFileWriter;
 
