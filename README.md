@@ -7,6 +7,11 @@
 
 Output Cyclops infobooks as HTML.
 
+This tool is the basis for the following mod-specific plugins:
+
+* [infobook-html-integrateddynamics](https://github.com/CyclopsMC/infobook-html-integrateddynamics).
+* [infobook-html-evilcraft](https://github.com/CyclopsMC/infobook-html-evilcraft).
+
 ## Usage
 
 This tool allows Cyclops infobooks to be exported as an HTML website in three phases:
