@@ -1,6 +1,17 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.1.1"></a>
+## [v1.1.1](https://github.com/CyclopsMC/infobook-html/compare/v1.1.0...v1.1.1) - 2019-07-31
+
+### Added
+* [Allow baseUrl to be overridden via CLI](https://github.com/CyclopsMC/infobook-html/commit/c0090fd3fedc664cb33049bef5bc7e27225cb2b8)
+
+### Fixed
+* [Fix _lang dirs not being served on GitHub pages](https://github.com/CyclopsMC/infobook-html/commit/bb0c7bda1a8081322d1192ff293bbee1bdb411b0)
+* [Fix language links not resolving to baseIRI](https://github.com/CyclopsMC/infobook-html/commit/e87eb5a8cf5e5a1651350dfc49923503e3badb7e)
+* [Always end directory URLs with a slash](https://github.com/CyclopsMC/infobook-html/commit/9185cefa713e2d07783ff1f9b800926e24af8a8e)
+
 <a name="v1.1.0"></a>
 ## [v1.1.0](https://github.com/CyclopsMC/infobook-html/compare/v1.0.1...v1.1.0) - 2019-07-29
 
