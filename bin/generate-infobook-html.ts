@@ -17,10 +17,10 @@ import {HtmlInfoBookSerializer, ISerializeContext} from "../lib/serialize/HtmlIn
 
 // Process CLI args
 const args = minimist(process.argv.slice(2));
-if (args.help || args._.length !== 2) {
+if (args.help || (args._.length !== 2 && args._.length !== 3)) {
   process.stdout.write(`generate-cyclops-infobook-html Output Cyclops infobooks as HTML
 Usage:
-  generate-cyclops-infobook-html /path/to/config.json /path/to/output/
+  generate-cyclops-infobook-html /path/to/config.json /path/to/output/ [baseUrl]
 Options:
   --help        print this help message
 `);
@@ -30,6 +30,11 @@ Options:
 async function create() {
   // Create infobook from config
   const config = JSON.parse(fs.readFileSync(args._[0], "utf8"));
+
+  // Override baseUrl
+  if (args._.length === 3) {
+    config.baseUrl = args._[2];
+  }
 
   // Check if registries have been generated
   if (!fs.existsSync('registries')) {
