@@ -364,7 +364,7 @@ export class HtmlInfoBookSerializer {
   protected filePathToUrl(filePath: string, basePath: string, baseUrl: string) {
     let url = filePath.replace(basePath, baseUrl);
     const last = basename(url);
-    if (last.indexOf('.') < 0) {
+    if (!url.endsWith('/') && last.indexOf('.') < 0) {
       url = url + '/';
     }
     return url;
