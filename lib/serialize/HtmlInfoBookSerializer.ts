@@ -99,11 +99,8 @@ export class HtmlInfoBookSerializer {
       const languages: { url: string, name: string }[] = [];
       for (const name of contextRoot.resourceHandler.getLanguages()) {
         const baseFilePath = filePath.substr(join(contextRoot.basePath, this.getLanguagePath(language)).length);
-        const languageFilePath = join(this.getLanguagePath(name), baseFilePath);
-        let url = this.filePathToUrl(languageFilePath, contextRoot.basePath, context.baseUrl);
-        if (url[0] !== '/') {
-          url = '/' + url;
-        }
+        const languageFilePath = join(contextRoot.basePath, this.getLanguagePath(name), baseFilePath);
+        const url = this.filePathToUrl(languageFilePath, contextRoot.basePath, context.baseUrl);
         languages.push({ name, url });
       }
 
