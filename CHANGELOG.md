@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.1.2"></a>
+## [v1.1.2](https://github.com/CyclopsMC/infobook-html/compare/v1.1.1...v1.1.2) - 2019-07-31
+
+### Fixed
+* [Fix some URLs ending with two slashes](https://github.com/CyclopsMC/infobook-html/commit/8bb6b5f2efaa5babdbb0365258a911e82121ec74)
+
 <a name="v1.1.1"></a>
 ## [v1.1.1](https://github.com/CyclopsMC/infobook-html/compare/v1.1.0...v1.1.1) - 2019-07-31
 
