@@ -44,6 +44,9 @@ export class HtmlInfoBookSerializer {
     await this.ensureDirExists(join(context.path, 'assets'));
     await this.ensureDirExists(join(context.path, 'assets', 'icons'));
 
+    // Create a .nojekyll file to ensure _lang directories are served via GitHub pages.
+    await fs.writeFile(join(context.path, '.nojekyll'), '');
+
     // Serialize sections in all languages
     for (const language of context.resourceHandler.getLanguages()) {
       const langPath = this.getLanguagePath(language, context.path);
