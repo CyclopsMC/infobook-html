@@ -82,7 +82,7 @@
     "@types/xml2js": "^0.4.4",
     "@types/yauzl": "^2.9.1",
     "minimist": "^1.2.0",
-    "mkdirp": "^0.5.1",
+    "mkdirp": "^1.0.2",
     "mvn-artifact-download": "^4.0.0",
     "ncp": "^2.0.0",
     "node-fetch": "^2.6.0",
