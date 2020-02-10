@@ -73,7 +73,7 @@
     "version": "manual-git-changelog onversion"
   },
   "dependencies": {
-    "@types/mkdirp": "^0.5.2",
+    "@types/mkdirp": "^1.0.0",
     "@types/ncp": "^2.0.1",
     "@types/node": "^13.1.0",
     "@types/node-fetch": "^2.5.0",
