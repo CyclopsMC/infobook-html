@@ -3140,34 +3140,34 @@ ms@^2.1.1:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.1.tgz#30a5864eb3ebb0a66f2ebe6d727af06a09d86e0a"
   integrity sha512-tgp+dl5cGk28utYktBsrFqA7HKgrhgPsg6Z/EfhWI4gl1Hwq8B/GmY/0oXZ6nF8hDVesS/FpnYaD/kOWhYQvyg==
 
-mvn-artifact-download@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/mvn-artifact-download/-/mvn-artifact-download-4.0.0.tgz#12b9ac4d1c6344c856686869a06eb4094cc4d5f3"
-  integrity sha512-EOP858wzCwl1HP3YmjbiUX2Vl8fAgFH9wOnaqLoDEu1tDHai6Dwes2KkbfqrmsxYGIqjKAtH33fHBOxvQjO3tA==
+mvn-artifact-download@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/mvn-artifact-download/-/mvn-artifact-download-5.0.0.tgz#ab94be6a5c02662a3fd4c506fecf6c9130703862"
+  integrity sha512-VKPTQ/ayCrCJc9YhQ6tt7xNRl4XMxP6OABSPbXijs6vMCHzuPo3Gu7tnnLydRxsnpWPhbOWVaGEHnnLeDOh5Sw==
   dependencies:
-    mvn-artifact-filename "^4.0.0"
-    mvn-artifact-name-parser "^4.0.0"
-    mvn-artifact-url "^4.0.0"
-    node-fetch "^2.2.0"
+    mvn-artifact-filename "^5.0.0"
+    mvn-artifact-name-parser "^5.0.0"
+    mvn-artifact-url "^5.0.0"
+    node-fetch "^2.6.0"
 
-mvn-artifact-filename@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/mvn-artifact-filename/-/mvn-artifact-filename-4.0.0.tgz#9a6e96d702624be196fa25c41ce85e95e4980e11"
-  integrity sha512-1ufp6Wnw52gnfnCKdmHWpvujlZ2CA2jbzgCPgG0G9VK80yNagLWRZbxxsXP+JkR32fCCQ13Q4xo1FGWqxcsmiw==
+mvn-artifact-filename@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/mvn-artifact-filename/-/mvn-artifact-filename-5.0.0.tgz#02e1c9d149fde2cb002c5d5c800c6baf2ae3c03c"
+  integrity sha512-ue6M+nKu/iyBx91flSoyfCBs94uz5ZSVGI3HdsDHR2cooNn425Cbpm7D81CgcDLvBcEdXUk0FVvfgGVtgGbKWg==
 
-mvn-artifact-name-parser@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/mvn-artifact-name-parser/-/mvn-artifact-name-parser-4.0.0.tgz#08e13f99047e9d9cbd9f969918ec10a8983d5405"
-  integrity sha512-cekSBsmwFGhoQudXiyvxi6Qq/szIo40p+v+LJqEZa1X1rQD57lo16me3lRZN+Crn7rl8bmRw0StqLhSETzHhag==
+mvn-artifact-name-parser@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/mvn-artifact-name-parser/-/mvn-artifact-name-parser-5.0.0.tgz#160ddb3bbbe9e85cc454f9a55f8f46bf2117954d"
+  integrity sha512-NMIP9GElpgqQbycxUSiXZyCpApRpkQm+Z4HI0D20jZrSnghJ3wvOyNNdRK0jQWoQL5TrC3+gLbLEjiKnRkSUpg==
 
-mvn-artifact-url@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/mvn-artifact-url/-/mvn-artifact-url-4.0.0.tgz#4de1e0dad8dd5e26d294b2cf3b551b43fdbfc070"
-  integrity sha512-ZmcGB6BfirBCmXj9WiRgzSrAcJF2yVABsRGZxB0VewViR6U8htJCFqvpYqyN4crOW14e/UtdnbQkzpls6WdwcQ==
+mvn-artifact-url@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/mvn-artifact-url/-/mvn-artifact-url-5.0.0.tgz#d5bded7e72f05a3e9838bfcfec15969e654e5ab9"
+  integrity sha512-r8rqLCWElcp1vY0zyRffwL5X+5vQMdN51mr7wpgmxMlmFeLzTRW+nLVqOr6B4uGW4qL+lnbkP/GxF/bC8yTz9Q==
   dependencies:
-    mvn-artifact-filename "^4.0.0"
-    node-fetch "^2.2.0"
-    xml2js "^0.4.17"
+    mvn-artifact-filename "^5.0.0"
+    node-fetch "^2.6.0"
+    xml2js "^0.4.23"
 
 nanomatch@^1.2.9:
   version "1.2.13"
@@ -3201,7 +3201,7 @@ nice-try@^1.0.4:
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.5.tgz#a3378a7696ce7d223e88fc9b764bd7ef1089e366"
   integrity sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ==
 
-node-fetch@^2.2.0, node-fetch@^2.6.0:
+node-fetch@^2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz#e633456386d4aa55863f676a7ab0daa8fdecb0fd"
   integrity sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==
@@ -4767,13 +4767,26 @@ xml-name-validator@^3.0.0:
   resolved "https://registry.yarnpkg.com/xml-name-validator/-/xml-name-validator-3.0.0.tgz#6ae73e06de4d8c6e47f9fb181f78d648ad457c6a"
   integrity sha512-A5CUptxDsvxKJEU3yO6DuWBSJz/qizqzJKOMIfUJHETbBw/sFaDxgd6fxm1ewUaM0jZ444Fc5vC5ROYurg/4Pw==
 
-xml2js@^0.4.17, xml2js@^0.4.19:
+xml2js@^0.4.19:
   version "0.4.19"
   resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.4.19.tgz#686c20f213209e94abf0d1bcf1efaa291c7827a7"
   integrity sha512-esZnJZJOiJR9wWKMyuvSE1y6Dq5LCuJanqhxslH2bxM6duahNZ+HMpCLhBQGZkbX6xRf8x1Y2eJlgt2q3qo49Q==
   dependencies:
     sax ">=0.6.0"
     xmlbuilder "~9.0.1"
+
+xml2js@^0.4.23:
+  version "0.4.23"
+  resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.4.23.tgz#a0c69516752421eb2ac758ee4d4ccf58843eac66"
+  integrity sha512-ySPiMjM0+pLDftHgXY4By0uswI3SPKLDw/i3UXbnO8M/p28zqexCUoPmQFrYD+/1BzhGJSs2i1ERWKJAtiLrug==
+  dependencies:
+    sax ">=0.6.0"
+    xmlbuilder "~11.0.0"
+
+xmlbuilder@~11.0.0:
+  version "11.0.1"
+  resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-11.0.1.tgz#be9bae1c8a046e76b31127726347d0ad7002beb3"
+  integrity sha512-fDlsI/kFEx7gLvbecc0/ohLG50fugQp8ryHzMTuW9vSa1GJ0XYWKnhsUx7oie3G98+r56aTQIUB4kht42R3JvA==
 
 xmlbuilder@~9.0.1:
   version "9.0.7"
