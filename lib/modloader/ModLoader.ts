@@ -131,7 +131,7 @@ export class ModLoader {
     proc.stdout.on('data', (line: string) => {
       if (line.indexOf('[minecraft/DedicatedServer]: Done') >= 0) {
         process.stdout.write('Dumping registries...\n');
-        this.sendCommand(proc, '/cyclops dumpregistries');
+        this.sendCommand(proc, '/cyclopscore dumpregistries');
         this.sendCommand(proc, '/stop');
       }
     });
