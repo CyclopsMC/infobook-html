@@ -231,8 +231,8 @@ export class ModLoader {
         zipFile.readEntry();
       } else {
         // File
-        if (entry.fileName.startsWith('assets/')) {
-          const targetFile = join(this.path, 'mod_assets', entry.fileName.substring(7, entry.fileName.length));
+        if (entry.fileName.startsWith('assets/') || entry.fileName.startsWith('data/')) {
+          const targetFile = join(this.path, 'mod_assets', entry.fileName.substring(entry.fileName.startsWith('assets/') ? 7 : 5, entry.fileName.length));
           const targetDir = dirname(targetFile);
           this.ensureDirExists(targetDir).then(() => {
             zipFile.openReadStream(entry, (e, readStream) => {
