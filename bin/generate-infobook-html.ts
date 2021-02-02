@@ -6,7 +6,7 @@ import {
   InfoBookAppendixHandlerAdvancementRewards,
 } from "../lib/infobook/appendix/InfoBookAppendixHandlerAdvancementRewards";
 import {InfoBookAppendixHandlerCraftingRecipe} from "../lib/infobook/appendix/InfoBookAppendixHandlerCraftingRecipe";
-import {InfoBookAppendixHandlerFurnaceRecipe} from "../lib/infobook/appendix/InfoBookAppendixHandlerFurnaceRecipe";
+import {InfoBookAppendixHandlerSmeltingRecipe} from "../lib/infobook/appendix/InfoBookAppendixHandlerSmeltingRecipe";
 import {InfoBookAppendixHandlerImage} from "../lib/infobook/appendix/InfoBookAppendixHandlerImage";
 import {InfoBookAppendixHandlerKeybinding} from "../lib/infobook/appendix/InfoBookAppendixHandlerKeybinding";
 import {IInfoBook} from "../lib/infobook/IInfoBook";
@@ -67,11 +67,10 @@ async function create() {
   const infoBookInitializer = new InfoBookInitializer(config);
   infoBookInitializer.registerAppendixHandler('advancement_rewards',
     new InfoBookAppendixHandlerAdvancementRewards(resourceLoader.getResourceHandler()));
-  infoBookInitializer.registerAppendixHandler('crafting_recipe',
-    new InfoBookAppendixHandlerCraftingRecipe(resourceLoader.getResourceHandler(),
-      'registries', config.recipeOverrides, config.recipePredefineds));
-  infoBookInitializer.registerAppendixHandler('furnace_recipe',
-    new InfoBookAppendixHandlerFurnaceRecipe(resourceLoader.getResourceHandler(), 'registries'));
+  infoBookInitializer.registerAppendixHandler('minecraft:crafting',
+    new InfoBookAppendixHandlerCraftingRecipe(resourceLoader.getResourceHandler(), 'registries', config.recipeOverrides));
+  infoBookInitializer.registerAppendixHandler('minecraft:smelting',
+    new InfoBookAppendixHandlerSmeltingRecipe(resourceLoader.getResourceHandler(), 'registries', config.recipeOverrides));
   infoBookInitializer.registerAppendixHandler('image',
     new InfoBookAppendixHandlerImage(resourceLoader.getResourceHandler()));
   infoBookInitializer.registerAppendixHandler('keybinding',

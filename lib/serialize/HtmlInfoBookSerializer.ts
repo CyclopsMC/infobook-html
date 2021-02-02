@@ -247,7 +247,7 @@ export class HtmlInfoBookSerializer {
       return slot ? '<div class="item item-slot">&nbsp;</div>' : '<div class="item">&nbsp;</div>';
     }
 
-    const icon = resourceHandler.getItemIconFile(item.item, item.data, item.nbt);
+    const icon = resourceHandler.getItemIconFile(item.item, item.nbt);
     if (!icon) {
       throw new Error(`Could not find an icon for item ${JSON.stringify(item)}`);
     }
@@ -298,11 +298,7 @@ export class HtmlInfoBookSerializer {
   }
 
   public tagFluid(context: ISerializeContext, fluidName: string): string {
-    if (fluidName === 'water' || fluidName === 'lava') {
-      return 'minecraft:' + fluidName;
-    } else {
-      return context.modId + ':' + fluidName;
-    }
+    return fluidName;
   }
 
   public getLanguagePath(language: string, path?: string): string {

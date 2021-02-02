@@ -34,14 +34,15 @@ export class ResourceLoader {
       } else {
         const split = iconName.split("__");
         const namespace = split[0];
-        const path = split[1];
-        const meta = parseInt(split[2], 10);
+        let path = split[1];
         let nbt = '';
-        if (split.length > 3) {
-          nbt = split.slice(3, split.length).join(":");
+        if (split.length > 2) {
+          nbt = split.slice(2, split.length).join(":");
           nbt = nbt.substr(0, nbt.length - 4);
+        } else {
+          path = path.substr(0, path.length - 4);
         }
-        this.resourceHandler.addItemIcon(namespace, path, meta, nbt, iconFile);
+        this.resourceHandler.addItemIcon(namespace, path, nbt, iconFile);
       }
     }
   }
@@ -153,18 +154,7 @@ export class ResourceLoader {
    * @returns {Promise<void>} A promise resolving when loading is done.
    */
   public async loadAssetsLangFile(modid: string, language: string, fullFilePath: string) {
-    const translations: {[translationKey: string]: string} = {};
-
-    const lines = (await fs.readFile(fullFilePath)).toString('utf8').split('\n');
-    for (const line of lines) {
-      if (line.length > 0 && line[0] !== '#') {
-        const separatorIndex = line.indexOf('=');
-        const key = line.substr(0, separatorIndex);
-        const value = line.substr(separatorIndex + 1);
-        translations[key] = value;
-      }
-    }
-
+    const translations: {[translationKey: string]: string} = JSON.parse((await fs.readFile(fullFilePath)).toString('utf8'));
     this.resourceHandler.addTranslations(language, translations);
   }
 

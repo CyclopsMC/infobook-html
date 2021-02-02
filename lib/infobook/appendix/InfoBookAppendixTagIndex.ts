@@ -24,12 +24,12 @@ export class InfoBookAppendixTagIndex implements IInfoAppendix {
 
       // First try localizing as item, and if that fails, as fluid
       let icon: string;
-      const item = { item: tag, data: 0 };
+      const item = { item: tag };
       let translationKey = this.resourceHandler.getItemTranslationKey(item);
       if (translationKey) {
         icon = serializer.createItemDisplay(this.resourceHandler, context, fileWriter, item, false);
       } else {
-        const fluid = { fluid: tag.substr(tag.indexOf(':') + 1) };
+        const fluid = { fluid: tag };
         translationKey = this.resourceHandler.getFluidTranslationKey(fluid);
         icon = serializer.createFluidDisplay(this.resourceHandler, context, fileWriter, fluid, false);
       }

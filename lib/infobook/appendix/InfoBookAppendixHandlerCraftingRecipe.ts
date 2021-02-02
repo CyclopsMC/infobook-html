@@ -1,85 +1,30 @@
-import * as fs from "fs";
-import {join} from "path";
 import {compileFile as compilePug, compileTemplate} from "pug";
 import {ResourceHandler} from "../../resource/ResourceHandler";
 import {HtmlInfoBookSerializer, ISerializeContext} from "../../serialize/HtmlInfoBookSerializer";
 import {IFileWriter} from "../IFileWriter";
-import {IInfoAppendix} from "../IInfoAppendix";
 import {IItem} from "../IItem";
-import {IInfoBookAppendixHandler} from "./IInfoBookAppendixHandler";
+import {
+  InfoBookAppendixHandlerAbstractRecipe,
+  IRecipe,
+} from "./InfoBookAppendixHandlerAbstractRecipe";
 
 /**
  * Handles crafting recipe appendices.
  */
-export class InfoBookAppendixHandlerCraftingRecipe implements IInfoBookAppendixHandler {
+export class InfoBookAppendixHandlerCraftingRecipe extends InfoBookAppendixHandlerAbstractRecipe<IRecipeCrafting> {
 
-  private readonly resourceHandler: ResourceHandler;
-  private readonly registry: IRecipeRegistry;
-  private readonly registryTagged: {[tag: string]: IRecipe[]};
-  private readonly recipePredefineds: IRecipePredefineds;
   private readonly templateCraftingRecipe: compileTemplate;
 
-  constructor(resourceHandler: ResourceHandler, registriesPath: string, recipeOverrides: any,
-              recipePredefineds: IRecipePredefineds) {
-    this.resourceHandler = resourceHandler;
-    this.registry = JSON.parse(fs.readFileSync(join(registriesPath, 'crafting_recipe.json'), "utf8"));
-    if (recipeOverrides) {
-      this.registry = { ... this.registry, ...recipeOverrides };
-    }
-    this.recipePredefineds = recipePredefineds;
-    this.registryTagged = {};
-    for (const recipeId in this.registry) {
-      for (const recipe of this.registry[recipeId]) {
-        for (const tag of recipe.tags) {
-          let recipes = this.registryTagged[tag];
-          if (!recipes) {
-            recipes = this.registryTagged[tag] = [];
-          }
-          recipes.push(recipe);
-        }
-      }
-    }
+  constructor(resourceHandler: ResourceHandler, registriesPath: string, recipeOverrides: any) {
+    super('minecraft:crafting', resourceHandler, registriesPath, recipeOverrides);
     this.templateCraftingRecipe = compilePug(__dirname + '/../../../template/appendix/crafting_recipe.pug');
   }
 
-  public createAppendix(data: any): IInfoAppendix {
-    let index = data.$.index || 0;
-    // const meta = data.$.meta || 0;
-    // const count = data.$.count || 1;
-    const outputName = data._;
-    let recipes: IRecipe[];
-    if (data.$.predefined) {
-      const predefined = this.recipePredefineds[outputName];
-      if (!predefined) {
-        throw new Error(`Could not find any predefined recipe for ${outputName}`);
-      }
-      recipes = [predefined];
-    } else {
-      recipes = this.registry[outputName];
-      if (!recipes) {
-        recipes = this.registryTagged['crafting_recipe:' + outputName];
-        index = -1;
-      }
-    }
-    if (!recipes) {
-      throw new Error(`Could not find any recipe for ${outputName}`);
-    }
-    if (index > -1) {
-      if (index >= recipes.length) {
-        throw new Error(`Could not find recipe ${index} for ${outputName} that only has ${recipes.length} recipes.`);
-      }
-      recipes = [recipes[index]];
-    }
-
-    return {
-      getName: (context) => this.resourceHandler.getTranslation('tile.workbench.name', context.language),
-      toHtml: (context: ISerializeContext, fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer) => {
-        return recipes.map((recipe) => this.serializeRecipe(recipe, context, fileWriter, serializer)).join('<hr />');
-      },
-    };
+  protected getRecipeNameUnlocalized(): string {
+    return 'block.minecraft.crafting_table';
   }
 
-  protected serializeRecipe(recipe: IRecipe, context: ISerializeContext,
+  protected serializeRecipe(recipe: IRecipeCrafting, context: ISerializeContext,
                             fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer) {
     // Prepare input array
     const inputs = "|".repeat(9).split("|").map(() => []);
@@ -100,7 +45,7 @@ export class InfoBookAppendixHandlerCraftingRecipe implements IInfoBookAppendixH
           items = [];
         }
         if (!items.length) {
-          items.push({ item: 'minecraft:air', data: 0 });
+          items.push({ item: 'minecraft:air' });
         }
         const outputIndex = y * 3 + x;
         for (const item of items) {
@@ -114,25 +59,16 @@ export class InfoBookAppendixHandlerCraftingRecipe implements IInfoBookAppendixH
       fileWriter, recipe.output, true);
 
     const appendixIcon = serializer.createItemDisplay(this.resourceHandler, context,
-      fileWriter, { item: 'minecraft:crafting_table', data: 0 }, false);
+      fileWriter, { item: 'minecraft:crafting_table' }, false);
 
     return this.templateCraftingRecipe({ inputs, output, appendixIcon });
   }
 
 }
-
-export interface IRecipeRegistry {
-  [id: string]: [IRecipe];
-}
-
-export interface IRecipe {
+export interface IRecipeCrafting extends IRecipe {
+  id: string;
   input: IItem[][];
   output: IItem;
-  width: number;
-  height: number;
-  tags: string[];
-}
-
-export interface IRecipePredefineds {
-  [id: string]: IRecipe;
+  width?: number;
+  height?: number;
 }

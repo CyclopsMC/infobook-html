@@ -32,8 +32,7 @@ export class InfoBookAppendixHandlerAdvancementRewards implements IInfoBookAppen
         throw new Error(`Unknown achievement reward type '${rewardTag.$.type}'`);
       }
       const count = rewardTag.$.amount;
-      const meta = rewardTag.$.meta || 0;
-      rewardsData.push({ item: rewardTag._, data: meta, count });
+      rewardsData.push({ item: rewardTag._, count });
     }
 
     return {

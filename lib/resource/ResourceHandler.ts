@@ -37,23 +37,18 @@ export class ResourceHandler {
    * Add an entry to a {@llink IItemKeyedRegistry}.
    * @param {string} namespace The namespace.
    * @param {string} path The path.
-   * @param {number} meta The meta.
    * @param {string} nbt The NBT. (empty string represents no NBT)
    * @param {string} value The value.
    */
   protected static addItemKeyedRegistryEntry(registry: IItemKeyedRegistry, namespace: string, path: string,
-                                             meta: number, nbt: string, value: string) {
+                                             nbt: string, value: string) {
     let paths = registry[namespace];
     if (!paths) {
       paths = registry[namespace] = {};
     }
-    let metas = paths[path];
-    if (!metas) {
-      metas = paths[path] = {};
-    }
-    let nbts = metas[meta];
+    let nbts = paths[path];
     if (!nbts) {
-      nbts = metas[meta] = {};
+      nbts = paths[path] = {};
     }
     nbts[nbt] = value;
   }
@@ -62,21 +57,16 @@ export class ResourceHandler {
    * Get an value from a {@llink IItemKeyedRegistry}.
    * @param {string} namespace The namespace.
    * @param {string} path The path.
-   * @param {number} meta The meta.
    * @param {string} nbt The NBT. (empty string represents no NBT)
    * @return The value.
    */
-  protected static getItemKeyedRegistryEntry(registry: IItemKeyedRegistry, namespace: string, path: string,
-                                             meta: number, nbt: string = ''): string {
+  protected static getItemKeyedRegistryEntry(registry: IItemKeyedRegistry, namespace: string,
+                                             path: string, nbt: string = ''): string {
     const paths = registry[namespace];
     if (!paths) {
       return null;
     }
-    const metas = paths[path];
-    if (!metas) {
-      return null;
-    }
-    const nbts = metas[meta];
+    const nbts = paths[path];
     if (!nbts) {
       return null;
     }
@@ -164,24 +154,22 @@ export class ResourceHandler {
    * Add an item icon file.
    * @param {string} namespace The icon namespace.
    * @param {string} path The icon path.
-   * @param {number} meta The icon meta.
    * @param {string} nbt The icon NBT. (empty string represents no NBT)
    * @param {string} file The icon file path.
    */
-  public addItemIcon(namespace: string, path: string, meta: number, nbt: string, file: string) {
-    ResourceHandler.addItemKeyedRegistryEntry(this.iconsItem, namespace, path, meta, nbt, file);
+  public addItemIcon(namespace: string, path: string, nbt: string, file: string) {
+    ResourceHandler.addItemKeyedRegistryEntry(this.iconsItem, namespace, path, nbt, file);
   }
 
   /**
    * Get an item icon file.
    * @param {string} itemId The icon namespace:path.
-   * @param {number} meta The icon meta.
    * @param {string} nbt The icon NBT. (empty string represents no NBT)
    * @return The icon file path or null.
    */
-  public getItemIconFile(itemId: string, meta: number, nbt: string = ''): string {
+  public getItemIconFile(itemId: string, nbt: string = ''): string {
     const { namespace, path } = ResourceHandler.splitItemId(itemId);
-    return ResourceHandler.getItemKeyedRegistryEntry(this.iconsItem, namespace, path, meta, nbt);
+    return ResourceHandler.getItemKeyedRegistryEntry(this.iconsItem, namespace, path, nbt);
   }
 
   /**
@@ -199,7 +187,7 @@ export class ResourceHandler {
    * @return The icon file path or null.
    */
   public getFluidIconFile(fluidName: string): string {
-    return this.iconsFluid[fluidName];
+    return this.iconsFluid[fluidName.replace(':', '__')];
   }
 
   /**
@@ -209,8 +197,7 @@ export class ResourceHandler {
    */
   public addItemTranslationKey(item: IItem, translationKey: string) {
     const { namespace, path } = ResourceHandler.splitItemId(item.item);
-    ResourceHandler.addItemKeyedRegistryEntry(this.itemTranslationKeys, namespace, path, item.data, item.nbt,
-      translationKey);
+    ResourceHandler.addItemKeyedRegistryEntry(this.itemTranslationKeys, namespace, path, item.nbt, translationKey);
   }
 
   /**
@@ -220,7 +207,7 @@ export class ResourceHandler {
    */
   public getItemTranslationKey(item: IItem): string {
     const { namespace, path } = ResourceHandler.splitItemId(item.item);
-    return ResourceHandler.getItemKeyedRegistryEntry(this.itemTranslationKeys, namespace, path, item.data, item.nbt);
+    return ResourceHandler.getItemKeyedRegistryEntry(this.itemTranslationKeys, namespace, path, item.nbt);
   }
 
   /**
@@ -294,7 +281,7 @@ export class ResourceHandler {
 }
 
 export interface IItemKeyedRegistry {
-  [namespace: string]: {[path: string]: {[meta: number]: {[nbt: string]: string}}};
+  [namespace: string]: {[path: string]: {[nbt: string]: string}};
 }
 
 export interface IAdvancement {
