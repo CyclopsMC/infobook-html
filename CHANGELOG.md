@@ -1,6 +1,18 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.0.0"></a>
+## [v2.0.0](https://github.com/CyclopsMC/infobook-html/compare/v1.1.2...v2.0.0) - 2021-02-03
+
+### Changed
+* [Update to MC 1.16](https://github.com/CyclopsMC/infobook-html/commit/249b211cb524414db95e3600dcdf14d9304926db)
+* [Also extract mod data](https://github.com/CyclopsMC/infobook-html/commit/c11023465f93c2018deaa10e14270102398dfb2a)
+* [Update footer year](https://github.com/CyclopsMC/infobook-html/commit/c946bab5c16c293b8a6a01a1c7ee1eb9c28b0ad6)
+  
+### Fixed
+* [Fix incorrect dumpregistries command](https://github.com/CyclopsMC/infobook-html/commit/90bf5675f8a71170e36e91d41c01d5ec94fab430)
+* [Fix server start failing after install in a hacky way](https://github.com/CyclopsMC/infobook-html/commit/03319253969e45b76d98b7b918bbf493c5985693)
+
 <a name="v1.1.2"></a>
 ## [v1.1.2](https://github.com/CyclopsMC/infobook-html/compare/v1.1.1...v1.1.2) - 2019-07-31
 
