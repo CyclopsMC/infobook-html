@@ -43,7 +43,26 @@ async function run(command: string, configPath: string) {
     if (!modLoader.areModsInstalled()) {
       await modLoader.installMods();
     }
-    await modLoader.startServer();
+
+    // Multiple attempts for starting the server
+    // Needed because for some reason this can fail when happening right after Forge installation
+    let attempts = 0;
+    let lastError: Error;
+    do {
+      try {
+        await modLoader.startServer();
+        lastError = undefined;
+        break;
+      } catch (error) {
+        lastError = error;
+        process.stdout.write('Failed to start server, retrying after delay...\n');
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+      }
+    } while (attempts++ < 5);
+    if (lastError) {
+      throw lastError;
+    }
+
     await modLoader.copyRegistries(join(process.cwd(), 'registries'));
     await modLoader.extractMinecraftAssets();
     await modLoader.extractModsAssets();

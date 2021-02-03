@@ -58,6 +58,10 @@ export class ModLoader {
     await new Promise((resolve, reject) => exec(
       `cd ${this.path} && java -jar forge-installer.jar --installServer`).on('exit', resolve));
 
+    // Wait a bit, because otherwise some files don't exist yet (while they should...)
+    process.stdout.write('Wait a bit after Forge installation...\n');
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+
     // Cleanup
     process.stdout.write('Cleaning up...\n');
     await fs.promises.unlink(installerFile);
@@ -119,11 +123,18 @@ export class ModLoader {
   public async startServer() {
     // Start the Forge server
     process.stdout.write('Starting server...\n');
+
     const proc = exec(`cd ${this.path} && java -jar forge-*.jar nogui`);
     // Ignore stdout: proc.stdout.pipe(process.stdout);
     proc.stderr.pipe(process.stderr);
     const onDone = new Promise((resolve, reject) => {
-      proc.addListener('exit', resolve);
+      proc.addListener('exit', (code) => {
+        if (code === 0) {
+          resolve();
+        } else {
+          reject('Server closed with non-zero exit code');
+        }
+      });
       proc.addListener('error', reject);
     });
 
