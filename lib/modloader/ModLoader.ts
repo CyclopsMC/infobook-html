@@ -8,6 +8,7 @@ import {dirname, join, sep} from "path";
 import rimraf = require('rimraf');
 import {promisify} from "util";
 import {Entry, open as openZip, ZipFile} from "yauzl";
+import * as Path from "path";
 
 /**
  * Takes care of installing Forge, installing mods, starting a Forge server, and fetching metadata.
@@ -50,7 +51,7 @@ export class ModLoader {
       throw new Error(`Failed to fetch (${res.statusText}): ${forgeInstaller}`);
     }
     const installerFile = join(this.path, 'forge-installer.jar');
-    await new Promise(async (resolve, reject) => fs.writeFile(installerFile,
+    await new Promise<void>(async (resolve, reject) => fs.writeFile(installerFile,
       await res.buffer(), (err) => err ? reject(err) : resolve()));
 
     // Install Forge
@@ -124,10 +125,10 @@ export class ModLoader {
     // Start the Forge server
     process.stdout.write('Starting server...\n');
 
-    const proc = exec(`cd ${this.path} && java -jar forge-*.jar nogui`);
+    const proc = exec(`cd ${this.path} && ./run.sh nogui`);
     // Ignore stdout: proc.stdout.pipe(process.stdout);
     proc.stderr.pipe(process.stderr);
-    const onDone = new Promise((resolve, reject) => {
+    const onDone = new Promise<void>((resolve, reject) => {
       proc.addListener('exit', (code) => {
         if (code === 0) {
           resolve();
@@ -140,7 +141,7 @@ export class ModLoader {
 
     // Once the loading is complete, send our command and stop the server
     proc.stdout.on('data', (line: string) => {
-      if (line.indexOf('[minecraft/DedicatedServer]: Done') >= 0) {
+      if (line.indexOf('[Server thread/INFO]: Done') >= 0) {
         process.stdout.write('Dumping registries...\n');
         this.sendCommand(proc, '/cyclopscore dumpregistries');
         this.sendCommand(proc, '/stop');
@@ -183,9 +184,14 @@ export class ModLoader {
 
     // Find Minecraft jar
     let jar: string = null;
-    for (const file of await fs.promises.readdir(this.path)) {
-      if (file.startsWith('minecraft_server') && file.endsWith('.jar')) {
-        jar = join(this.path, file);
+    const subPath = Path.join(this.path, 'libraries', 'net', 'minecraft', 'server');
+    for (const dir of await fs.promises.readdir(subPath)) {
+      if (dir.indexOf('-') > 0) {
+        for (const file of await fs.promises.readdir(Path.join(subPath, dir))) {
+          if (file.startsWith('server') && file.endsWith('extra.jar')) {
+            jar = join(subPath, dir, file);
+          }
+        }
       }
     }
 
