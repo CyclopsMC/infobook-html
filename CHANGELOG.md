@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v3.0.0"></a>
+## [v3.0.0](https://github.com/CyclopsMC/infobook-html/compare/v2.0.0...v3.0.0) - 2022-03-10
+
+### Changed
+* [Update to MC 1.18](https://github.com/CyclopsMC/infobook-html/commit/1fb77959593a2b84cb14e56406f0df20ad450e16)
+
 <a name="v2.0.0"></a>
 ## [v2.0.0](https://github.com/CyclopsMC/infobook-html/compare/v1.1.2...v2.0.0) - 2021-02-03
 
