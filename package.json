@@ -75,7 +75,7 @@
   "dependencies": {
     "@types/mkdirp": "^0.5.2",
     "@types/ncp": "^2.0.1",
-    "@types/node": "^13.1.0",
+    "@types/node": "^16.0.0",
     "@types/node-fetch": "^2.5.0",
     "@types/pug": "^2.0.4",
     "@types/rimraf": "^3.0.0",
