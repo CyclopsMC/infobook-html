@@ -99,23 +99,30 @@ export class ModLoader {
         process.stdout.write(`  - ${fileName} from CurseForge...\n`);
         const url = `https://minecraft.curseforge.com/api/maven/${mod.project}/${mod.artifact
           .replace(/-/g, '/')}/${fileName}`;
-        const response = await fetch(url);
-        if (response.status !== 200) {
-          throw new Error(response.statusText + ' on ' + url);
-        }
-        await new Promise((resolve, reject) => {
-          response.body
-            .on('error', reject)
-            .on('end', resolve)
-            .pipe(fs.createWriteStream(join(modsDir, fileName)));
-        });
+        await this.downloadFile(url, fileName, modsDir);
       } else if (mod.type === 'maven') {
         process.stdout.write(`  - ${mod.artifact} from ${mod.repo}...\n`);
         await download(mod.artifact, modsDir, mod.repo);
+      } else if (mod.type === 'raw') {
+        process.stdout.write(`  - ${mod.name} from ${mod.url}...\n`);
+        await this.downloadFile(mod.url, mod.name, modsDir);
       } else {
         throw new Error('Unknown mod type ' + (<any> mod).type);
       }
     }
+  }
+
+  public async downloadFile(url: string, fileName: string, modsDir: string): Promise<void> {
+    const response = await fetch(url);
+    if (response.status !== 200) {
+      throw new Error(response.statusText + ' on ' + url);
+    }
+    await new Promise((resolve, reject) => {
+      response.body
+        .on('error', reject)
+        .on('end', resolve)
+        .pipe(fs.createWriteStream(join(modsDir, fileName)));
+    });
   }
 
   /**
@@ -141,7 +148,7 @@ export class ModLoader {
 
     // Once the loading is complete, send our command and stop the server
     proc.stdout.on('data', (line: string) => {
-      if (line.indexOf('[Server thread/INFO]: Done') >= 0) {
+      if (line.indexOf('Done') >= 0 && line.indexOf('For help, type "help"') >= 0) {
         process.stdout.write('Dumping registries...\n');
         this.sendCommand(proc, '/cyclopscore dumpregistries');
         this.sendCommand(proc, '/stop');
@@ -312,7 +319,7 @@ export interface IModLoaderArgs {
   versionMinecraft: string;
 }
 
-export type IMod = IModMaven | IModCurseforge;
+export type IMod = IModMaven | IModCurseforge | IModRaw;
 
 export interface IModMaven {
   type: 'maven';
@@ -325,4 +332,10 @@ export interface IModCurseforge {
   project: string;
   artifact: string;
   version: string;
+}
+
+export interface IModRaw {
+  type: 'raw';
+  name: string;
+  url: string;
 }
