@@ -9,6 +9,7 @@ import {InfoBookAppendixHandlerCraftingRecipe} from "../lib/infobook/appendix/In
 import {InfoBookAppendixHandlerSmeltingRecipe} from "../lib/infobook/appendix/InfoBookAppendixHandlerSmeltingRecipe";
 import {InfoBookAppendixHandlerImage} from "../lib/infobook/appendix/InfoBookAppendixHandlerImage";
 import {InfoBookAppendixHandlerKeybinding} from "../lib/infobook/appendix/InfoBookAppendixHandlerKeybinding";
+import {InfoBookAppendixHandlerTextfield} from "../lib/infobook/appendix/InfoBookAppendixHandlerTextfield";
 import {IInfoBook} from "../lib/infobook/IInfoBook";
 import {IInfobookPlugin} from "../lib/infobook/IInfobookPlugin";
 import {InfoBookInitializer} from "../lib/infobook/InfoBookInitializer";
@@ -75,6 +76,8 @@ async function create() {
     new InfoBookAppendixHandlerImage(resourceLoader.getResourceHandler()));
   infoBookInitializer.registerAppendixHandler('keybinding',
     new InfoBookAppendixHandlerKeybinding(resourceLoader.getResourceHandler()));
+  infoBookInitializer.registerAppendixHandler('textfield',
+    new InfoBookAppendixHandlerTextfield(resourceLoader.getResourceHandler()));
 
   // Load plugins
   const assetsPaths = [];
