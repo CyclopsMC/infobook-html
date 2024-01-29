@@ -44,6 +44,11 @@ Before you can execute this phase, you need a `modpack.json` file with contents 
 	  "type": "maven",
       "artifact": "org.cyclops.commoncapabilities:CommonCapabilities:1.12.2-2.4.4-309",
       "repo": "https://oss.jfrog.org/artifactory/simple/libs-release/"
+    },
+    {
+      "type": "raw",
+      "name": "integratedscripting-1.19.2-1.0.0-61.jar",
+      "url": "https://www.dropbox.com/s/mbbikni5ieyttuq/integratedscripting-1.19.2-1.0.0-61.jar?dl=1"
     }
   ]
 }
