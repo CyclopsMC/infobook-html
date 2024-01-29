@@ -167,6 +167,11 @@ hr {
     top: 1px;
 }
 
+.appendix-textfield {
+    text-align: left;
+    padding: 10px;
+}
+
 .appendix .inputs {
     display: inline-block;
     vertical-align: middle;
