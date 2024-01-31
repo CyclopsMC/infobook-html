@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v3.1.0"></a>
+## [v3.1.0](https://github.com/CyclopsMC/infobook-html/compare/v3.0.0...v3.1.0) - 2024-01-31
+
+### Added
+* [Support text field appendix](https://github.com/CyclopsMC/infobook-html/commit/6f24bbbd606b6cfd1237e3bf740e73ffc23008be)
+* [Allowing raw mod URLs in modpack](https://github.com/CyclopsMC/infobook-html/commit/11c9ed5adc554ae7dafa66a202ac83fcacd240fb)
+
 <a name="v3.0.0"></a>
 ## [v3.0.0](https://github.com/CyclopsMC/infobook-html/compare/v2.0.0...v3.0.0) - 2022-03-10
 
