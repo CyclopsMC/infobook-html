@@ -78,7 +78,7 @@
     "@types/node": "^13.1.0",
     "@types/node-fetch": "^2.5.0",
     "@types/pug": "^2.0.4",
-    "@types/rimraf": "^3.0.0",
+    "@types/rimraf": "^4.0.0",
     "@types/xml2js": "^0.4.4",
     "@types/yauzl": "^2.9.1",
     "minimist": "^1.2.0",
