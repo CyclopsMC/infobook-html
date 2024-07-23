@@ -16,7 +16,7 @@ async function run(command: string, configPath: string) {
   const modLoader = new ModLoader({
     mods: config.mods,
     path: join(process.cwd(), 'server'),
-    versionForge: config.forge,
+    loader: 'forge' in config ? { versionForge: config.forge } : { versionNeoForge: config.neoforge },
     versionMinecraft: config.minecraft,
   });
 

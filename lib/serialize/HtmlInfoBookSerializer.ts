@@ -247,7 +247,7 @@ export class HtmlInfoBookSerializer {
       return slot ? '<div class="item item-slot">&nbsp;</div>' : '<div class="item">&nbsp;</div>';
     }
 
-    const icon = resourceHandler.getItemIconFile(item.item, item.nbt);
+    const icon = resourceHandler.getItemIconFile(item.item, item.components);
     if (!icon) {
       throw new Error(`Could not find an icon for item ${JSON.stringify(item)}`);
     }

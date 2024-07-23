@@ -17,13 +17,13 @@ export class ModLoader {
 
   private readonly mods: IMod[];
   private readonly path: string;
-  private readonly versionForge: string;
+  private readonly loader: ILoader;
   private readonly versionMinecraft: string;
 
   constructor(args: IModLoaderArgs) {
     this.mods = args.mods;
     this.path = args.path;
-    this.versionForge = args.versionForge;
+    this.loader = args.loader;
     this.versionMinecraft = args.versionMinecraft;
   }
 
@@ -42,25 +42,45 @@ export class ModLoader {
       await fs.promises.mkdir(this.path);
     }
 
-    // Download Forge installer
-    process.stdout.write('Downloading Forge...\n');
-    const forgeInstaller: string = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${
-      this.versionMinecraft}-${this.versionForge}/forge-${this.versionMinecraft}-${this.versionForge}-installer.jar`;
-    const res = await fetch(forgeInstaller);
-    if (!res.ok) {
-      throw new Error(`Failed to fetch (${res.statusText}): ${forgeInstaller}`);
-    }
-    const installerFile = join(this.path, 'forge-installer.jar');
-    await new Promise<void>(async (resolve, reject) => fs.writeFile(installerFile,
-      await res.buffer(), (err) => err ? reject(err) : resolve()));
+    let installerFile: string;
+    if ('versionForge' in this.loader) {
+      // Download Forge installer
+      process.stdout.write('Downloading Forge...\n');
+      const forgeInstaller: string = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${
+        this.versionMinecraft}-${this.loader.versionForge}/forge-${this.versionMinecraft}-${this.loader.versionForge}-installer.jar`;
+      const res = await fetch(forgeInstaller);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch (${res.statusText}): ${forgeInstaller}`);
+      }
+      installerFile = join(this.path, 'forge-installer.jar');
+      await new Promise<void>(async (resolve, reject) => fs.writeFile(installerFile,
+        await res.buffer(), (err) => err ? reject(err) : resolve()));
 
-    // Install Forge
-    process.stdout.write('Installing Forge...\n');
-    await new Promise((resolve, reject) => exec(
-      `cd ${this.path} && java -jar forge-installer.jar --installServer`).on('exit', resolve));
+      // Install Forge
+      process.stdout.write('Installing Forge...\n');
+      await new Promise((resolve, reject) => exec(
+        `cd ${this.path} && java -jar forge-installer.jar --installServer`).on('exit', resolve));
+    } else {
+      // Download NeoForge installer
+      process.stdout.write('Downloading NeoForge...\n');
+      const installer: string = `https://maven.neoforged.net/releases/net/neoforged/neoforge/${
+        this.loader.versionNeoForge}/neoforge-${this.loader.versionNeoForge}-installer.jar`;
+      const res = await fetch(installer);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch (${res.statusText}): ${installer}`);
+      }
+      installerFile = join(this.path, 'neoforge-installer.jar');
+      await new Promise<void>(async (resolve, reject) => fs.writeFile(installerFile,
+        await res.buffer(), (err) => err ? reject(err) : resolve()));
+
+      // Install Forge
+      process.stdout.write('Installing NeoForge...\n');
+      await new Promise((resolve, reject) => exec(
+        `cd ${this.path} && java -jar neoforge-installer.jar --installServer`).on('exit', resolve));
+    }
 
     // Wait a bit, because otherwise some files don't exist yet (while they should...)
-    process.stdout.write('Wait a bit after Forge installation...\n');
+    process.stdout.write('Wait a bit after mod loader installation...\n');
     await new Promise((resolve) => setTimeout(resolve, 10000));
 
     // Cleanup
@@ -102,7 +122,11 @@ export class ModLoader {
         await this.downloadFile(url, fileName, modsDir);
       } else if (mod.type === 'maven') {
         process.stdout.write(`  - ${mod.artifact} from ${mod.repo}...\n`);
-        await download(mod.artifact, modsDir, mod.repo);
+        const name = await download(mod.artifact, modsDir, mod.repo);
+        // Rename file if needed
+        if ('name' in mod) {
+          fs.renameSync(name, join(modsDir, mod.name));
+        }
       } else if (mod.type === 'raw') {
         process.stdout.write(`  - ${mod.name} from ${mod.url}...\n`);
         await this.downloadFile(mod.url, mod.name, modsDir);
@@ -315,8 +339,14 @@ export class ModLoader {
 export interface IModLoaderArgs {
   mods: IMod[];
   path: string;
-  versionForge: string;
+  loader: ILoader;
   versionMinecraft: string;
+}
+
+export type ILoader = {
+  versionForge: string;
+} | {
+  versionNeoForge: string;
 }
 
 export type IMod = IModMaven | IModCurseforge | IModRaw;
@@ -325,6 +355,7 @@ export interface IModMaven {
   type: 'maven';
   artifact: string;
   repo: string;
+  name?: string;
 }
 
 export interface IModCurseforge {

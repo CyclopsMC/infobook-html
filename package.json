@@ -90,5 +90,8 @@
     "rimraf": "^3.0.0",
     "xml2js": "^0.4.19",
     "yauzl": "^2.10.0"
+  },
+  "resolutions": {
+    "@types/istanbul-reports": "3.0.0"
   }
 }

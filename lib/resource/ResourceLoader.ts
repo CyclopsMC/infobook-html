@@ -122,7 +122,7 @@ export class ResourceLoader {
     }
 
     // Handle advancements
-    const advancementsDir = join(fullPath, 'advancements');
+    const advancementsDir = join(fullPath, 'advancement');
     try {
       if ((await fs.stat(langDir)).isDirectory()) {
         await this.loadAssetsAdvancements(modid, advancementsDir, '');

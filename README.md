@@ -54,6 +54,8 @@ Before you can execute this phase, you need a `modpack.json` file with contents 
 }
 ```
 
+*The "forge" entry may be replaced by "neoforge".*
+
 To start this phase, simply run `generate-mod-metadata modpack.json generate`.
 
 Optionally, you can delete the resulting server files afterwards using `generate-mod-metadata modpack.json clean`.

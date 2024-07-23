@@ -197,7 +197,7 @@ export class ResourceHandler {
    */
   public addItemTranslationKey(item: IItem, translationKey: string) {
     const { namespace, path } = ResourceHandler.splitItemId(item.item);
-    ResourceHandler.addItemKeyedRegistryEntry(this.itemTranslationKeys, namespace, path, item.nbt, translationKey);
+    ResourceHandler.addItemKeyedRegistryEntry(this.itemTranslationKeys, namespace, path, item.components, translationKey);
   }
 
   /**
@@ -207,7 +207,7 @@ export class ResourceHandler {
    */
   public getItemTranslationKey(item: IItem): string {
     const { namespace, path } = ResourceHandler.splitItemId(item.item);
-    return ResourceHandler.getItemKeyedRegistryEntry(this.itemTranslationKeys, namespace, path, item.nbt);
+    return ResourceHandler.getItemKeyedRegistryEntry(this.itemTranslationKeys, namespace, path, item.components);
   }
 
   /**
