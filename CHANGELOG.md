@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v4.0.0"></a>
+## [v4.0.0](https://github.com/CyclopsMC/infobook-html/compare/v3.0.0...v4.0.0) - 2024-07-23
+
+### BREAKING CHANGE
+* [Update to NeoForge 1.21](https://github.com/CyclopsMC/infobook-html/commit/bec55a8a0d2049a07cc3dafee2276c94ed738e73)
+    The most notable change here is that "nbt" on items and fluids is replaced by "components".
+
 <a name="v3.1.0"></a>
 ## [v3.1.0](https://github.com/CyclopsMC/infobook-html/compare/v3.0.0...v3.1.0) - 2024-01-31
 
