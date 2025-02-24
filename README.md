@@ -64,7 +64,7 @@ If you want to re-download the mods without re-installing Forge, you can run `ge
 
 ### 2. Icon Generation
 
-This phase should be done using the [Item Exporter mod](https://github.com/CyclopsMC/IconExporter).
+This phase should be done using the [Icon Exporter mod](https://github.com/CyclopsMC/IconExporter).
 
 Simply create a modpack with all the mods that were downloaded in the previous step (including the Item Exporter mod),
 start a world, and run the `/iconexporter export 64` command.
