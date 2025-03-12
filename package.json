@@ -73,7 +73,7 @@
     "version": "manual-git-changelog onversion"
   },
   "dependencies": {
-    "@types/mkdirp": "^0.5.2",
+    "@types/mkdirp": "^1.0.0",
     "@types/ncp": "^2.0.1",
     "@types/node": "^13.1.0",
     "@types/node-fetch": "^2.5.0",
@@ -82,7 +82,7 @@
     "@types/xml2js": "^0.4.4",
     "@types/yauzl": "^2.9.1",
     "minimist": "^1.2.0",
-    "mkdirp": "^0.5.1",
+    "mkdirp": "^1.0.0",
     "mvn-artifact-download": "^5.0.0",
     "ncp": "^2.0.0",
     "node-fetch": "^2.6.0",
