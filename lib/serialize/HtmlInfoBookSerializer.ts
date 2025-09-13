@@ -326,6 +326,7 @@ export class HtmlInfoBookSerializer {
     value = value.replace(/§N/g, '<br />');
 
     // Colors to HTML
+    value = value.replace(/§r([^§]*)§0/g, '<span style="color: #000000">$1</span>');
     value = value.replace(/§1([^§]*)§0/g, '<span style="color: #0000AA">$1</span>');
     value = value.replace(/§2([^§]*)§0/g, '<span style="color: #00AA00">$1</span>');
     value = value.replace(/§3([^§]*)§0/g, '<span style="color: #00AAAA">$1</span>');
