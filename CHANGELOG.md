@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v4.0.1"></a>
+## [v4.0.1](https://github.com/CyclopsMC/infobook-html/compare/v4.0.0...v4.0.1) - 2025-09-13
+
+### Fixed
+* [Convert reset string format code, Closes #36](https://github.com/CyclopsMC/infobook-html/commit/9af942c77ffa3af16e8f40adbebcf3ceca297296)
+
 <a name="v4.0.0"></a>
 ## [v4.0.0](https://github.com/CyclopsMC/infobook-html/compare/v3.0.0...v4.0.0) - 2024-07-23
 
