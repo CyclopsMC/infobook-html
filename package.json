@@ -92,6 +92,6 @@
     "yauzl": "^2.10.0"
   },
   "resolutions": {
-    "@types/istanbul-reports": "3.0.0"
+    "@types/istanbul-reports": "3.0.4"
   }
 }
