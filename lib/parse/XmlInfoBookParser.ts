@@ -70,7 +70,7 @@ export class XmlInfoBookParser {
       paragraphTranslationKeys: (data.paragraph || []).map((subData: any) => this.jsonToParagraph(subData)),
       appendix: ((data.appendix || []).concat(data.appendix_list || []))
         .map((subData: any) => this.jsonToAppendix(subData, modId)),
-      tags: data.tag || [],
+      tags: (Array.isArray(data.tag) && typeof data.tag[0] === 'string' ? data.tag : undefined) || [],
       modId,
     };
     sections[section.nameTranslationKey] = section;
