@@ -21,5 +21,5 @@ export interface IInfoAppendix {
    * @param serializer The HTML serializer.
    * @returns {string} The HTML representation of this appendix.
    */
-  toHtml(context: ISerializeContext, fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer): string;
+  toHtml(context: ISerializeContext, fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer): Promise<string>;
 }

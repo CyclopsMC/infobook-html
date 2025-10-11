@@ -21,7 +21,7 @@ export class InfoBookAppendixHandlerTextfield implements IInfoBookAppendixHandle
       .replace(/\n/g, '<br \>');
     const scale = data.$.scale || 1;
     return {
-      toHtml: (context: ISerializeContext, fileWriter: IFileWriter) => {
+      toHtml: async(context: ISerializeContext, fileWriter: IFileWriter) => {
         return `<div class="appendix-textfield" style="font-size: ${scale}em">${contents}</div>`;
       },
     };

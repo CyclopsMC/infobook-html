@@ -132,6 +132,21 @@ export class HtmlInfoBookSerializer {
           appendices.unshift(new InfoBookAppendixAd());
         }
 
+        const sectionAppendices: string[] = [];
+        for (const appendix of appendices) {
+          if (appendix) {
+            const appendixContents = await appendix.toHtml(context, this.fileWriter, this);
+            if (appendix.skipWrapper) {
+              sectionAppendices.push(appendixContents);
+            } else {
+              sectionAppendices.push(this.appendixWrapper({
+                appendixContents,
+                appendixName: appendix.getName ? appendix.getName(context) : null,
+              }));
+            }
+          }
+        }
+
         // Create leaf file
         const fileContents = this.templateSection({
           ...context,
@@ -140,19 +155,7 @@ export class HtmlInfoBookSerializer {
           languages,
           nextPage,
           previousPage,
-          sectionAppendices: appendices
-            .filter((appendix) => appendix) // TODO: rm
-            .map((appendix) => {
-              const appendixContents = appendix.toHtml(context, this.fileWriter, this);
-              if (appendix.skipWrapper) {
-                return appendixContents;
-              } else {
-                return this.appendixWrapper({
-                  appendixContents,
-                  appendixName: appendix.getName ? appendix.getName(context) : null,
-                });
-              }
-            }),
+          sectionAppendices,
           sectionParagraphs: section.paragraphTranslationKeys
             .map((key) => context.resourceHandler.getTranslation(key, context.language))
             .map((value) => this.formatString(value)),
@@ -240,9 +243,9 @@ export class HtmlInfoBookSerializer {
     return { link, linkTarget };
   }
 
-  public createItemDisplay(resourceHandler: ResourceHandler, context: ISerializeContext,
+  public async createItemDisplay(resourceHandler: ResourceHandler, context: ISerializeContext,
                            fileWriter: IFileWriter, item: IItem, slot: boolean,
-                           annotation: string = ''): string {
+                           annotation: string = ''): Promise<string> {
     if (item.item === 'minecraft:air') {
       return slot ? '<div class="item item-slot">&nbsp;</div>' : '<div class="item">&nbsp;</div>';
     }
@@ -251,7 +254,7 @@ export class HtmlInfoBookSerializer {
     if (!icon) {
       throw new Error(`Could not find an icon for item ${JSON.stringify(item)}`);
     }
-    const iconUrl = fileWriter.write('icons/' + basename(icon), createReadStream(icon));
+    const iconUrl = await fileWriter.write('icons/' + basename(icon), () => createReadStream(icon));
 
     const key = resourceHandler.getItemTranslationKey(item);
     if (!key) {
@@ -271,13 +274,13 @@ export class HtmlInfoBookSerializer {
     });
   }
 
-  public createFluidDisplay(resourceHandler: ResourceHandler, context: ISerializeContext,
-                            fileWriter: IFileWriter, fluid: IFluid, slot: boolean): string {
+  public async createFluidDisplay(resourceHandler: ResourceHandler, context: ISerializeContext,
+                            fileWriter: IFileWriter, fluid: IFluid, slot: boolean): Promise<string> {
     const icon = resourceHandler.getFluidIconFile(fluid.fluid);
     if (!icon) {
       throw new Error(`Could not find an icon for fluid ${JSON.stringify(fluid)}`);
     }
-    const iconUrl = fileWriter.write('icons/' + basename(icon), createReadStream(icon));
+    const iconUrl = await fileWriter.write('icons/' + basename(icon), () => createReadStream(icon));
 
     const key = resourceHandler.getFluidTranslationKey(fluid);
     if (!key) {

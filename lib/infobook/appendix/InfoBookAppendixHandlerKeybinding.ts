@@ -22,7 +22,7 @@ export class InfoBookAppendixHandlerKeybinding implements IInfoBookAppendixHandl
     const key = this.resourceHandler.getKeybinding(id);
     return {
       getName: (context) => this.resourceHandler.getTranslation(`infobook.cyclopscore.keybinding`, context.language),
-      toHtml: (context: ISerializeContext) => {
+      toHtml: async(context: ISerializeContext) => {
         const name = this.resourceHandler.getTranslation(id, context.language);
         return this.templateKeybinding({ name, key });
       },

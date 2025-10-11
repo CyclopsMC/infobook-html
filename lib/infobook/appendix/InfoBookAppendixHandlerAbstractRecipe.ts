@@ -51,8 +51,8 @@ export abstract class InfoBookAppendixHandlerAbstractRecipe<R extends IRecipe> i
 
     return {
       getName: (context) => this.resourceHandler.getTranslation(this.getRecipeNameUnlocalized(), context.language),
-      toHtml: (context: ISerializeContext, fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer) => {
-        return recipes.map((recipe) => this.serializeRecipe(recipe, context, fileWriter, serializer)).join('<hr />');
+      toHtml: async(context: ISerializeContext, fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer) => {
+        return (await Promise.all(recipes.map((recipe) => this.serializeRecipe(recipe, context, fileWriter, serializer)))).join('<hr />');
       },
     };
   }
@@ -60,7 +60,7 @@ export abstract class InfoBookAppendixHandlerAbstractRecipe<R extends IRecipe> i
   protected abstract getRecipeNameUnlocalized(): string;
 
   protected abstract serializeRecipe(recipe: R, context: ISerializeContext,
-                                     fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer): string;
+                                     fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer): Promise<string>;
 
 }
 

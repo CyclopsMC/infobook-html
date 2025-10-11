@@ -24,13 +24,13 @@ export class InfoBookAppendixHandlerSmeltingRecipe extends InfoBookAppendixHandl
     return 'block.minecraft.furnace';
   }
 
-  protected serializeRecipe(recipe: IRecipeSmelting, context: ISerializeContext, fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer): string {
-    const input = recipe.input.map((item) => serializer.createItemDisplay(this.resourceHandler, context,
-      fileWriter, item, true));
-    const output = serializer.createItemDisplay(this.resourceHandler, context,
+  protected async serializeRecipe(recipe: IRecipeSmelting, context: ISerializeContext, fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer): Promise<string> {
+    const input = await Promise.all(recipe.input.map((item) => serializer.createItemDisplay(this.resourceHandler, context,
+      fileWriter, item, true)));
+    const output = await serializer.createItemDisplay(this.resourceHandler, context,
       fileWriter, recipe.output, true);
 
-    const appendixIcon = serializer.createItemDisplay(this.resourceHandler, context,
+    const appendixIcon = await serializer.createItemDisplay(this.resourceHandler, context,
       fileWriter, { item: 'minecraft:furnace' }, false);
 
     return this.templateFurnaceRecipe({ input, output, appendixIcon });

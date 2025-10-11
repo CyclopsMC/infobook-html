@@ -10,5 +10,5 @@ export interface IFileWriter {
    * @param {"stream".internal.Readable} contents A stream of contents to write.
    * @returns {string} The file path in the output, relative to the output root.
    */
-  write(baseName: string, contents: Readable): string;
+  write(baseName: string, contents: () => Readable): Promise<string>;
 }

@@ -24,7 +24,7 @@ export class InfoBookAppendixHandlerCraftingRecipe extends InfoBookAppendixHandl
     return 'block.minecraft.crafting_table';
   }
 
-  protected serializeRecipe(recipe: IRecipeCrafting, context: ISerializeContext,
+  protected async serializeRecipe(recipe: IRecipeCrafting, context: ISerializeContext,
                             fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer) {
     // Prepare input array
     const inputs = "|".repeat(9).split("|").map(() => []);
@@ -49,16 +49,16 @@ export class InfoBookAppendixHandlerCraftingRecipe extends InfoBookAppendixHandl
         }
         const outputIndex = y * 3 + x;
         for (const item of items) {
-          inputs[outputIndex].push(serializer.createItemDisplay(this.resourceHandler, context,
+          inputs[outputIndex].push(await serializer.createItemDisplay(this.resourceHandler, context,
             fileWriter, item, true));
         }
       }
     }
 
-    const output = serializer.createItemDisplay(this.resourceHandler, context,
+    const output = await serializer.createItemDisplay(this.resourceHandler, context,
       fileWriter, recipe.output, true);
 
-    const appendixIcon = serializer.createItemDisplay(this.resourceHandler, context,
+    const appendixIcon = await serializer.createItemDisplay(this.resourceHandler, context,
       fileWriter, { item: 'minecraft:crafting_table' }, false);
 
     return this.templateCraftingRecipe({ inputs, output, appendixIcon });

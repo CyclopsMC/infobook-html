@@ -22,8 +22,8 @@ export class InfoBookAppendixHandlerImage implements IInfoBookAppendixHandler {
     const fileName = basename(data._);
     const { width, height } = data.$;
     return {
-      toHtml: (context: ISerializeContext, fileWriter: IFileWriter) => {
-        const writtenPath = fileWriter.write(fileName, createReadStream(fullPath));
+      toHtml: async(context: ISerializeContext, fileWriter: IFileWriter): Promise<string> => {
+        const writtenPath = await fileWriter.write(fileName, () => createReadStream(fullPath));
         return `<canvas class="appendix-image" style="background: url(${
           writtenPath}); width: ${width * 2}px; height: ${height * 2}px; background-size: 512px 512px;"></canvas>`;
       },

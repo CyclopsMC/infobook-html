@@ -16,7 +16,7 @@ export class InfoBookAppendixAd implements IInfoAppendix {
     this.templateTagIndex = compilePug(__dirname + '/../../../template/appendix/ad.pug');
   }
 
-  public toHtml(context: ISerializeContext, fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer): string {
+  public async toHtml(context: ISerializeContext, fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer): Promise<string> {
     return this.templateTagIndex(context.googleAdsense);
   }
 

@@ -17,11 +17,15 @@ export class FileWriter implements IFileWriter {
     this.writtenFiles = {};
   }
 
-  public write(baseName: string, contents: Readable): string {
+  public async write(baseName: string, contents: () => Readable): Promise<string> {
     // Don't write the file if it has been written before
     if (!this.writtenFiles[baseName]) {
-      contents.pipe(createWriteStream(join(this.context.basePath, 'assets', baseName)));
+      const eventEmitter = contents().pipe(createWriteStream(join(this.context.basePath, 'assets', baseName)));
       this.writtenFiles[baseName] = true;
+      await new Promise((resolve, reject) => {
+        eventEmitter.on('finish', resolve);
+        eventEmitter.on('error', reject);
+      });
     }
     return this.context.baseUrl + 'assets/' + baseName;
   }

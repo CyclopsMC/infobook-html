@@ -17,7 +17,7 @@ export class InfoBookAppendixTagIndex implements IInfoAppendix {
     this.templateTagIndex = compilePug(__dirname + '/../../../template/appendix/tag_index.pug');
   }
 
-  public toHtml(context: ISerializeContext, fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer): string {
+  public async toHtml(context: ISerializeContext, fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer): Promise<string> {
     const links: { url: string, name: string, icon: string }[] = [];
     for (const tag in context.sectionIndex.tags) {
       const url = context.sectionIndex.tags[tag];
@@ -27,11 +27,11 @@ export class InfoBookAppendixTagIndex implements IInfoAppendix {
       const item = { item: tag };
       let translationKey = this.resourceHandler.getItemTranslationKey(item);
       if (translationKey) {
-        icon = serializer.createItemDisplay(this.resourceHandler, context, fileWriter, item, false);
+        icon = await serializer.createItemDisplay(this.resourceHandler, context, fileWriter, item, false);
       } else {
         const fluid = { fluid: tag };
         translationKey = this.resourceHandler.getFluidTranslationKey(fluid);
-        icon = serializer.createFluidDisplay(this.resourceHandler, context, fileWriter, fluid, false);
+        icon = await serializer.createFluidDisplay(this.resourceHandler, context, fileWriter, fluid, false);
       }
       const name = this.resourceHandler.getTranslation(translationKey, context.language);
 

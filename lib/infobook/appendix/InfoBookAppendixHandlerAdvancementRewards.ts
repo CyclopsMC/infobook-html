@@ -37,15 +37,15 @@ export class InfoBookAppendixHandlerAdvancementRewards implements IInfoBookAppen
 
     return {
       getName: (context) => this.resourceHandler.getTranslation('gui.advancements', context.language),
-      toHtml: (context: ISerializeContext, fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer) => {
+      toHtml: async(context: ISerializeContext, fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer): Promise<string> => {
         const advancements = advancementsData
           .map((advancement) => ({
             description: this.resourceHandler.getTranslation(advancement.description, context.language),
             title: this.resourceHandler.getTranslation(advancement.title, context.language),
           }));
-        const rewards = rewardsData
+        const rewards = await Promise.all(rewardsData
           .map((reward) => serializer.createItemDisplay(
-            this.resourceHandler, context, fileWriter, reward, true));
+            this.resourceHandler, context, fileWriter, reward, true)));
         const rewardsString = this.resourceHandler.getTranslation(`gui.cyclopscore.rewards`, context.language);
         return this.templateAdvancementRewards({ advancements, rewards, rewardsString });
       },
