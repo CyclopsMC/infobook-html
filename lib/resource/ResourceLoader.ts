@@ -77,8 +77,8 @@ export class ResourceLoader {
    * @param {string[]} paths An array of paths to traverse to look for resources.
    * @returns {Promise<void>} A promise resolving when loading is done.
    */
-  public async loadAll(baseDir: string, path: string) {
-    await this.load(join(baseDir, path));
+  public async loadAll(baseDir: string, path: string, excludedModLanguages: string[]) {
+    await this.load(join(baseDir, path), excludedModLanguages);
   }
 
   /**
@@ -89,14 +89,15 @@ export class ResourceLoader {
    * @param {string} fullPath A full path to look in.
    * @returns {Promise<void>} A promise resolving when loading is done.
    */
-  public async load(fullPath: string) {
+  public async load(fullPath: string, excludedModLanguages: string[]) {
     const entries = await fs.readdir(fullPath);
 
     // Look for a valid pack
     for (const modid of entries) {
+      const excludedModLanguage = excludedModLanguages.includes(modid);
       const modPath = join(fullPath, modid);
       if ((await fs.stat(modPath)).isDirectory()) {
-        await this.loadAssets(modid, modPath);
+        await this.loadAssets(modid, modPath, excludedModLanguage);
       }
     }
   }
@@ -107,7 +108,7 @@ export class ResourceLoader {
    * @param {string} fullPath The full path of the pack.
    * @returns {Promise<void>} A promise resolving when loading is done.
    */
-  public async loadAssets(modid: string, fullPath: string) {
+  public async loadAssets(modid: string, fullPath: string, excludedModLanguage: boolean) {
     // Set base path
     this.resourceHandler.setResourcePackBasePath(modid, fullPath);
 
@@ -115,7 +116,7 @@ export class ResourceLoader {
     const langDir = join(fullPath, 'lang');
     try {
       if ((await fs.stat(langDir)).isDirectory()) {
-        await this.loadAssetsLang(modid, langDir);
+        await this.loadAssetsLang(modid, langDir, excludedModLanguage);
       }
     } catch (e) {
       // Ignore mods without language files
@@ -138,11 +139,11 @@ export class ResourceLoader {
    * @param {string} langDir The full language directory path.
    * @returns {Promise<void>} A promise resolving when loading is done.
    */
-  public async loadAssetsLang(modid: string, langDir: string) {
+  public async loadAssetsLang(modid: string, langDir: string, excludedModLanguage: boolean) {
     const entries = await fs.readdir(langDir);
     for (const entry of entries) {
       const language = entry.substring(0, entry.indexOf('.'));
-      await this.loadAssetsLangFile(modid, language, join(langDir, entry));
+      await this.loadAssetsLangFile(modid, language, join(langDir, entry), excludedModLanguage);
     }
   }
 
@@ -153,9 +154,9 @@ export class ResourceLoader {
    * @param {string} fullFilePath The full language file path.
    * @returns {Promise<void>} A promise resolving when loading is done.
    */
-  public async loadAssetsLangFile(modid: string, language: string, fullFilePath: string) {
+  public async loadAssetsLangFile(modid: string, language: string, fullFilePath: string, excludedModLanguage: boolean) {
     const translations: {[translationKey: string]: string} = JSON.parse((await fs.readFile(fullFilePath)).toString('utf8'));
-    this.resourceHandler.addTranslations(language, translations);
+    this.resourceHandler.addTranslations(language, translations, excludedModLanguage);
   }
 
   /**

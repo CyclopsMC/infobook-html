@@ -62,7 +62,7 @@ async function create() {
   await resourceLoader.loadItemTranslationKeys('registries');
   await resourceLoader.loadFluidTranslationKeys('registries');
   await resourceLoader.loadKeybindings(config.keybindings);
-  await resourceLoader.loadAll(process.cwd(), 'mod_assets');
+  await resourceLoader.loadAll(process.cwd(), 'mod_assets', config.excludedModLanguages || []);
 
   // Setup infobook loader
   const infoBookInitializer = new InfoBookInitializer(config);

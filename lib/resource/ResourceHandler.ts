@@ -13,6 +13,7 @@ export class ResourceHandler {
   };
 
   private readonly translations: {[language: string]: {[key: string]: string}} = {};
+  private readonly languages: {[language: string]: boolean} = {};
   private readonly resourcePackBasePaths: {[resourcePackId: string]: string} = {};
   private readonly iconsItem: IItemKeyedRegistry = {};
   private readonly itemTranslationKeys: IItemKeyedRegistry = {};
@@ -81,7 +82,7 @@ export class ResourceHandler {
    * @returns {string[]} All available language keys.
    */
   public getLanguages(): string[] {
-    return Object.keys(this.translations);
+    return Object.keys(this.languages);
   }
 
   /**
@@ -89,7 +90,7 @@ export class ResourceHandler {
    * @param {string} language A language key.
    * @param {{[p: string]: string}} translations A mapping from translation key to translated value.
    */
-  public addTranslations(language: string, translations: {[key: string]: string}) {
+  public addTranslations(language: string, translations: {[key: string]: string}, excludedModLanguage: boolean) {
     language = language.toLowerCase();
     const existingTranslations = this.translations[language];
     if (!existingTranslations) {
@@ -98,6 +99,9 @@ export class ResourceHandler {
       for (const key in translations) {
         existingTranslations[key] = translations[key];
       }
+    }
+    if (!excludedModLanguage && Object.keys(translations).length > 0) {
+      this.languages[language] = true;
     }
   }
 
