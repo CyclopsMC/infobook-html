@@ -1,6 +1,19 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v5.0.0"></a>
+## [v5.0.0](https://github.com/CyclopsMC/infobook-html/compare/v4.0.1...v5.0.0) - 2025-10-11
+
+### BREAKING CHANGE
+* [Make file writing async](https://github.com/CyclopsMC/infobook-html/commit/fe23ad5fb8a4006e178c47cb81bc6d77e65a4040)
+
+### Added
+* [Allow languages to be excluded](https://github.com/CyclopsMC/infobook-html/commit/54bc4beefc27f34913f388300b6c1315989f7204)
+
+### Fixed:
+* [Fix crash for tags with attributes](https://github.com/CyclopsMC/infobook-html/commit/17218c454f4c1005f03af69405d52f84845a0574)
+* [Fix some tags being omitted](https://github.com/CyclopsMC/infobook-html/commit/5e18a835c4ee56ca331862d431faa221353e304f)
+
 <a name="v4.0.1"></a>
 ## [v4.0.1](https://github.com/CyclopsMC/infobook-html/compare/v4.0.0...v4.0.1) - 2025-09-13
 
