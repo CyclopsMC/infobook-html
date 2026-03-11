@@ -36,6 +36,32 @@ jobs:
           npm test
       - name: Download mods and generate metadata 📦
         run: npm run generate:metadata
+      - name: Inject custom language files 🌐
+        run: |
+          python3 - <<'PYEOF'
+          import json, os
+
+          for modid in os.listdir('lang'):
+            lang_dir = os.path.join('lang', modid)
+            if not os.path.isdir(lang_dir):
+              continue
+            for lang_file in os.listdir(lang_dir):
+              src = os.path.join(lang_dir, lang_file)
+              dst_dir = os.path.join('mod_assets', modid, 'lang')
+              dst = os.path.join(dst_dir, lang_file)
+              os.makedirs(dst_dir, exist_ok=True)
+              try:
+                with open(dst) as f:
+                  existing = json.load(f)
+              except (FileNotFoundError, json.JSONDecodeError):
+                existing = {}
+              with open(src) as f:
+                custom = json.load(f)
+              existing.update(custom)
+              with open(dst, 'w') as f:
+                json.dump(existing, f, indent=2)
+              print(f'Merged {src} into {dst}')
+          PYEOF
       - name: Install Xvfb 🖥️
         run: sudo apt-get install -y xvfb
       - name: Generate icons 🎨
