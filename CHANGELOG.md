@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v5.1.0"></a>
+## [v5.1.0](https://github.com/CyclopsMC/infobook-html/compare/v5.0.0...v5.1.0) - 2026-03-11
+
+### Added
+* [Add icons generator and compressor](https://github.com/CyclopsMC/infobook-html/commit/aa680fd62eebabab1aaef232fb24a8feda6c69b4)
+
 <a name="v5.0.0"></a>
 ## [v5.0.0](https://github.com/CyclopsMC/infobook-html/compare/v4.0.1...v5.0.0) - 2025-10-11
 
