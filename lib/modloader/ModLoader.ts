@@ -111,7 +111,7 @@ export class ModLoader {
     process.stdout.write('Downloading mods...\n');
     const modsDir = join(this.path, 'mods');
     if (!fs.existsSync(modsDir)) {
-      await fs.promises.mkdir(modsDir);
+      await fs.promises.mkdir(modsDir, { recursive: true });
     }
     for (const mod of this.mods) {
       if (mod.type === 'curseforge') {
