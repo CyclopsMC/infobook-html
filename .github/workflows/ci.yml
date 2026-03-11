@@ -13,13 +13,13 @@ jobs:
         with:
           node-version: 20
       - name: Install dependencies 📦
-        run: npm install
+        run: yarn install
       - name: Build 🔧
-        run: npm run build
+        run: yarn build
       - name: Lint 🔍
-        run: npm run lint
+        run: yarn lint
       - name: Test 🧪
-        run: npm test
+        run: yarn test
 
   validate-icons:
     permissions:
@@ -46,8 +46,8 @@ jobs:
             headlessmc-
       - name: Install dependencies and build 🔧
         run: |
-          npm install
-          npm run build
+          yarn install
+          yarn build
       - name: Install Xvfb 🖥️
         run: sudo apt-get install -y xvfb
       - name: Generate icons 🎨
