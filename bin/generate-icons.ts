@@ -46,8 +46,9 @@ Options:
   --mods-dir               directory containing mod JARs (default: server/mods)
   --icons-dir              output directory for icons (default: icons)
   --work-dir               working directory for HeadlessMC (default: headlessmc)
-  --github-token           GitHub token for downloading from GitHub Packages
-  --icon-exporter-version  version of the IconExporter artifact (default: 1.4.0-174)
+  --github-token           GitHub token for downloading from GitHub Packages (only needed with --icon-exporter-version)
+  --icon-exporter-version  version of the IconExporter artifact; if omitted, the latest version for
+                           the configured Minecraft version is fetched automatically from Modrinth
   --headlessmc-version     version of HeadlessMC to use (default: 2.8.0)
   --timeout                timeout in seconds for the full icon generation (default: 1800)
 `);
