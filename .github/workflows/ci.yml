@@ -1,0 +1,58 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  build:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+      - name: Setup Node.js 🟢
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies 📦
+        run: npm install
+      - name: Build 🔧
+        run: npm run build
+      - name: Lint 🔍
+        run: npm run lint
+      - name: Test 🧪
+        run: npm test
+
+  validate-icons:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+      - name: Setup Node.js 🟢
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Setup Java ☕
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
+      - name: Cache HeadlessMC files 💾
+        uses: actions/cache@v4
+        with:
+          path: headlessmc
+          key: headlessmc-${{ hashFiles('test/resources/modpack-minecraft.json') }}
+          restore-keys: |
+            headlessmc-
+      - name: Install dependencies and build 🔧
+        run: |
+          npm install
+          npm run build
+      - name: Install Xvfb 🖥️
+        run: sudo apt-get install -y xvfb
+      - name: Generate icons 🎨
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" node bin/generate-icons.js test/resources/modpack-minecraft.json --icons-dir output/assets/icon
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Compress icons 🗜️
+        run: node bin/compress-icons.js output
