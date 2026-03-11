@@ -1,4 +1,12 @@
 {
   "minecraft": "1.21.1",
-  "neoforge": "21.1.210"
+  "neoforge": "21.1.210",
+  "mods": [
+    {
+      "type": "curseforge",
+      "project": "cyclops-core",
+      "artifact": "CyclopsCore-1.21.1",
+      "version": "1.29.0"
+    }
+  ]
 }

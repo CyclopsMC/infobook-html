@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 import * as fs from "fs";
 import minimist = require("minimist");
-import {join} from "path";
+import {dirname, join} from "path";
 import {IconsGenerator} from "../lib/icon/IconsGenerator";
+import {ModLoader} from "../lib/modloader/ModLoader";
 
 // Process CLI args
 const args = minimist(process.argv.slice(2));
@@ -22,8 +23,23 @@ async function run(configPath: string) {
     process.exit(1);
   }
 
+  const modsDir = join(process.cwd(), args['mods-dir'] || join('server', 'mods'));
+
+  // Install mods from config if specified and not already installed
+  if (config.mods && config.mods.length > 0) {
+    const modLoader = new ModLoader({
+      mods: config.mods,
+      path: dirname(modsDir),
+      loader: 'forge' in config ? { versionForge: config.forge } : { versionNeoForge: config.neoforge },
+      versionMinecraft: config.minecraft,
+    });
+    if (!modLoader.areModsInstalled()) {
+      await modLoader.installMods();
+    }
+  }
+
   const generator = new IconsGenerator({
-    modsDir: join(process.cwd(), args['mods-dir'] || join('server', 'mods')),
+    modsDir,
     iconsDir: join(process.cwd(), args['icons-dir'] || 'icon'),
     workDir: join(process.cwd(), args['work-dir'] || 'headlessmc'),
     minecraftVersion: config.minecraft,
