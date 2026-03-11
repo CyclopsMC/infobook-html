@@ -72,7 +72,11 @@
     "build-watch": "tsc --watch",
     "validate": "npm ls",
     "prepare": "npm run build",
-    "version": "manual-git-changelog onversion"
+    "version": "manual-git-changelog onversion",
+    "generate:metadata": "node bin/generate-mod-metadata.js modpack.json generate",
+    "generate:icons": "node bin/generate-icons.js modpack.json",
+    "generate:html": "node bin/generate-infobook-html.js config.json output",
+    "generate:compress": "node bin/compress-icons.js output"
   },
   "dependencies": {
     "@types/mkdirp": "^0.5.2",

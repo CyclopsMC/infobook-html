@@ -1,0 +1,117 @@
+name: Build and Deploy
+on: [push]
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Setup Java ☕
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
+      - name: Setup Node.js 🟢
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Cache Minecraft server files 💾
+        uses: actions/cache@v4
+        with:
+          path: |
+            server
+            headlessmc/game
+          key: minecraft-${{ hashFiles('modpack.json') }}
+          restore-keys: |
+            minecraft-
+      - name: Install and Build 🔧
+        run: |
+          npm install --legacy-peer-deps
+          npm run build
+          npm run lint
+          npm test
+      - name: Download mods and generate metadata 📦
+        run: npm run generate:metadata
+      - name: Inject custom language files 🌐
+        run: |
+          python3 - <<'PYEOF'
+          import json, os
+
+          for modid in os.listdir('lang'):
+            lang_dir = os.path.join('lang', modid)
+            if not os.path.isdir(lang_dir):
+              continue
+            for lang_file in os.listdir(lang_dir):
+              src = os.path.join(lang_dir, lang_file)
+              dst_dir = os.path.join('mod_assets', modid, 'lang')
+              dst = os.path.join(dst_dir, lang_file)
+              os.makedirs(dst_dir, exist_ok=True)
+              try:
+                with open(dst) as f:
+                  existing = json.load(f)
+              except (FileNotFoundError, json.JSONDecodeError):
+                existing = {}
+              with open(src) as f:
+                custom = json.load(f)
+              existing.update(custom)
+              with open(dst, 'w') as f:
+                json.dump(existing, f, indent=2)
+              print(f'Merged {src} into {dst}')
+          PYEOF
+      - name: Install Xvfb 🖥️
+        run: sudo apt-get install -y xvfb
+      - name: Generate icons 🎨
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" npm run generate:icons
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate HTML 📄
+        run: npm run generate:html
+      - name: Compress icons 🗜️
+        run: npm run generate:compress
+      - name: Restore unchanged icons and track Minecraft version 🔄
+        run: |
+          # Read the current Minecraft version from modpack.json
+          MC_VERSION=$(python3 -c "import json; print(json.load(open('modpack.json'))['minecraft'])")
+          echo "Current Minecraft version: $MC_VERSION"
+
+          # Try to fetch gh-pages (may not exist on the very first deployment)
+          PREV_VERSION=""
+          if git fetch origin gh-pages --depth=1 2>/dev/null; then
+            PREV_VERSION=$(git cat-file blob origin/gh-pages:minecraft-version.txt 2>/dev/null || echo "")
+          fi
+          echo "Previous Minecraft version: '${PREV_VERSION}'"
+
+          if [ "$MC_VERSION" = "$PREV_VERSION" ]; then
+            echo "Minecraft version unchanged — restoring existing icons from gh-pages (only new icons will be added)"
+            RESTORED=0
+            SKIPPED=0
+            while IFS= read -r icon_path; do
+              local_path="output/$icon_path"
+              if [ -f "$local_path" ]; then
+                git cat-file blob "origin/gh-pages:$icon_path" > "$local_path"
+                RESTORED=$((RESTORED + 1))
+              else
+                SKIPPED=$((SKIPPED + 1))
+              fi
+            done < <(git ls-tree -r --name-only origin/gh-pages -- 'assets/icons/' 2>/dev/null || true)
+            echo "Restored $RESTORED existing icons from gh-pages; $SKIPPED icons from gh-pages no longer present in new export"
+          else
+            echo "Minecraft version changed from '${PREV_VERSION}' to '${MC_VERSION}' — using all freshly generated icons"
+          fi
+
+          # Write the current Minecraft version into output/ so it is tracked on gh-pages
+          # and future deployments can detect whether the Minecraft version has changed.
+          echo "$MC_VERSION" > output/minecraft-version.txt
+          echo "Written output/minecraft-version.txt"
+      - name: Deploy 🚀
+        if: github.ref == 'refs/heads/master'
+        uses: JamesIves/github-pages-deploy-action@3.6.2
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: output
+          CLEAN: true

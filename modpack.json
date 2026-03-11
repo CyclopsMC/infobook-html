@@ -1,0 +1,12 @@
+{
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.210",
+  "mods": [
+    {
+      "type": "maven",
+      "artifact": "curse.maven:cyclopscore-232758:7076266",
+      "repo": "https://cursemaven.com/",
+      "name": "CyclopsCore-1.21.1-neoforge-1.27.0.jar"
+    }
+  ]
+}
