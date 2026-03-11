@@ -1,0 +1,7 @@
+{
+  "baseUrl": "https://cyclopscore.rubensworks.net/book/",
+  "modId": "cyclopscore",
+  "modName": "CyclopsCore",
+  "bookName": "CyclopsCore Test Book",
+  "sectionsFile": "mod_assets/cyclopscore/info/test.xml"
+}
