@@ -49,16 +49,16 @@ async function create() {
       'Could not find a "mod_assets" folder, make sure to create one with generate-mod-metadata.\n');
     process.exit(1);
   }
-  // Check if icons are available
-  if (!fs.existsSync('icons')) {
+  // Check if icon are available
+  if (!fs.existsSync('icon')) {
     process.stderr.write(
-      'Could not find a "icons" folder, make sure to create one with output from the IconExporter mod.\n');
+      'Could not find a "icon" folder, make sure to create one with output from the IconExporter mod.\n');
     process.exit(1);
   }
 
   // Read resources
   const resourceLoader = new ResourceLoader();
-  await resourceLoader.loadIcons('icons');
+  await resourceLoader.loadIcons('icon');
   await resourceLoader.loadItemTranslationKeys('registries');
   await resourceLoader.loadFluidTranslationKeys('registries');
   await resourceLoader.loadKeybindings(config.keybindings);

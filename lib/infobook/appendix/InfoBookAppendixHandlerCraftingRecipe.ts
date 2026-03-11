@@ -27,7 +27,7 @@ export class InfoBookAppendixHandlerCraftingRecipe extends InfoBookAppendixHandl
   protected async serializeRecipe(recipe: IRecipeCrafting, context: ISerializeContext,
                             fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer) {
     // Prepare input array
-    const inputs = "|".repeat(9).split("|").map(() => []);
+    const inputs = "|".repeat(9).split("|").map((): any[] => []);
 
     // Define custom dimensions for shapeless recipes
     if (!recipe.width || !recipe.height) {

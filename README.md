@@ -13,11 +13,12 @@ This tool is the basis for the following mod-specific plugins:
 
 ## Usage
 
-This tool allows Cyclops infobooks to be exported as an HTML website in three phases:
+This tool allows Cyclops infobooks to be exported as an HTML website in four phases:
 
 1. Metadata generation: A preparation step for generating all required metadata that is needed for serializing the infobook to HTML.
 2. Icon generation: Exporting item and block icons to PNG files. 
 3. HTML generation: Serialization to HTML based on the infook XML and metadata.
+4. Icon compression: Optionally compress icons within the output directory.
 
 ### 1. Metadata Generation
 
@@ -64,12 +65,27 @@ If you want to re-download the mods without re-installing Forge, you can run `ge
 
 ### 2. Icon Generation
 
-This phase should be done using the [Icon Exporter mod](https://github.com/CyclopsMC/IconExporter).
+This phase can be done manually using the [Icon Exporter mod](https://github.com/CyclopsMC/IconExporter), or automatically.
+
+#### Manual icon generation
 
 Simply create a modpack with all the mods that were downloaded in the previous step (including the Item Exporter mod),
 start a world, and run the `/iconexporter export 64` command.
 
 Next, copy the resulting contents of `icon-exports-x64` to `icons` in your project directory.
+
+#### Automatic icon generation
+
+The `generate-icons` command can be executed,
+which will cause a Headless Minecraft instance to be downloaded and started,
+and the Icon Exporter mod to be ran.
+
+When running this on a headless machine, you should have `xvfb` installed and running.
+For example:
+```
+$ sudo apt-get install -y xvfb
+$ xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" generate-icons
+```
 
 ### 3. HTML Generation
 
@@ -129,6 +145,11 @@ Before you start this phase, make sure the following files and directories are p
 
 This phase can be started by executing `generate-cyclops-infobook-html config.json /output`.
 Afterwards, the contents of `/output` can be hosted on any Web server.
+
+### 4. Icon Compression
+
+Using the `compress-icons` command, icons within the `output/` directory will be compressed.
+This is recommended when deploying the output to a web server.
 
 ### Plugins
 

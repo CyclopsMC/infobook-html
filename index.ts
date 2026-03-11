@@ -1,3 +1,5 @@
+export * from "./lib/icon/IconsCompressor";
+export * from "./lib/icon/IconsGenerator";
 export * from "./lib/infobook/appendix/IInfoBookAppendixHandler";
 export * from "./lib/infobook/appendix/InfoBookAppendixAd";
 export * from "./lib/infobook/appendix/InfoBookAppendixHandlerAbstractRecipe";

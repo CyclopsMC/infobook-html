@@ -42,7 +42,7 @@ export class HtmlInfoBookSerializer {
 
     await this.ensureDirExists(context.path);
     await this.ensureDirExists(join(context.path, 'assets'));
-    await this.ensureDirExists(join(context.path, 'assets', 'icons'));
+    await this.ensureDirExists(join(context.path, 'assets', 'icon'));
 
     // Create a .nojekyll file to ensure _lang directories are served via GitHub pages.
     await fs.writeFile(join(context.path, '.nojekyll'), '');
@@ -254,7 +254,7 @@ export class HtmlInfoBookSerializer {
     if (!icon) {
       throw new Error(`Could not find an icon for item ${JSON.stringify(item)}`);
     }
-    const iconUrl = await fileWriter.write('icons/' + basename(icon), () => createReadStream(icon));
+    const iconUrl = await fileWriter.write('icon/' + basename(icon), () => createReadStream(icon));
 
     const key = resourceHandler.getItemTranslationKey(item);
     if (!key) {
@@ -280,7 +280,7 @@ export class HtmlInfoBookSerializer {
     if (!icon) {
       throw new Error(`Could not find an icon for fluid ${JSON.stringify(fluid)}`);
     }
-    const iconUrl = await fileWriter.write('icons/' + basename(icon), () => createReadStream(icon));
+    const iconUrl = await fileWriter.write('icon/' + basename(icon), () => createReadStream(icon));
 
     const key = resourceHandler.getFluidTranslationKey(fluid);
     if (!key) {
