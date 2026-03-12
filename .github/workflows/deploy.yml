@@ -34,6 +34,8 @@ jobs:
           npm run build
           npm run lint
           npm test
+      - name: Submit coverage results
+        uses: coverallsapp/github-action@v2
       - name: Download mods and generate metadata 📦
         run: npm run generate:metadata
       - name: Inject custom language files 🌐
