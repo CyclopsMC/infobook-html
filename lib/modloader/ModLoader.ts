@@ -137,7 +137,13 @@ export class ModLoader {
         await this.downloadFile(url, fileName, modsDir);
       } else if (mod.type === 'maven') {
         process.stdout.write(`  - ${mod.artifact} from ${mod.repo}...\n`);
-        const name = await download(mod.artifact, modsDir, mod.repo);
+        let name: string;
+        if (mod.headers && Object.keys(mod.headers).length > 0) {
+          // Authenticated download: construct URL manually and use fetch with headers
+          name = await this.downloadMavenArtifact(mod.artifact, mod.repo, modsDir, mod.headers);
+        } else {
+          name = await download(mod.artifact, modsDir, mod.repo);
+        }
         // Rename file if needed
         if ('name' in mod) {
           fs.renameSync(name, join(modsDir, mod.name));
@@ -151,8 +157,13 @@ export class ModLoader {
     }
   }
 
-  public async downloadFile(url: string, fileName: string, modsDir: string): Promise<void> {
-    const response = await fetch(url);
+  public async downloadFile(
+    url: string,
+    fileName: string,
+    modsDir: string,
+    headers?: Record<string, string>,
+  ): Promise<void> {
+    const response = await fetch(url, headers ? { headers } : undefined);
     if (response.status !== 200) {
       throw new Error(`${response.statusText} on ${url}`);
     }
@@ -162,6 +173,54 @@ export class ModLoader {
         .on('end', resolve)
         .pipe(fs.createWriteStream(join(modsDir, fileName)));
     });
+  }
+
+  /**
+   * Download a Maven artifact by constructing the repository URL manually.
+   * This is used for authenticated repositories where custom headers are needed.
+   * @param artifact The Maven artifact coordinates (groupId:artifactId:version[:classifier]).
+   * @param repoUrl The base URL of the Maven repository.
+   * @param modsDir The directory to save the downloaded file.
+   * @param headers Optional HTTP headers (e.g., Authorization).
+   * @returns The full path to the downloaded file.
+   */
+  public async downloadMavenArtifact(
+    artifact: string,
+    repoUrl: string,
+    modsDir: string,
+    headers?: Record<string, string>,
+  ): Promise<string> {
+    const parts = artifact.split(':');
+    if (parts.length < 3) {
+      throw new Error(`Invalid Maven artifact: ${artifact}. Expected format: groupId:artifactId:version[:classifier]`);
+    }
+    const [ groupId, artifactId, version, classifier ] = parts;
+    const groupPath = groupId.replaceAll('.', '/');
+    const suffix = classifier ? `-${classifier}` : '';
+    const fileName = `${artifactId}-${version}${suffix}.jar`;
+    const base = repoUrl.endsWith('/') ? repoUrl : `${repoUrl}/`;
+    const url = `${base}${groupPath}/${artifactId}/${version}/${fileName}`;
+
+    // Expand environment variable placeholders in header values (e.g. ${GITHUB_TOKEN})
+    const resolvedHeaders: Record<string, string> = {};
+    if (headers) {
+      for (const [ key, value ] of Object.entries(headers)) {
+        resolvedHeaders[key] = value.replaceAll(
+          /\$\{([^}]+)\}/gu,
+          (fullMatch, name: string) => {
+            const envValue = process.env[name];
+            if (envValue === undefined) {
+              process.stderr.write(`Warning: environment variable '${name}' is not set; the request header '${key}' may be invalid\n`);
+              return fullMatch;
+            }
+            return envValue;
+          },
+        );
+      }
+    }
+
+    await this.downloadFile(url, fileName, modsDir, resolvedHeaders);
+    return join(modsDir, fileName);
   }
 
   /**
@@ -375,6 +434,7 @@ export interface IModMaven {
   artifact: string;
   repo: string;
   name?: string;
+  headers?: Record<string, string>;
 }
 
 export interface IModCurseforge {

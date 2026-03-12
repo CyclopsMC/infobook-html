@@ -14,7 +14,8 @@
     "generate-cyclops-infobook-html": "bin/generate-infobook-html.js",
     "generate-mod-metadata": "bin/generate-mod-metadata.js",
     "generate-icons": "bin/generate-icons.js",
-    "compress-icons": "bin/compress-icons.js"
+    "compress-icons": "bin/compress-icons.js",
+    "convert-pom-to-modpack": "bin/convert-pom-to-modpack.js"
   },
   "files": [
     "assets/**/*",
@@ -62,6 +63,7 @@
     "prepare": "npm run build",
     "version": "manual-git-changelog onversion",
     "generate:metadata": "node bin/generate-mod-metadata.js modpack.json generate",
+    "generate:modpack": "node bin/convert-pom-to-modpack.js modpack.pom.xml modpack.settings.xml modpack.json",
     "generate:icons": "node bin/generate-icons.js modpack.json",
     "generate:html": "node bin/generate-infobook-html.js config.json output",
     "generate:compress": "node bin/compress-icons.js output"

@@ -36,8 +36,12 @@ jobs:
           npm test
       - name: Submit coverage results
         uses: coverallsapp/github-action@v2
+      - name: Generate modpack.json from POM 📋
+        run: npm run generate:modpack
       - name: Download mods and generate metadata 📦
         run: npm run generate:metadata
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Inject custom language files 🌐
         run: |
           python3 - <<'PYEOF'
