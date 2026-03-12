@@ -14,3 +14,4 @@ icons
 output
 headlessmc
 .eslintcache
+!eslint.config.js
