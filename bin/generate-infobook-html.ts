@@ -74,7 +74,7 @@ async function create(): Promise<void> {
   );
 
   // Setup infobook loader
-  const infoBookInitializer = new InfoBookInitializer(<IInfoBookArgs>config);
+  const infoBookInitializer = new InfoBookInitializer(<IInfoBookArgs><unknown>config);
   infoBookInitializer.registerAppendixHandler(
     'advancement_rewards',
     new InfoBookAppendixHandlerAdvancementRewards(resourceLoader.getResourceHandler()),
@@ -140,7 +140,7 @@ async function create(): Promise<void> {
   }
   const infoBookSerializer = new HtmlInfoBookSerializer();
   await infoBookSerializer.serialize(infoBook, {
-    ...<IInfoBookArgs>config,
+    ...<ISerializeContext><unknown>config,
     headSuffixGetters,
     mods,
     path,

@@ -18,7 +18,7 @@ describe('XmlInfoBookParser', () => {
   describe('parse', () => {
     it('should reject for an invalid path', async() => {
       await expect(parser.parse(join(__dirname, 'assets', 'unknown.xml'), 'mod')).rejects
-        .toThrow(new Error(`ENOENT: no such file or directory, open '${__dirname}/assets/unknown.xml'`));
+        .toThrow(new Error(`ENOENT: no such file or directory, open '${join(__dirname, 'assets', 'unknown.xml')}'`));
     });
 
     it('should resolve for a valid path', async() => {
@@ -154,8 +154,8 @@ describe('XmlInfoBookParser', () => {
   });
 
   describe('jsonToInfoBook', () => {
-    it('should return the root section', async() => {
-      await expect(parser.jsonToInfoBook({
+    it('should return the root section', () => {
+      expect(parser.jsonToInfoBook({
         section: {
           $: { name: 'abc' },
         },
@@ -181,8 +181,8 @@ describe('XmlInfoBookParser', () => {
       });
     });
 
-    it('should throw for a missing root section', async() => {
-      await expect(() => parser.jsonToInfoBook({
+    it('should throw for a missing root section', () => {
+      expect(() => parser.jsonToInfoBook({
         blabla: {
           $: { name: 'abc' },
         },
@@ -331,28 +331,28 @@ describe('XmlInfoBookParser', () => {
   });
 
   describe('jsonToParagraph', () => {
-    it('should return the data as string', async() => {
-      await expect(parser.jsonToParagraph('abc')).toBe('abc');
+    it('should return the data as string', () => {
+      expect(parser.jsonToParagraph('abc')).toBe('abc');
     });
   });
 
   describe('jsonToAppendix', () => {
-    it('should error for no $ field', async() => {
-      await expect(() => parser.jsonToAppendix({}, 'mod'))
+    it('should error for no $ field', () => {
+      expect(() => parser.jsonToAppendix({}, 'mod'))
         .toThrow(new Error('No type or factory was found for the appendix {}.'));
     });
 
-    it('should error for no type', async() => {
-      await expect(() => parser.jsonToAppendix({ $: {}}, 'mod'))
+    it('should error for no type', () => {
+      expect(() => parser.jsonToAppendix({ $: {}}, 'mod'))
         .toThrow(new Error('No type or factory was found for the appendix {"$":{}}.'));
     });
 
-    it('should return null for an unknown type', async() => {
-      await expect(parser.jsonToAppendix({ $: { type: 'unknown' }}, 'mod')).toBeNull();
+    it('should return null for an unknown type', () => {
+      expect(parser.jsonToAppendix({ $: { type: 'unknown' }}, 'mod')).toBeNull();
     });
 
-    it('should return an appendix for an image for a known type', async() => {
-      await expect(parser.jsonToAppendix({ $: { type: 'dummy' }}, 'mod')).toBe(dummyAppendix);
+    it('should return an appendix for an image for a known type', () => {
+      expect(parser.jsonToAppendix({ $: { type: 'dummy' }}, 'mod')).toBe(dummyAppendix);
     });
   });
 });

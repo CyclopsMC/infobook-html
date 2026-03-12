@@ -314,7 +314,12 @@ export class HtmlInfoBookSerializer {
     if (!key) {
       throw new Error(`Could not find translation key for fluid ${JSON.stringify(fluid)}`);
     }
-    const { link, linkTarget } = this.createResourceLink(resourceHandler, context, this.tagFluid(context, fluid.fluid), key);
+    const { link, linkTarget } = this.createResourceLink(
+      resourceHandler,
+      context,
+      this.tagFluid(context, fluid.fluid),
+      key,
+    );
 
     return this.templateItem({
       ...context,

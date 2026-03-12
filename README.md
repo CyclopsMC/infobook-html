@@ -31,18 +31,18 @@ Before you can execute this phase, you need a `modpack.json` file with contents 
   "forge": "14.23.5.2838",
   "mods": [
     {
-	  "type": "curseforge",
-	  "project": "cyclops-core",
-	  "artifact": "CyclopsCore-1.12.2",
-	  "version": "1.4.0"
+      "type": "curseforge",
+      "project": "cyclops-core",
+      "artifact": "CyclopsCore-1.12.2",
+      "version": "1.4.0"
     },
     {
-	  "type": "maven",
+      "type": "maven",
       "artifact": "org.cyclops.integrateddynamics:IntegratedDynamics:1.12.2-1.0.9-1317",
       "repo": "https://oss.jfrog.org/artifactory/simple/libs-release/"
     },
     {
-	  "type": "maven",
+      "type": "maven",
       "artifact": "org.cyclops.commoncapabilities:CommonCapabilities:1.12.2-2.4.4-309",
       "repo": "https://oss.jfrog.org/artifactory/simple/libs-release/"
     },

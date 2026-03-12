@@ -21,8 +21,8 @@ export class FileWriter implements IFileWriter {
     if (!this.writtenFiles[baseName]) {
       const eventEmitter = contents().pipe(createWriteStream(join(this.context.basePath, 'assets', baseName)));
       this.writtenFiles[baseName] = true;
-      await new Promise((resolve, reject) => {
-        eventEmitter.on('finish', resolve);
+      await new Promise<void>((resolve, reject) => {
+        eventEmitter.on('finish', () => resolve());
         eventEmitter.on('error', reject);
       });
     }
