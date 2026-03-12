@@ -19,7 +19,8 @@
     {
       "matchManagers": ["maven"],
       "automerge": true,
-      "automergeType": "branch"
+      "automergeType": "branch",
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(-(?<build>\\d+))?$"
     }
   ],
   "github-actions": {
