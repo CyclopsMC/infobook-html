@@ -18,7 +18,7 @@
     <dependency>
       <groupId>org.cyclops.cyclopscore</groupId>
       <artifactId>cyclopscore-1.21.1-neoforge</artifactId>
-      <version>1.27.0</version>
+      <version>1.29.0-950</version>
     </dependency>
   </dependencies>
 
