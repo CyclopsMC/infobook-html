@@ -1,8 +1,9 @@
-/* tslint:disable:ter-indent */
-import {ChildProcess, spawn} from "child_process";
-import * as fs from "fs";
-import fetch, {RequestInit} from "node-fetch";
-import {join} from "path";
+/* Tslint:disable:ter-indent */
+import { spawn } from 'node:child_process';
+import * as fs from 'node:fs';
+import { join } from 'node:path';
+import type { RequestInit } from 'node-fetch';
+import fetch from 'node-fetch';
 
 /**
  * Generates icons using the IconExporter mod and HeadlessMC.
@@ -11,16 +12,15 @@ import {join} from "path";
  * runs the iconexporter export command, and copies the resulting icons.
  */
 export class IconsGenerator {
-
-  private static readonly HEADLESSMC_JAR = 'headlessmc-launcher.jar';
-  private static readonly ICONEXPORTER_JAR = 'iconexporter.jar';
-  private static readonly HMC_GAME_SUBDIR = 'game';
-  private static readonly HMC_CONFIG_SUBDIR = 'HeadlessMC';
-  private static readonly ICON_EXPORT_SUBDIR = 'icon-exports-x64';
-  private static readonly DEFAULT_ICON_SIZE = 64;
-  private static readonly HMC_SPECIFICS_REPO = 'headlesshq/hmc-specifics';
-  private static readonly MODRINTH_API_BASE = 'https://api.modrinth.com/v2';
-  private static readonly ICONEXPORTER_MODRINTH_SLUG = 'icon-exporter';
+  private static readonly headlessMcJar = 'headlessmc-launcher.jar';
+  private static readonly iconExporterJar = 'iconexporter.jar';
+  private static readonly hmcGameSubdir = 'game';
+  private static readonly hmcConfigSubdir = 'HeadlessMC';
+  private static readonly iconExportSubdir = 'icon-exports-x64';
+  private static readonly defaultIconSize = 64;
+  private static readonly hmcSpecificsRepo = 'headlesshq/hmc-specifics';
+  private static readonly modrinthApiBase = 'https://api.modrinth.com/v2';
+  private static readonly iconExporterModrinthSlug = 'icon-exporter';
 
   private readonly modsDir: string;
   private readonly iconsDir: string;
@@ -52,7 +52,8 @@ export class IconsGenerator {
     this.neoforgeVersion = args.neoforgeVersion;
     this.iconExporterVersion = args.iconExporterVersion;
     this.headlessMcVersion = args.headlessMcVersion || '2.8.0';
-    this.launchTimeoutMs = args.launchTimeoutMs || (15 * 60 * 1000); // 15 minutes
+    // 15 minutes
+    this.launchTimeoutMs = args.launchTimeoutMs || (15 * 60 * 1000);
   }
 
   /**
@@ -61,7 +62,7 @@ export class IconsGenerator {
   public async generate(): Promise<void> {
     // Ensure working directory exists
     if (!fs.existsSync(this.workDir)) {
-      await fs.promises.mkdir(this.workDir, {recursive: true});
+      await fs.promises.mkdir(this.workDir, { recursive: true });
     }
 
     process.stdout.write('Downloading HeadlessMC...\n');
@@ -87,7 +88,7 @@ export class IconsGenerator {
    * Download the HeadlessMC launcher jar.
    */
   public async downloadHeadlessMc(): Promise<void> {
-    const jarPath = join(this.workDir, IconsGenerator.HEADLESSMC_JAR);
+    const jarPath = join(this.workDir, IconsGenerator.headlessMcJar);
     if (fs.existsSync(jarPath)) {
       process.stdout.write('HeadlessMC already downloaded, skipping.\n');
       return;
@@ -104,7 +105,7 @@ export class IconsGenerator {
    * latest version for the configured Minecraft version. No authentication is required.
    */
   public async downloadIconExporter(): Promise<void> {
-    const jarPath = join(this.workDir, IconsGenerator.ICONEXPORTER_JAR);
+    const jarPath = join(this.workDir, IconsGenerator.iconExporterJar);
     if (fs.existsSync(jarPath)) {
       process.stdout.write('IconExporter already downloaded, skipping.\n');
       return;
@@ -128,9 +129,9 @@ export class IconsGenerator {
    * Returns the primary file's download URL and filename.
    */
   public async fetchIconExporterFromModrinth(version?: string): Promise<{ url: string; filename: string }> {
-    const gameVersions = JSON.stringify([this.minecraftVersion]);
-    const loaders = JSON.stringify(['neoforge']);
-    const apiUrl = `${IconsGenerator.MODRINTH_API_BASE}/project/${IconsGenerator.ICONEXPORTER_MODRINTH_SLUG}/version` +
+    const gameVersions = JSON.stringify([ this.minecraftVersion ]);
+    const loaders = JSON.stringify([ 'neoforge' ]);
+    const apiUrl = `${IconsGenerator.modrinthApiBase}/project/${IconsGenerator.iconExporterModrinthSlug}/version` +
       `?game_versions=${encodeURIComponent(gameVersions)}&loaders=${encodeURIComponent(loaders)}`;
 
     const response = await fetch(apiUrl);
@@ -138,7 +139,7 @@ export class IconsGenerator {
       throw new Error(`Failed to fetch IconExporter versions from Modrinth: ${response.status} ${response.statusText}`);
     }
 
-    const versions: IModrinthVersion[] = await response.json();
+    const versions = <IModrinthVersion[]> await response.json();
     if (!versions || versions.length === 0) {
       throw new Error(`No IconExporter versions found on Modrinth for Minecraft ${this.minecraftVersion} with NeoForge`);
     }
@@ -148,7 +149,7 @@ export class IconsGenerator {
       // Modrinth version_number is typically "{mcVersion}-{modVersion}" (e.g. "1.21.1-1.4.0-174").
       // Match either an exact version_number or the canonical "<mcVersion>-<version>" form.
       const canonicalVersionNumber = `${this.minecraftVersion}-${version}`;
-      const found = versions.find((v) => v.version_number === version || v.version_number === canonicalVersionNumber);
+      const found = versions.find(v => v.version_number === version || v.version_number === canonicalVersionNumber);
       if (!found) {
         throw new Error(`IconExporter version "${version}" not found on Modrinth for Minecraft ${this.minecraftVersion} with NeoForge`);
       }
@@ -158,7 +159,7 @@ export class IconsGenerator {
       matched = versions[0];
     }
 
-    const primaryFile = matched.files.find((f) => f.primary) || matched.files[0];
+    const primaryFile = matched.files.find(f => f.primary) || matched.files[0];
     if (!primaryFile) {
       throw new Error(`No files found for IconExporter version ${matched.version_number}`);
     }
@@ -170,11 +171,11 @@ export class IconsGenerator {
    * Set up the game directory with mods and options.
    */
   public async setupGameDirectory(): Promise<void> {
-    const gameDir = join(this.workDir, IconsGenerator.HMC_GAME_SUBDIR);
+    const gameDir = join(this.workDir, IconsGenerator.hmcGameSubdir);
     const modsDir = join(gameDir, 'mods');
 
     if (!fs.existsSync(modsDir)) {
-      await fs.promises.mkdir(modsDir, {recursive: true});
+      await fs.promises.mkdir(modsDir, { recursive: true });
     }
 
     // Copy mods from server/mods directory
@@ -193,16 +194,16 @@ export class IconsGenerator {
     }
 
     // Copy IconExporter to mods directory
-    const iconExporterSrc = join(this.workDir, IconsGenerator.ICONEXPORTER_JAR);
+    const iconExporterSrc = join(this.workDir, IconsGenerator.iconExporterJar);
     if (fs.existsSync(iconExporterSrc)) {
-      await fs.promises.copyFile(iconExporterSrc, join(modsDir, IconsGenerator.ICONEXPORTER_JAR));
+      await fs.promises.copyFile(iconExporterSrc, join(modsDir, IconsGenerator.iconExporterJar));
       process.stdout.write('Added IconExporter to mods directory\n');
     }
 
     // Download hmc-specifics if not already present (avoids relying on HeadlessMC's
     // GitHub API lookup which may hit rate limits in CI environments)
     const existingMods = await fs.promises.readdir(modsDir);
-    const hasHmcSpecifics = existingMods.some((f) => f.startsWith('hmc-specifics-'));
+    const hasHmcSpecifics = existingMods.some(f => f.startsWith('hmc-specifics-'));
     if (!hasHmcSpecifics) {
       await this.downloadHmcSpecifics(modsDir);
     }
@@ -218,12 +219,12 @@ export class IconsGenerator {
    * Write the HeadlessMC configuration file.
    */
   public writeHmcConfig(): void {
-    const configDir = join(this.workDir, IconsGenerator.HMC_CONFIG_SUBDIR);
+    const configDir = join(this.workDir, IconsGenerator.hmcConfigSubdir);
     if (!fs.existsSync(configDir)) {
-      fs.mkdirSync(configDir, {recursive: true});
+      fs.mkdirSync(configDir, { recursive: true });
     }
 
-    const gameDir = join(this.workDir, IconsGenerator.HMC_GAME_SUBDIR);
+    const gameDir = join(this.workDir, IconsGenerator.hmcGameSubdir);
     const configPath = join(configDir, 'config.properties');
     const config = [
       `hmc.mcdir=${gameDir}`,
@@ -238,21 +239,24 @@ export class IconsGenerator {
    * Run the Minecraft client using HeadlessMC and export icons.
    */
   public async runGameAndExportIcons(): Promise<void> {
-    const jarPath = join(this.workDir, IconsGenerator.HEADLESSMC_JAR);
+    const jarPath = join(this.workDir, IconsGenerator.headlessMcJar);
 
     return new Promise<void>((resolve, reject) => {
       const proc = spawn('java', [
-        `-Dhmc.mcdir=${join(this.workDir, IconsGenerator.HMC_GAME_SUBDIR)}`,
+        `-Dhmc.mcdir=${join(this.workDir, IconsGenerator.hmcGameSubdir)}`,
         // Tell HeadlessMC that Xvfb is in use so it skips offline headless checks
         '-Dhmc.check.xvfb=true',
-        '-jar', jarPath,
+        '-jar',
+        jarPath,
       ], {
         cwd: this.workDir,
-        stdio: ['pipe', 'pipe', 'pipe'],
+        stdio: [ 'pipe', 'pipe', 'pipe' ],
         env: {
           ...process.env,
           // Disable ANSI escape sequences for easier parsing
+          // eslint-disable-next-line ts/naming-convention
           TERM: 'dumb',
+          // eslint-disable-next-line ts/naming-convention
           NO_COLOR: '1',
         },
       });
@@ -269,7 +273,7 @@ export class IconsGenerator {
 
       const sendCommand = (command: string): void => {
         process.stdout.write(`[HMC] > ${command}\n`);
-        proc.stdin.write(command + '\n');
+        proc.stdin.write(`${command}\n`);
       };
 
       // Click a button by its text label, resolving to numeric ID from the last gui output.
@@ -280,11 +284,11 @@ export class IconsGenerator {
         const lastScreenIdx = outputBuffer.lastIndexOf('\nScreen:');
         const recentGuiOutput = lastScreenIdx >= 0 ? outputBuffer.slice(lastScreenIdx) : outputBuffer;
         const id = this.findButtonIdByText(recentGuiOutput, buttonText);
-        if (id !== null) {
-          sendCommand(`click ${id}`);
-        } else {
+        if (id === null) {
           process.stdout.write(`[HMC] Warning: button "${buttonText}" not found in gui output, trying text fallback\n`);
           sendCommand(`click ${buttonText}`);
+        } else {
+          sendCommand(`click ${id}`);
         }
       };
 
@@ -294,7 +298,8 @@ export class IconsGenerator {
           state = newState;
           stateSettledAt = Date.now();
           commandSent = false;
-          stateBuffer = ''; // reset per-state buffer on every transition
+          // Reset per-state buffer on every transition
+          stateBuffer = '';
         }
       };
 
@@ -303,10 +308,10 @@ export class IconsGenerator {
         stateBuffer += chunk;
         // Keep global buffer size manageable
         if (outputBuffer.length > 100000) {
-          outputBuffer = outputBuffer.slice(outputBuffer.length - 20000);
+          outputBuffer = outputBuffer.slice(-20000);
         }
         // Track the current screen from each gui output chunk
-        const screenMatch = chunk.match(/^Screen:\s*(.+)$/m);
+        const screenMatch = /^Screen:\s*(.+)$/mu.exec(chunk);
         if (screenMatch) {
           lastKnownScreen = screenMatch[1].trim();
           process.stdout.write(`[HMC] Current screen: ${lastKnownScreen}\n`);
@@ -372,8 +377,8 @@ export class IconsGenerator {
               commandSent = true;
               clickByText('Create New World');
               transitionTo('creating_world');
-            } else if (stateBuffer.includes("Couldn't find command for '[gui]'") && !commandSent) {
-              // gui not yet recognized; hmc-specifics may still be initializing - retry
+            } else if (stateBuffer.includes('Couldn\'t find command for \'[gui]\'') && !commandSent) {
+              // Gui not yet recognized; hmc-specifics may still be initializing - retry
               commandSent = true;
               setTimeout(() => {
                 sendCommand('gui');
@@ -400,11 +405,14 @@ export class IconsGenerator {
               commandSent = true;
               clickByText('Create New World');
               transitionTo('creating_world');
-            } else if ((stateBuffer.includes('logged in') || stateBuffer.includes('not displaying a Gui')) && !commandSent) {
+            } else if (
+              (stateBuffer.includes('logged in') || stateBuffer.includes('not displaying a Gui')) &&
+              !commandSent
+            ) {
               // World already loaded (detected either from HMC login message or from a gui poll)
               commandSent = true;
               setTimeout(() => {
-                sendCommand(`/iconexporter export ${IconsGenerator.DEFAULT_ICON_SIZE}`);
+                sendCommand(`/iconexporter export ${IconsGenerator.defaultIconSize}`);
                 transitionTo('exporting_icons');
               }, 3000);
             } else if ((lastKnownScreen.includes('SelectWorldScreen') ||
@@ -440,7 +448,7 @@ export class IconsGenerator {
               commandSent = true;
               // Wait for world to fully initialize before triggering export
               setTimeout(() => {
-                sendCommand(`/iconexporter export ${IconsGenerator.DEFAULT_ICON_SIZE}`);
+                sendCommand(`/iconexporter export ${IconsGenerator.defaultIconSize}`);
                 transitionTo('exporting_icons');
               }, 3000);
             } else if ((lastKnownScreen.includes('SelectWorldScreen') ||
@@ -454,7 +462,7 @@ export class IconsGenerator {
             } else if (Date.now() - stateSettledAt > 120000 && !commandSent) {
               // Timeout waiting for world - try to proceed anyway
               commandSent = true;
-              sendCommand(`/iconexporter export ${IconsGenerator.DEFAULT_ICON_SIZE}`);
+              sendCommand(`/iconexporter export ${IconsGenerator.defaultIconSize}`);
               transitionTo('exporting_icons');
             } else if (!commandSent) {
               // Actively poll gui so we can detect world load ("not displaying a Gui") even
@@ -483,7 +491,8 @@ export class IconsGenerator {
                   sendCommand('quit');
                   transitionTo('quitting');
                 }, 5000);
-              } else if (Date.now() - stateSettledAt > 1200000) { // 20 minutes
+              // 20 minutes
+              } else if (Date.now() - stateSettledAt > 1200000) {
                 // Timeout - quit anyway
                 commandSent = true;
                 process.stdout.write('[HMC] Warning: icon export may not have completed, quitting...\n');
@@ -549,18 +558,18 @@ export class IconsGenerator {
    * Copy exported icons to the output icons directory.
    */
   public async copyIcons(): Promise<void> {
-    const exportDir = join(this.workDir, IconsGenerator.HMC_GAME_SUBDIR, IconsGenerator.ICON_EXPORT_SUBDIR);
+    const exportDir = join(this.workDir, IconsGenerator.hmcGameSubdir, IconsGenerator.iconExportSubdir);
 
     if (!fs.existsSync(exportDir)) {
       throw new Error(`Icon export directory not found: ${exportDir}. Make sure the IconExporter command ran successfully.`);
     }
 
     if (!fs.existsSync(this.iconsDir)) {
-      await fs.promises.mkdir(this.iconsDir, {recursive: true});
+      await fs.promises.mkdir(this.iconsDir, { recursive: true });
     }
 
     const files = await fs.promises.readdir(exportDir);
-    const pngFiles = files.filter((f) => f.endsWith('.png'));
+    const pngFiles = files.filter(f => f.endsWith('.png'));
 
     for (const file of pngFiles) {
       await fs.promises.copyFile(join(exportDir, file), join(this.iconsDir, file));
@@ -580,9 +589,9 @@ export class IconsGenerator {
    */
   public findButtonIdByText(guiOutput: string, buttonText: string): number | null {
     for (const line of guiOutput.split('\n')) {
-      const cols = line.trim().split(/\s{2,}/);
-      if (cols.length >= 2 && /^\d+$/.test(cols[0]) && cols[1].trim() === buttonText) {
-        return parseInt(cols[0], 10);
+      const cols = line.trim().split(/\s{2,}/u);
+      if (cols.length >= 2 && /^\d+$/u.test(cols[0]) && cols[1].trim() === buttonText) {
+        return Number.parseInt(cols[0], 10);
       }
     }
     return null;
@@ -622,14 +631,14 @@ export class IconsGenerator {
    */
   public async downloadHmcSpecifics(modsDir: string): Promise<void> {
     process.stdout.write('Downloading hmc-specifics...\n');
-    const apiUrl = `https://api.github.com/repos/${IconsGenerator.HMC_SPECIFICS_REPO}/releases/latest`;
+    const apiUrl = `https://api.github.com/repos/${IconsGenerator.hmcSpecificsRepo}/releases/latest`;
     const apiResponse = await fetch(apiUrl);
     if (!apiResponse.ok) {
       throw new Error(`Failed to fetch hmc-specifics release info: ${apiResponse.status} ${apiResponse.statusText}`);
     }
-    const release: any = await apiResponse.json();
-    const asset = (release.assets as any[]).find(
-      (a: any) => a.name.includes(this.minecraftVersion) && a.name.includes('neoforge'),
+    const release = <IGithubRelease> await apiResponse.json();
+    const asset = release.assets.find(
+      a => a.name.includes(this.minecraftVersion) && a.name.includes('neoforge'),
     );
     if (!asset) {
       throw new Error(`Could not find hmc-specifics asset for MC ${this.minecraftVersion} in release ${release.tag_name}`);
@@ -655,7 +664,7 @@ export class IconsGenerator {
 
     const parentDir = join(destPath, '..');
     if (!fs.existsSync(parentDir)) {
-      await fs.promises.mkdir(parentDir, {recursive: true});
+      await fs.promises.mkdir(parentDir, { recursive: true });
     }
 
     await new Promise<void>((resolve, reject) => {
@@ -667,7 +676,6 @@ export class IconsGenerator {
       stream.on('error', reject);
     });
   }
-
 }
 
 export type IGameState =
@@ -686,8 +694,21 @@ export interface IModrinthVersionFile {
 }
 
 export interface IModrinthVersion {
+  // eslint-disable-next-line ts/naming-convention
   version_number: string;
   files: IModrinthVersionFile[];
+}
+
+export interface IGithubAsset {
+  name: string;
+  // eslint-disable-next-line ts/naming-convention
+  browser_download_url: string;
+}
+
+export interface IGithubRelease {
+  assets: IGithubAsset[];
+  // eslint-disable-next-line ts/naming-convention
+  tag_name: string;
 }
 
 export interface IIconsGeneratorArgs {

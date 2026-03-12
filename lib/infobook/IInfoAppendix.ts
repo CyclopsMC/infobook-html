@@ -1,5 +1,5 @@
-import {HtmlInfoBookSerializer, ISerializeContext} from "../serialize/HtmlInfoBookSerializer";
-import {IFileWriter} from "./IFileWriter";
+import type { HtmlInfoBookSerializer, ISerializeContext } from '../serialize/HtmlInfoBookSerializer';
+import type { IFileWriter } from './IFileWriter';
 
 /**
  * Datastructure for an info book appendix.
@@ -21,5 +21,5 @@ export interface IInfoAppendix {
    * @param serializer The HTML serializer.
    * @returns {string} The HTML representation of this appendix.
    */
-  toHtml(context: ISerializeContext, fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer): Promise<string>;
+  toHtml: (context: ISerializeContext, fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer) => Promise<string>;
 }

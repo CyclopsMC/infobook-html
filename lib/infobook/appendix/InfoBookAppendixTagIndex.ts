@@ -1,24 +1,31 @@
-import {compileFile as compilePug, compileTemplate} from "pug";
-import {ResourceHandler} from "../../resource/ResourceHandler";
-import {HtmlInfoBookSerializer, ISerializeContext} from "../../serialize/HtmlInfoBookSerializer";
-import {IFileWriter} from "../IFileWriter";
-import {IInfoAppendix} from "../IInfoAppendix";
+import { join } from 'node:path';
+import type { compileTemplate } from 'pug';
+import { compileFile as compilePug } from 'pug';
+import type { ResourceHandler } from '../../resource/ResourceHandler';
+import type { HtmlInfoBookSerializer, ISerializeContext } from '../../serialize/HtmlInfoBookSerializer';
+import type { IFileWriter } from '../IFileWriter';
+import type { IInfoAppendix } from '../IInfoAppendix';
 
 /**
  * An appendix that lists all tags with links to them
  */
 export class InfoBookAppendixTagIndex implements IInfoAppendix {
-
   private readonly resourceHandler: ResourceHandler;
   private readonly templateTagIndex: compileTemplate;
 
-  constructor(resourceHandler: ResourceHandler) {
+  public constructor(resourceHandler: ResourceHandler) {
     this.resourceHandler = resourceHandler;
-    this.templateTagIndex = compilePug(__dirname + '/../../../template/appendix/tag_index.pug');
+    this.templateTagIndex = compilePug(
+      join(__dirname, '..', '..', '..', 'template', 'appendix', 'tag_index.pug'),
+    );
   }
 
-  public async toHtml(context: ISerializeContext, fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer): Promise<string> {
-    const links: { url: string, name: string, icon: string }[] = [];
+  public async toHtml(
+    context: ISerializeContext,
+    fileWriter: IFileWriter,
+    serializer: HtmlInfoBookSerializer,
+  ): Promise<string> {
+    const links: { url: string; name: string; icon: string }[] = [];
     for (const tag in context.sectionIndex.tags) {
       const url = context.sectionIndex.tags[tag];
 
@@ -40,5 +47,4 @@ export class InfoBookAppendixTagIndex implements IInfoAppendix {
     links.sort((link1, link2) => link1.name.localeCompare(link2.name));
     return this.templateTagIndex({ links });
   }
-
 }

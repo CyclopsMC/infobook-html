@@ -1,4 +1,4 @@
-import {Readable} from "stream";
+import type { Readable } from 'node:stream';
 
 /**
  * Allows auxiliary files to be written to the output.
@@ -10,5 +10,5 @@ export interface IFileWriter {
    * @param {"stream".internal.Readable} contents A stream of contents to write.
    * @returns {string} The file path in the output, relative to the output root.
    */
-  write(baseName: string, contents: () => Readable): Promise<string>;
+  write: (baseName: string, contents: () => Readable) => Promise<string>;
 }

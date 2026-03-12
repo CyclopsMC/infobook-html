@@ -1,7 +1,7 @@
-import {execFile} from "child_process";
-import * as fs from "fs";
-import {dirname, join} from "path";
-import {promisify} from "util";
+import { execFile } from 'node:child_process';
+import * as fs from 'node:fs';
+import { dirname, join } from 'node:path';
+import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
 
@@ -11,7 +11,6 @@ const execFileAsync = promisify(execFile);
  * with metadata stripping.
  */
 export class IconsCompressor {
-
   private readonly iconsDir: string;
 
   public constructor(iconsDir: string) {
@@ -21,9 +20,9 @@ export class IconsCompressor {
     this.iconsDir = iconsDir;
   }
 
-    /**
-     * Compress all PNG files in the icon directory using OptiPNG.
-     */
+  /**
+   * Compress all PNG files in the icon directory using OptiPNG.
+   */
   public async compress(): Promise<void> {
     const optipngPath = this.getOptipngPath();
 
@@ -32,7 +31,7 @@ export class IconsCompressor {
     }
 
     const files = await fs.promises.readdir(this.iconsDir);
-    const pngFiles = files.filter((f) => f.endsWith('.png'));
+    const pngFiles = files.filter(f => f.endsWith('.png'));
 
     if (pngFiles.length === 0) {
       process.stdout.write(`No PNG files found in ${this.iconsDir}\n`);
@@ -49,7 +48,7 @@ export class IconsCompressor {
       const filePath = join(this.iconsDir, file);
       const sizeBefore = fs.statSync(filePath).size;
       try {
-        await execFileAsync(optipngPath, ['-o7', '-strip', 'all', '-quiet', filePath]);
+        await execFileAsync(optipngPath, [ '-o7', '-strip', 'all', '-quiet', filePath ]);
         const sizeAfter = fs.statSync(filePath).size;
         totalSavedBytes += sizeBefore - sizeAfter;
         compressed++;
@@ -61,21 +60,20 @@ export class IconsCompressor {
 
     const savedKb = (totalSavedBytes / 1024).toFixed(1);
     process.stdout.write(
-            `Compressed ${compressed} icons (saved ${savedKb} KB)` +
-            (errors > 0 ? `, ${errors} errors` : '') +
-            `\n`,
-        );
+            `Compressed ${compressed} icons (saved ${savedKb} KB)${
+            errors > 0 ? `, ${errors} errors` : ''
+            }\n`,
+    );
   }
 
-    /**
-     * Get the path to the optipng binary from optipng-bin package.
-     * Uses require.resolve to find the package root, then constructs the vendor binary path.
-     */
+  /**
+   * Get the path to the optipng binary from optipng-bin package.
+   * Uses require.resolve to find the package root, then constructs the vendor binary path.
+   */
   public getOptipngPath(): string {
     const indexPath = require.resolve('optipng-bin');
     const pkgRoot = dirname(indexPath);
     const binaryName = process.platform === 'win32' ? 'optipng.exe' : 'optipng';
     return join(pkgRoot, 'vendor', binaryName);
   }
-
 }

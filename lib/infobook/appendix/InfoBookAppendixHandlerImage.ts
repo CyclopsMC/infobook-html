@@ -1,26 +1,25 @@
-import {createReadStream} from "fs";
-import {basename} from "path";
-import {ResourceHandler} from "../../resource/ResourceHandler";
-import {ISerializeContext} from "../../serialize/HtmlInfoBookSerializer";
-import {IFileWriter} from "../IFileWriter";
-import {IInfoAppendix} from "../IInfoAppendix";
-import {IInfoBookAppendixHandler} from "./IInfoBookAppendixHandler";
+import { createReadStream } from 'node:fs';
+import { basename } from 'node:path';
+import type { ResourceHandler } from '../../resource/ResourceHandler';
+import type { ISerializeContext } from '../../serialize/HtmlInfoBookSerializer';
+import type { IFileWriter } from '../IFileWriter';
+import type { IInfoAppendix } from '../IInfoAppendix';
+import type { IInfoBookAppendixHandler } from './IInfoBookAppendixHandler';
 
 /**
  * Handles image appendices.
  */
 export class InfoBookAppendixHandlerImage implements IInfoBookAppendixHandler {
-
   private readonly resourceHandler: ResourceHandler;
 
-  constructor(resourceHandler: ResourceHandler) {
+  public constructor(resourceHandler: ResourceHandler) {
     this.resourceHandler = resourceHandler;
   }
 
   public createAppendix(data: any): IInfoAppendix {
-    const fullPath = this.resourceHandler.expandResourcePath(data._);
-    const fileName = basename(data._);
-    const { width, height } = data.$;
+    const fullPath = this.resourceHandler.expandResourcePath(<string>data._);
+    const fileName = basename(<string>data._);
+    const { width, height } = <{ width: number; height: number }>data.$;
     return {
       toHtml: async(context: ISerializeContext, fileWriter: IFileWriter): Promise<string> => {
         const writtenPath = await fileWriter.write(fileName, () => createReadStream(fullPath));
@@ -29,5 +28,4 @@ export class InfoBookAppendixHandlerImage implements IInfoBookAppendixHandler {
       },
     };
   }
-
 }

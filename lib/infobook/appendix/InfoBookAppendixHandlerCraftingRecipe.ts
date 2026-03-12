@@ -1,33 +1,43 @@
-import {compileFile as compilePug, compileTemplate} from "pug";
-import {ResourceHandler} from "../../resource/ResourceHandler";
-import {HtmlInfoBookSerializer, ISerializeContext} from "../../serialize/HtmlInfoBookSerializer";
-import {IFileWriter} from "../IFileWriter";
-import {IItem} from "../IItem";
+import { join } from 'node:path';
+import type { compileTemplate } from 'pug';
+import { compileFile as compilePug } from 'pug';
+import type { ResourceHandler } from '../../resource/ResourceHandler';
+import type { HtmlInfoBookSerializer, ISerializeContext } from '../../serialize/HtmlInfoBookSerializer';
+import type { IFileWriter } from '../IFileWriter';
+import type { IItem } from '../IItem';
+import type {
+  IRecipe,
+} from './InfoBookAppendixHandlerAbstractRecipe';
 import {
   InfoBookAppendixHandlerAbstractRecipe,
-  IRecipe,
-} from "./InfoBookAppendixHandlerAbstractRecipe";
+} from './InfoBookAppendixHandlerAbstractRecipe';
 
 /**
  * Handles crafting recipe appendices.
  */
-export class InfoBookAppendixHandlerCraftingRecipe extends InfoBookAppendixHandlerAbstractRecipe<IRecipeCrafting> {
-
+export class InfoBookAppendixHandlerCraftingRecipe
+  extends InfoBookAppendixHandlerAbstractRecipe<IRecipeCrafting> {
   private readonly templateCraftingRecipe: compileTemplate;
 
-  constructor(resourceHandler: ResourceHandler, registriesPath: string, recipeOverrides: any) {
+  public constructor(resourceHandler: ResourceHandler, registriesPath: string, recipeOverrides: any) {
     super('minecraft:crafting', resourceHandler, registriesPath, recipeOverrides);
-    this.templateCraftingRecipe = compilePug(__dirname + '/../../../template/appendix/crafting_recipe.pug');
+    this.templateCraftingRecipe = compilePug(
+      join(__dirname, '..', '..', '..', 'template', 'appendix', 'crafting_recipe.pug'),
+    );
   }
 
   protected getRecipeNameUnlocalized(): string {
     return 'block.minecraft.crafting_table';
   }
 
-  protected async serializeRecipe(recipe: IRecipeCrafting, context: ISerializeContext,
-                            fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer) {
+  protected async serializeRecipe(
+    recipe: IRecipeCrafting,
+    context: ISerializeContext,
+    fileWriter: IFileWriter,
+    serializer: HtmlInfoBookSerializer,
+  ): Promise<string> {
     // Prepare input array
-    const inputs = "|".repeat(9).split("|").map((): any[] => []);
+    const inputs = '|'.repeat(9).split('|').map((): any[] => []);
 
     // Define custom dimensions for shapeless recipes
     if (!recipe.width || !recipe.height) {
@@ -44,26 +54,36 @@ export class InfoBookAppendixHandlerCraftingRecipe extends InfoBookAppendixHandl
         } else {
           items = [];
         }
-        if (!items.length) {
+        if (items.length === 0) {
           items.push({ item: 'minecraft:air' });
         }
         const outputIndex = y * 3 + x;
         for (const item of items) {
-          inputs[outputIndex].push(await serializer.createItemDisplay(this.resourceHandler, context,
-            fileWriter, item, true));
+          inputs[outputIndex].push(
+            await serializer.createItemDisplay(this.resourceHandler, context, fileWriter, item, true),
+          );
         }
       }
     }
 
-    const output = await serializer.createItemDisplay(this.resourceHandler, context,
-      fileWriter, recipe.output, true);
+    const output = await serializer.createItemDisplay(
+      this.resourceHandler,
+      context,
+      fileWriter,
+      recipe.output,
+      true,
+    );
 
-    const appendixIcon = await serializer.createItemDisplay(this.resourceHandler, context,
-      fileWriter, { item: 'minecraft:crafting_table' }, false);
+    const appendixIcon = await serializer.createItemDisplay(
+      this.resourceHandler,
+      context,
+      fileWriter,
+      { item: 'minecraft:crafting_table' },
+      false,
+    );
 
     return this.templateCraftingRecipe({ inputs, output, appendixIcon });
   }
-
 }
 export interface IRecipeCrafting extends IRecipe {
   id: string;

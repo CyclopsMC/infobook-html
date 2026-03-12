@@ -1,33 +1,34 @@
-import {join} from "path";
-import {IFluid} from "../infobook/IFluid";
-import {IItem} from "../infobook/IItem";
+import { join } from 'node:path';
+import type { IFluid } from '../infobook/IFluid';
+import type { IItem } from '../infobook/IItem';
 
 /**
  * Allows Minecraft resources to be used.
  */
 export class ResourceHandler {
-
-  private static readonly TRANSLATION_DEFAULTS: {[key: string]: string} = {
+  private static readonly translationDefaults: Record<string, string> = {
+    // eslint-disable-next-line ts/naming-convention
     'fluid.tile.lava': 'Lava',
+    // eslint-disable-next-line ts/naming-convention
     'fluid.tile.water': 'Water',
   };
 
-  private readonly translations: {[language: string]: {[key: string]: string}} = {};
-  private readonly languages: {[language: string]: boolean} = {};
-  private readonly resourcePackBasePaths: {[resourcePackId: string]: string} = {};
+  private readonly translations: Record<string, Record<string, string>> = {};
+  private readonly languages: Record<string, boolean> = {};
+  private readonly resourcePackBasePaths: Record<string, string> = {};
   private readonly iconsItem: IItemKeyedRegistry = {};
   private readonly itemTranslationKeys: IItemKeyedRegistry = {};
-  private readonly iconsFluid: {[fluidName: string]: string} = {};
-  private readonly fluidTranslationKeys: {[fluidName: string]: string} = {};
-  private readonly advancements: {[advancementId: string]: IAdvancement} = {};
-  private readonly keybindings: {[keyId: string]: string} = {};
+  private readonly iconsFluid: Record<string, string> = {};
+  private readonly fluidTranslationKeys: Record<string, string> = {};
+  private readonly advancements: Record<string, IAdvancement> = {};
+  private readonly keybindings: Record<string, string> = {};
 
   /**
    * Split an item id like "minecraft:stone" into namespace an path.
    * @param {string} itemId An item id.
    * @returns {{namespace: string; path: string}} Namespace and path.
    */
-  public static splitItemId(itemId: string): { namespace: string, path: string } {
+  public static splitItemId(itemId: string): { namespace: string; path: string } {
     const split = itemId.split(':');
     const namespace = split[0];
     const path = split[1];
@@ -36,13 +37,19 @@ export class ResourceHandler {
 
   /**
    * Add an entry to a {@llink IItemKeyedRegistry}.
+   * @param {IItemKeyedRegistry} registry The registry.
    * @param {string} namespace The namespace.
    * @param {string} path The path.
    * @param {string} nbt The NBT. (empty string represents no NBT)
    * @param {string} value The value.
    */
-  protected static addItemKeyedRegistryEntry(registry: IItemKeyedRegistry, namespace: string, path: string,
-                                             nbt: string, value: string) {
+  protected static addItemKeyedRegistryEntry(
+    registry: IItemKeyedRegistry,
+    namespace: string,
+    path: string,
+    nbt: string,
+    value: string,
+  ): void {
     let paths = registry[namespace];
     if (!paths) {
       paths = registry[namespace] = {};
@@ -56,13 +63,18 @@ export class ResourceHandler {
 
   /**
    * Get an value from a {@llink IItemKeyedRegistry}.
+   * @param {IItemKeyedRegistry} registry The registry.
    * @param {string} namespace The namespace.
    * @param {string} path The path.
    * @param {string} nbt The NBT. (empty string represents no NBT)
    * @return The value.
    */
-  protected static getItemKeyedRegistryEntry(registry: IItemKeyedRegistry, namespace: string,
-                                             path: string, nbt: string = ''): string {
+  protected static getItemKeyedRegistryEntry(
+    registry: IItemKeyedRegistry,
+    namespace: string,
+    path: string,
+    nbt = '',
+  ): string {
     const paths = registry[namespace];
     if (!paths) {
       return null;
@@ -73,7 +85,8 @@ export class ResourceHandler {
     }
     let file = nbts[nbt];
     if (!file) {
-      file = nbts[Object.keys(nbts)[0]]; // Take the first NBT-tagged item if none without NBT could be found
+      // Take the first NBT-tagged item if none without NBT could be found
+      file = nbts[Object.keys(nbts)[0]];
     }
     return file;
   }
@@ -90,15 +103,15 @@ export class ResourceHandler {
    * @param {string} language A language key.
    * @param {{[p: string]: string}} translations A mapping from translation key to translated value.
    */
-  public addTranslations(language: string, translations: {[key: string]: string}, excludedModLanguage: boolean) {
+  public addTranslations(language: string, translations: Record<string, string>, excludedModLanguage: boolean): void {
     language = language.toLowerCase();
     const existingTranslations = this.translations[language];
-    if (!existingTranslations) {
-      this.translations[language] = translations;
-    } else {
+    if (existingTranslations) {
       for (const key in translations) {
         existingTranslations[key] = translations[key];
       }
+    } else {
+      this.translations[language] = translations;
     }
     if (!excludedModLanguage && Object.keys(translations).length > 0) {
       this.languages[language] = true;
@@ -115,7 +128,7 @@ export class ResourceHandler {
     const entries = this.translations[languageKey] || this.translations.en_us;
     let value = entries[translationKey];
     if (!value) {
-      value = this.translations.en_us[translationKey] || ResourceHandler.TRANSLATION_DEFAULTS[translationKey];
+      value = this.translations.en_us[translationKey] || ResourceHandler.translationDefaults[translationKey];
       if (!value) {
         throw new Error(`Could not find translation key ${translationKey} in ${languageKey}`);
       }
@@ -128,7 +141,7 @@ export class ResourceHandler {
    * @param {string} resourcePackId A resource pack id.
    * @param {string} basePath An absolute base path.
    */
-  public setResourcePackBasePath(resourcePackId: string, basePath: string) {
+  public setResourcePackBasePath(resourcePackId: string, basePath: string): void {
     if (this.resourcePackBasePaths[resourcePackId]) {
       throw new Error(`Tried overwriting a resource pack base path for '${resourcePackId}'`);
     }
@@ -145,12 +158,12 @@ export class ResourceHandler {
     if (separator < 0) {
       throw new Error(`Invalid resource key for expansion: ${resourceKey}`);
     }
-    const resourcePackId = resourceKey.substr(0, separator);
+    const resourcePackId = resourceKey.slice(0, Math.max(0, separator));
     const basePath = this.resourcePackBasePaths[resourcePackId];
     if (!basePath) {
       throw new Error(`Failed to expand unknown resource pack id for resource path: ${resourceKey}`);
     }
-    const suffix = resourceKey.substr(separator + 1);
+    const suffix = resourceKey.slice(separator + 1);
     return join(basePath, suffix);
   }
 
@@ -161,7 +174,7 @@ export class ResourceHandler {
    * @param {string} nbt The icon NBT. (empty string represents no NBT)
    * @param {string} file The icon file path.
    */
-  public addItemIcon(namespace: string, path: string, nbt: string, file: string) {
+  public addItemIcon(namespace: string, path: string, nbt: string, file: string): void {
     ResourceHandler.addItemKeyedRegistryEntry(this.iconsItem, namespace, path, nbt, file);
   }
 
@@ -171,7 +184,7 @@ export class ResourceHandler {
    * @param {string} nbt The icon NBT. (empty string represents no NBT)
    * @return The icon file path or null.
    */
-  public getItemIconFile(itemId: string, nbt: string = ''): string {
+  public getItemIconFile(itemId: string, nbt = ''): string {
     const { namespace, path } = ResourceHandler.splitItemId(itemId);
     return ResourceHandler.getItemKeyedRegistryEntry(this.iconsItem, namespace, path, nbt);
   }
@@ -181,7 +194,7 @@ export class ResourceHandler {
    * @param {string} fluidName The fluid name.
    * @param {string} file The icon file path.
    */
-  public addFluidIcon(fluidName: string, file: string) {
+  public addFluidIcon(fluidName: string, file: string): void {
     this.iconsFluid[fluidName] = file;
   }
 
@@ -199,9 +212,15 @@ export class ResourceHandler {
    * @param {IItem} item An item.
    * @param {string} translationKey The translation key.
    */
-  public addItemTranslationKey(item: IItem, translationKey: string) {
+  public addItemTranslationKey(item: IItem, translationKey: string): void {
     const { namespace, path } = ResourceHandler.splitItemId(item.item);
-    ResourceHandler.addItemKeyedRegistryEntry(this.itemTranslationKeys, namespace, path, item.components, translationKey);
+    ResourceHandler.addItemKeyedRegistryEntry(
+      this.itemTranslationKeys,
+      namespace,
+      path,
+      item.components,
+      translationKey,
+    );
   }
 
   /**
@@ -219,7 +238,7 @@ export class ResourceHandler {
    * @param {IFluid} fluid An fluid.
    * @param {string} translationKey The translation key.
    */
-  public addFluidTranslationKey(fluid: IFluid, translationKey: string) {
+  public addFluidTranslationKey(fluid: IFluid, translationKey: string): void {
     this.fluidTranslationKeys[fluid.fluid] = translationKey;
   }
 
@@ -237,7 +256,7 @@ export class ResourceHandler {
    * @param {IAdvancement} advancement An advancement.
    * @param {string} id An advancement id.
    */
-  public addAdvancement(advancement: IAdvancement, id: string) {
+  public addAdvancement(advancement: IAdvancement, id: string): void {
     if (this.advancements[id]) {
       throw new Error(`Tried overwriting an advancement for '${id}'`);
     }
@@ -262,7 +281,7 @@ export class ResourceHandler {
    * @param {string} id A keybinding id.
    * @param {string} keybinding An keybinding.
    */
-  public addKeybinding(id: string, keybinding: string) {
+  public addKeybinding(id: string, keybinding: string): void {
     if (this.keybindings[id]) {
       throw new Error(`Tried overwriting an keybinding for '${id}'`);
     }
@@ -281,12 +300,9 @@ export class ResourceHandler {
     }
     return keybinding;
   }
-
 }
 
-export interface IItemKeyedRegistry {
-  [namespace: string]: {[path: string]: {[nbt: string]: string}};
-}
+export type IItemKeyedRegistry = Record<string, Record<string, Record<string, string>>>;
 
 export interface IAdvancement {
   itemIcon: IItem;

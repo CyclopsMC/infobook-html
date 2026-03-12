@@ -1,17 +1,17 @@
 #!/usr/bin/env node
-import * as fs from "fs";
-import minimist = require("minimist");
-import {join} from "path";
-import {IconsGenerator} from "../lib/icon/IconsGenerator";
+import * as fs from 'node:fs';
+import { join } from 'node:path';
+import minimist from 'minimist';
+import { IconsGenerator } from '../lib/icon/IconsGenerator';
 
 // Process CLI args
 const args = minimist(process.argv.slice(2));
-if (args.help || args._.length < 1) {
+if (args.help || args._.length === 0) {
   printUsage();
 }
 
-async function run(configPath: string) {
-  const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
+async function run(configPath: string): Promise<void> {
+  const config = <Record<string, unknown>>JSON.parse(fs.readFileSync(configPath, 'utf8'));
 
   if (!config.minecraft) {
     process.stderr.write('Missing "minecraft" field in config\n');
@@ -23,20 +23,20 @@ async function run(configPath: string) {
   }
 
   const generator = new IconsGenerator({
-    modsDir: join(process.cwd(), args['mods-dir'] || join('server', 'mods')),
-    iconsDir: join(process.cwd(), args['icons-dir'] || 'icon'),
-    workDir: join(process.cwd(), args['work-dir'] || 'headlessmc'),
-    minecraftVersion: config.minecraft,
-    neoforgeVersion: config.neoforge || config.forge,
-    iconExporterVersion: args['icon-exporter-version'],
-    headlessMcVersion: args['headlessmc-version'],
-    launchTimeoutMs: args.timeout ? parseInt(args.timeout, 10) * 1000 : undefined,
+    modsDir: join(process.cwd(), <string>args['mods-dir'] || join('server', 'mods')),
+    iconsDir: join(process.cwd(), <string>args['icons-dir'] || 'icon'),
+    workDir: join(process.cwd(), <string>args['work-dir'] || 'headlessmc'),
+    minecraftVersion: <string>config.minecraft,
+    neoforgeVersion: <string>(config.neoforge || config.forge),
+    iconExporterVersion: <string | undefined>args['icon-exporter-version'],
+    headlessMcVersion: <string | undefined>args['headlessmc-version'],
+    launchTimeoutMs: args.timeout ? Number.parseInt(<string>args.timeout, 10) * 1000 : undefined,
   });
 
   await generator.generate();
 }
 
-function printUsage() {
+function printUsage(): never {
   process.stdout.write(`generate-icons Download IconExporter and HeadlessMC, launches Minecraft headlessly, and exports item icons
 Usage:
   generate-icons /path/to/modpack.json
@@ -55,7 +55,6 @@ Options:
 }
 
 run(args._[0]).catch((e) => {
-  // tslint:disable-next-line:no-console
   console.error(e);
   process.exit(1);
 });

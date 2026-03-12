@@ -1,18 +1,17 @@
-import {createWriteStream} from "fs";
-import {join} from "path";
-import {Readable} from "stream";
-import {ISerializeContext} from "../serialize/HtmlInfoBookSerializer";
-import {IFileWriter} from "./IFileWriter";
+import { createWriteStream } from 'node:fs';
+import { join } from 'node:path';
+import type { Readable } from 'node:stream';
+import type { ISerializeContext } from '../serialize/HtmlInfoBookSerializer';
+import type { IFileWriter } from './IFileWriter';
 
 /**
  * A context-based {@link IFileWriter}.
  */
 export class FileWriter implements IFileWriter {
-
   private readonly context: ISerializeContext;
-  private readonly writtenFiles: {[fileName: string]: boolean};
+  private readonly writtenFiles: Record<string, boolean>;
 
-  constructor(context: ISerializeContext) {
+  public constructor(context: ISerializeContext) {
     this.context = context;
     this.writtenFiles = {};
   }
@@ -22,11 +21,11 @@ export class FileWriter implements IFileWriter {
     if (!this.writtenFiles[baseName]) {
       const eventEmitter = contents().pipe(createWriteStream(join(this.context.basePath, 'assets', baseName)));
       this.writtenFiles[baseName] = true;
-      await new Promise((resolve, reject) => {
-        eventEmitter.on('finish', resolve);
+      await new Promise<void>((resolve, reject) => {
+        eventEmitter.on('finish', () => resolve());
         eventEmitter.on('error', reject);
       });
     }
-    return this.context.baseUrl + 'assets/' + baseName;
+    return `${this.context.baseUrl}assets/${baseName}`;
   }
 }

@@ -1,6 +1,6 @@
-import {IInfoSection} from "./IInfoSection";
+import type { IInfoSection } from './IInfoSection';
 
 export interface IInfoBook {
   rootSection: IInfoSection;
-  sections: {[id: string]: IInfoSection};
+  sections: Record<string, IInfoSection>;
 }
