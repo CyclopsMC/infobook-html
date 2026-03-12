@@ -23,7 +23,7 @@ async function run(pomPath: string, settingsPath: string | undefined, outputPath
 function printUsage(): never {
   process.stdout.write(`convert-pom-to-modpack Convert a Maven pom.xml + settings.xml into a modpack.json
 Usage:
-  convert-pom-to-modpack /path/to/modpack.pom.xml [/path/to/modpack.settings.xml] [/path/to/modpack.json]
+  convert-pom-to-modpack /path/to/modpack.pom.xml [/path/to/settings.xml] [/path/to/modpack.json]
 Arguments:
   pom.xml       Path to the Maven POM file (required)
   settings.xml  Path to the Maven settings file (optional, provides repository URLs and credentials)
