@@ -25,9 +25,7 @@ jobs:
           path: |
             server
             headlessmc/game
-          key: minecraft-${{ hashFiles('modpack.json') }}
-          restore-keys: |
-            minecraft-
+          key: minecraft-${{ hashFiles('modpack.pom.xml') }}
       - name: Install and Build 🔧
         run: |
           npm install --legacy-peer-deps
@@ -101,7 +99,7 @@ jobs:
               else
                 SKIPPED=$((SKIPPED + 1))
               fi
-            done < <(git ls-tree -r --name-only origin/gh-pages -- 'assets/icons/' 2>/dev/null || true)
+            done < <(git ls-tree -r --name-only origin/gh-pages -- 'assets/icon/' 2>/dev/null || true)
             echo "Restored $RESTORED existing icons from gh-pages; $SKIPPED icons from gh-pages no longer present in new export"
           else
             echo "Minecraft version changed from '${PREV_VERSION}' to '${MC_VERSION}' — using all freshly generated icons"
