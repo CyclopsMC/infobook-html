@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "lib": [
-      "es6"
+      "es6",
+      "es2021"
     ],
     "module": "commonjs",
     "noImplicitAny": false
