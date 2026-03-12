@@ -1,6 +1,15 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v5.2.0"></a>
+## [v5.2.0](https://github.com/CyclopsMC/infobook-html/compare/v5.1.0...v5.2.0) - 2026-03-12
+
+### Added
+* [Add pom.xml to modpack.json converter](https://github.com/CyclopsMC/infobook-html/commit/5def6e7a665494a642b6eb07635b960ac8e2bb68)
+
+### Changed
+* [Download IconExporter from Modrinth (no GitHub token required) (#40)](https://github.com/CyclopsMC/infobook-html/commit/e8862d694c6f25745b997172b1a04120ec52cb32)
+
 <a name="v5.1.0"></a>
 ## [v5.1.0](https://github.com/CyclopsMC/infobook-html/compare/v5.0.0...v5.1.0) - 2026-03-11
 
