@@ -1,6 +1,6 @@
 {
   "name": "cyclops-infobook-html",
-  "version": "5.2.1",
+  "version": "5.2.2",
   "description": "Output Cyclops infobooks as HTML",
   "author": "Ruben Taelman <rubensworks@gmail.com>",
   "license": "MIT",

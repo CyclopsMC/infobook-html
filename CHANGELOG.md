@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v5.2.2"></a>
+## [v5.2.2](https://github.com/CyclopsMC/infobook-html/compare/v5.2.1...v5.2.2) - 2026-03-12
+
+### Fixed
+* [Fix PomConverter trailing-slash stripping and bypass broken mvn-artifact-download for classifiers (#50)](https://github.com/CyclopsMC/infobook-html/commit/370f6b495e8b6dfd0f4b81ce99713f5d796ca15e)
+
 <a name="v5.2.1"></a>
 ## [v5.2.1](https://github.com/CyclopsMC/infobook-html/compare/v5.2.0...v5.2.1) - 2026-03-12
 
