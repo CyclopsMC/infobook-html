@@ -1,5 +1,30 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "github>rubensworks/renovate-presets:js"
-  ]
+  ],
+  "enabledManagers": ["maven", "github-actions"],
+  "hostRules": [
+    {
+      "matchHost": "https://maven.pkg.github.com/CyclopsMC/packages",
+      "token": "{{ secrets.RENOVATE_GITHUB_COM_TOKEN }}"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchManagers": ["github-actions"],
+      "automerge": true,
+      "automergeType": "branch"
+    },
+    {
+      "matchManagers": ["maven"],
+      "automerge": true,
+      "automergeType": "branch"
+    }
+  ],
+  "github-actions": {
+    "major": {
+      "enabled": true
+    }
+  }
 }
