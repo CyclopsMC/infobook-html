@@ -68,7 +68,7 @@
   },
   "dependencies": {
     "@types/minimist": "^1.2.0",
-    "@types/mkdirp": "^0.5.2",
+    "@types/mkdirp": "^2.0.0",
     "@types/ncp": "^2.0.1",
     "@types/node-fetch": "^2.5.0",
     "@types/pug": "^2.0.4",
