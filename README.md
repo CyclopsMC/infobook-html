@@ -1,8 +1,8 @@
 # Cyclops Infobook HTML
 
-[![Build Status](https://travis-ci.org/CyclopsMC/infobook-html.svg?branch=master)](https://travis-ci.org/CyclopsMC/infobook-html)
+[![Build Status](https://github.com/CyclopsMC/infobook-html/actions/workflows/deploy.yml/badge.svg)](https://github.com/CyclopsMC/infobook-html/actions/workflows/deploy.yml)
 [![Coverage Status](https://coveralls.io/repos/github/CyclopsMC/infobook-html/badge.svg?branch=master)](https://coveralls.io/github/CyclopsMC/infobook-html?branch=master)
-[![npm version](https://badge.fury.io/js/infobook-html.svg)](https://www.npmjs.com/package/infobook-html)
+[![npm version](https://badge.fury.io/js/cyclops-infobook-html.svg)](https://www.npmjs.com/package/cyclops-infobook-html)
 
 Output Cyclops infobooks as HTML.
 
