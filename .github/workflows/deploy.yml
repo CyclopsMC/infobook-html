@@ -66,8 +66,6 @@ jobs:
         run: sudo apt-get install -y xvfb
       - name: Generate icons 🎨
         run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" npm run generate:icons
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Generate HTML 📄
         run: npm run generate:html
       - name: Compress icons 🗜️

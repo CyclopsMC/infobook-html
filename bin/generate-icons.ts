@@ -28,7 +28,6 @@ async function run(configPath: string) {
     workDir: join(process.cwd(), args['work-dir'] || 'headlessmc'),
     minecraftVersion: config.minecraft,
     neoforgeVersion: config.neoforge || config.forge,
-    githubToken: args['github-token'] || process.env.GITHUB_TOKEN,
     iconExporterVersion: args['icon-exporter-version'],
     headlessMcVersion: args['headlessmc-version'],
     launchTimeoutMs: args.timeout ? parseInt(args.timeout, 10) * 1000 : undefined,
@@ -46,8 +45,9 @@ Options:
   --mods-dir               directory containing mod JARs (default: server/mods)
   --icons-dir              output directory for icons (default: icons)
   --work-dir               working directory for HeadlessMC (default: headlessmc)
-  --github-token           GitHub token for downloading from GitHub Packages
-  --icon-exporter-version  version of the IconExporter artifact (default: 1.4.0-174)
+  --icon-exporter-version  version of the IconExporter artifact to pin (e.g. "1.4.0-174");
+                           if omitted, the latest version for the configured Minecraft version
+                           is fetched automatically from Modrinth
   --headlessmc-version     version of HeadlessMC to use (default: 2.8.0)
   --timeout                timeout in seconds for the full icon generation (default: 1800)
 `);
