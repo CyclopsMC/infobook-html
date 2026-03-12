@@ -205,7 +205,7 @@ describe('PomConverter', () => {
       expect(result.mods[0]).toEqual({
         type: 'maven',
         artifact: 'org.cyclops.cyclopscore:cyclopscore-1.21.1-neoforge:1.27.0',
-        repo: 'https://repo.maven.apache.org/maven2',
+        repo: 'https://repo.maven.apache.org/maven2/',
       });
     });
 
@@ -216,7 +216,7 @@ describe('PomConverter', () => {
 
     it('should use the GitHub packages repo URL from settings.xml', async() => {
       const result = await convertPomToModpack(POM_BASIC, SETTINGS_GITHUB);
-      expect(result.mods[0].repo).toBe('https://maven.pkg.github.com/CyclopsMC/packages');
+      expect(result.mods[0].repo).toBe('https://maven.pkg.github.com/CyclopsMC/packages/');
     });
 
     it('should add a Bearer auth header when the server password is a placeholder', async() => {
@@ -236,16 +236,16 @@ describe('PomConverter', () => {
 
     it('should only include repos from active profiles', async() => {
       const result = await convertPomToModpack(POM_BASIC, SETTINGS_INACTIVE_PROFILE);
-      expect(result.mods[0].repo).toBe('https://active.example.com/maven2');
+      expect(result.mods[0].repo).toBe('https://active.example.com/maven2/');
     });
 
-    it('should strip trailing slash from repo URL', async() => {
+    it('should normalize repo URL to always have a trailing slash', async() => {
       const settingsWithTrailingSlash = SETTINGS_GITHUB.replace(
         'https://maven.pkg.github.com/CyclopsMC/packages',
         'https://maven.pkg.github.com/CyclopsMC/packages/',
       );
       const result = await convertPomToModpack(POM_BASIC, settingsWithTrailingSlash);
-      expect(result.mods[0].repo).toBe('https://maven.pkg.github.com/CyclopsMC/packages');
+      expect(result.mods[0].repo).toBe('https://maven.pkg.github.com/CyclopsMC/packages/');
     });
 
     it('should return empty mods array when there are no dependencies', async() => {
@@ -299,7 +299,7 @@ describe('PomConverter', () => {
           {
             type: 'maven',
             artifact: 'org.cyclops.cyclopscore:cyclopscore-1.21.1-neoforge:1.27.0',
-            repo: 'https://maven.pkg.github.com/CyclopsMC/packages',
+            repo: 'https://maven.pkg.github.com/CyclopsMC/packages/',
             headers: { Authorization: `Bearer ${GITHUB_TOKEN_PLACEHOLDER}` },
           },
         ],
@@ -315,7 +315,7 @@ describe('PomConverter', () => {
         // CyclopsMC package: found in primary (github) repo, assigned there
         mockFetch.mockResolvedValueOnce(<any>{ ok: true });
         const result = await convertPomToModpack(POM_BASIC, SETTINGS_MULTI_REPO);
-        expect(result.mods[0].repo).toBe('https://maven.pkg.github.com/CyclopsMC/packages');
+        expect(result.mods[0].repo).toBe('https://maven.pkg.github.com/CyclopsMC/packages/');
         expect(result.mods[0].headers).toEqual({ Authorization: `Bearer ${GITHUB_TOKEN_PLACEHOLDER}` });
       });
 
@@ -324,7 +324,7 @@ describe('PomConverter', () => {
         mockFetch.mockResolvedValueOnce(<any>{ ok: false }); // Github: 404
         mockFetch.mockResolvedValueOnce(<any>{ ok: true }); // Modmaven: 200
         const result = await convertPomToModpack(POM_WITH_CLASSIFIER, SETTINGS_MULTI_REPO);
-        expect(result.mods[0].repo).toBe('https://modmaven.dev');
+        expect(result.mods[0].repo).toBe('https://modmaven.dev/');
         expect(result.mods[0].headers).toBeUndefined();
       });
 
@@ -333,7 +333,7 @@ describe('PomConverter', () => {
         mockFetch.mockResolvedValueOnce(<any>{ ok: false });
         mockFetch.mockResolvedValueOnce(<any>{ ok: false });
         const result = await convertPomToModpack(POM_BASIC, SETTINGS_MULTI_REPO);
-        expect(result.mods[0].repo).toBe('https://maven.pkg.github.com/CyclopsMC/packages');
+        expect(result.mods[0].repo).toBe('https://maven.pkg.github.com/CyclopsMC/packages/');
       });
 
       it('should resolve each dependency independently across repos', async() => {
@@ -344,9 +344,9 @@ describe('PomConverter', () => {
         mockFetch.mockResolvedValueOnce(<any>{ ok: true });
         const result = await convertPomToModpack(POM_MULTI_DEP, SETTINGS_MULTI_REPO);
         expect(result.mods).toHaveLength(2);
-        expect(result.mods[0].repo).toBe('https://maven.pkg.github.com/CyclopsMC/packages');
+        expect(result.mods[0].repo).toBe('https://maven.pkg.github.com/CyclopsMC/packages/');
         expect(result.mods[0].headers).toEqual({ Authorization: `Bearer ${GITHUB_TOKEN_PLACEHOLDER}` });
-        expect(result.mods[1].repo).toBe('https://modmaven.dev');
+        expect(result.mods[1].repo).toBe('https://modmaven.dev/');
         expect(result.mods[1].headers).toBeUndefined();
       });
 
