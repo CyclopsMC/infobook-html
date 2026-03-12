@@ -40,11 +40,19 @@ export class InfoBookAppendixHandlerSmeltingRecipe
       recipe.input.map(item => serializer.createItemDisplay(this.resourceHandler, context, fileWriter, item, true)),
     );
     const output = await serializer.createItemDisplay(
-      this.resourceHandler, context, fileWriter, recipe.output, true,
+      this.resourceHandler,
+      context,
+      fileWriter,
+      recipe.output,
+      true,
     );
 
     const appendixIcon = await serializer.createItemDisplay(
-      this.resourceHandler, context, fileWriter, { item: 'minecraft:furnace' }, false,
+      this.resourceHandler,
+      context,
+      fileWriter,
+      { item: 'minecraft:furnace' },
+      false,
     );
 
     return this.templateFurnaceRecipe({ input, output, appendixIcon });

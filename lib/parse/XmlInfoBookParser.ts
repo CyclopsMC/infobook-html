@@ -68,9 +68,10 @@ export class XmlInfoBookParser {
       paragraphTranslationKeys: (<any[]>(data.paragraph || [])).map(
         (subData: any) => this.jsonToParagraph(subData),
       ),
-      appendix: ((<any[]>(data.appendix || []))
-        .concat(<any[]>(data.appendix_list || [])))
-        .map((subData: any) => this.jsonToAppendix(subData, modId)),
+      appendix: [
+        ...<any[]>(data.appendix || []),
+        ...<any[]>(data.appendix_list || []),
+      ].map((subData: any) => this.jsonToAppendix(subData, modId)),
       tags: (<string[]>(data.tag ? data.tag.filter((entry: any) => typeof entry === 'string') : [])),
       modId,
     };

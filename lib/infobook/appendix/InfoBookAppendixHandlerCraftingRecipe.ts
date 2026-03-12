@@ -67,11 +67,19 @@ export class InfoBookAppendixHandlerCraftingRecipe
     }
 
     const output = await serializer.createItemDisplay(
-      this.resourceHandler, context, fileWriter, recipe.output, true,
+      this.resourceHandler,
+      context,
+      fileWriter,
+      recipe.output,
+      true,
     );
 
     const appendixIcon = await serializer.createItemDisplay(
-      this.resourceHandler, context, fileWriter, { item: 'minecraft:crafting_table' }, false,
+      this.resourceHandler,
+      context,
+      fileWriter,
+      { item: 'minecraft:crafting_table' },
+      false,
     );
 
     return this.templateCraftingRecipe({ inputs, output, appendixIcon });

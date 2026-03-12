@@ -65,7 +65,7 @@ export class ModLoader {
 
       // Install Forge
       process.stdout.write('Installing Forge...\n');
-      await new Promise((resolve) => exec(
+      await new Promise(resolve => exec(
         `cd ${this.path} && java -jar forge-installer.jar --installServer`,
       ).on('exit', resolve));
     } else {
@@ -89,7 +89,7 @@ export class ModLoader {
 
       // Install Forge
       process.stdout.write('Installing NeoForge...\n');
-      await new Promise((resolve) => exec(
+      await new Promise(resolve => exec(
         `cd ${this.path} && java -jar neoforge-installer.jar --installServer`,
       ).on('exit', resolve));
     }

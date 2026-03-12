@@ -161,7 +161,12 @@ export class ResourceLoader {
    * @param {string} fullFilePath The full language file path.
    * @returns {Promise<void>} A promise resolving when loading is done.
    */
-  public async loadAssetsLangFile(modid: string, language: string, fullFilePath: string, excludedModLanguage: boolean): Promise<void> {
+  public async loadAssetsLangFile(
+    modid: string,
+    language: string,
+    fullFilePath: string,
+    excludedModLanguage: boolean,
+  ): Promise<void> {
     const translations = <Record<string, string>>JSON.parse((await fs.readFile(fullFilePath)).toString('utf8'));
     this.resourceHandler.addTranslations(language, translations, excludedModLanguage);
   }
@@ -194,7 +199,7 @@ export class ResourceLoader {
    */
   public async loadAssetsAdvancement(modid: string, advancementsFile: string, id: string): Promise<void> {
     const contentsData = (await fs.readFile(advancementsFile)).toString('utf8');
-    type AdvJson = { display: { icon: IItem; title: { translate: string }; description: {translate: string} } };
+    type AdvJson = { display: { icon: IItem; title: { translate: string }; description: { translate: string }}};
     const contents = <AdvJson>JSON.parse(contentsData);
     const itemIcon: IItem = contents.display.icon;
     const title: string = contents.display.title.translate;

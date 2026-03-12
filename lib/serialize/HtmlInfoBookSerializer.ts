@@ -251,7 +251,7 @@ export class HtmlInfoBookSerializer {
     let linkTarget;
     if (resource.startsWith('minecraft:')) {
       const translated = resourceHandler.getTranslation(translationKey, 'en_us');
-      // eslint-disable-next-line max-len
+
       link = `https://minecraft.gamepedia.com/${translated.replaceAll(' ', '_')}`;
       linkTarget = '_blank';
     } else if (context.sectionIndex.tags[resource]) {

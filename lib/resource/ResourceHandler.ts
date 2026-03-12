@@ -6,7 +6,6 @@ import type { IItem } from '../infobook/IItem';
  * Allows Minecraft resources to be used.
  */
 export class ResourceHandler {
-  // eslint-disable-next-line ts/naming-convention
   private static readonly translationDefaults: Record<string, string> = {
     // eslint-disable-next-line ts/naming-convention
     'fluid.tile.lava': 'Lava',
