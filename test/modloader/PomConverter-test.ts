@@ -1,7 +1,18 @@
+import fetch from 'node-fetch';
 import { convertPomToModpack } from '../../lib/modloader/PomConverter';
 
 // eslint-disable-next-line no-template-curly-in-string
 const GITHUB_TOKEN_PLACEHOLDER = '${GITHUB_TOKEN}';
+
+// Mock node-fetch so tests do not make real HTTP requests.
+// node-fetch v2 sets __esModule=true, so the factory must mirror that shape.
+// eslint-disable-next-line jest/no-untyped-mock-factory
+jest.mock('node-fetch', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
+
+const mockFetch = <jest.MockedFunction<typeof fetch>>fetch;
 
 const POM_BASIC = `<?xml version="1.0" encoding="UTF-8"?>
 <project>
@@ -116,6 +127,59 @@ const SETTINGS_INACTIVE_PROFILE = `<settings>
     </profile>
   </profiles>
 </settings>`;
+
+// A settings.xml with two active repositories: the authenticated CyclopsMC GitHub Maven
+// registry (primary) and an unauthenticated fallback (e.g. modmaven.dev).
+const SETTINGS_MULTI_REPO = `<settings>
+  <activeProfiles>
+    <activeProfile>cyclops</activeProfile>
+  </activeProfiles>
+  <profiles>
+    <profile>
+      <id>cyclops</id>
+      <repositories>
+        <repository>
+          <id>github</id>
+          <url>https://maven.pkg.github.com/CyclopsMC/packages</url>
+        </repository>
+        <repository>
+          <id>modmaven</id>
+          <url>https://modmaven.dev</url>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+  <servers>
+    <server>
+      <id>github</id>
+      <username>\${GITHUB_USER}</username>
+      <password>\${GITHUB_TOKEN}</password>
+    </server>
+  </servers>
+</settings>`;
+
+// A POM with two dependencies: one from CyclopsMC (available in primary repo) and one
+// from a third-party (only available in fallback repo).
+const POM_MULTI_DEP = `<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <version>1.21.1</version>
+  <properties>
+    <neoforge.version>21.1.210</neoforge.version>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.cyclops.cyclopscore</groupId>
+      <artifactId>cyclopscore-1.21.1-neoforge</artifactId>
+      <version>1.29.0-944</version>
+    </dependency>
+    <dependency>
+      <groupId>mekanism</groupId>
+      <artifactId>Mekanism</artifactId>
+      <version>1.21.1-10.7.18.84</version>
+      <classifier>all</classifier>
+    </dependency>
+  </dependencies>
+</project>`;
 
 describe('PomConverter', () => {
   describe('convertPomToModpack', () => {
@@ -239,6 +303,72 @@ describe('PomConverter', () => {
             headers: { Authorization: `Bearer ${GITHUB_TOKEN_PLACEHOLDER}` },
           },
         ],
+      });
+    });
+
+    describe('multi-repo resolution', () => {
+      beforeEach(() => {
+        mockFetch.mockReset();
+      });
+
+      it('should assign a dependency to the first repo that has the artifact', async() => {
+        // CyclopsMC package: found in primary (github) repo, assigned there
+        mockFetch.mockResolvedValueOnce(<any>{ ok: true });
+        const result = await convertPomToModpack(POM_BASIC, SETTINGS_MULTI_REPO);
+        expect(result.mods[0].repo).toBe('https://maven.pkg.github.com/CyclopsMC/packages');
+        expect(result.mods[0].headers).toEqual({ Authorization: `Bearer ${GITHUB_TOKEN_PLACEHOLDER}` });
+      });
+
+      it('should fall back to the second repo when the first does not have the artifact', async() => {
+        // Third-party package: NOT in primary (github) repo, found in fallback (modmaven)
+        mockFetch.mockResolvedValueOnce(<any>{ ok: false }); // Github: 404
+        mockFetch.mockResolvedValueOnce(<any>{ ok: true }); // Modmaven: 200
+        const result = await convertPomToModpack(POM_WITH_CLASSIFIER, SETTINGS_MULTI_REPO);
+        expect(result.mods[0].repo).toBe('https://modmaven.dev');
+        expect(result.mods[0].headers).toBeUndefined();
+      });
+
+      it('should stay on the first repo if all probes fail', async() => {
+        // Neither repo has the artifact, fall back to first configured repo
+        mockFetch.mockResolvedValueOnce(<any>{ ok: false });
+        mockFetch.mockResolvedValueOnce(<any>{ ok: false });
+        const result = await convertPomToModpack(POM_BASIC, SETTINGS_MULTI_REPO);
+        expect(result.mods[0].repo).toBe('https://maven.pkg.github.com/CyclopsMC/packages');
+      });
+
+      it('should resolve each dependency independently across repos', async() => {
+        // First dep (CyclopsMC): found in primary repo
+        mockFetch.mockResolvedValueOnce(<any>{ ok: true });
+        // Second dep (Mekanism): not in primary, found in fallback
+        mockFetch.mockResolvedValueOnce(<any>{ ok: false });
+        mockFetch.mockResolvedValueOnce(<any>{ ok: true });
+        const result = await convertPomToModpack(POM_MULTI_DEP, SETTINGS_MULTI_REPO);
+        expect(result.mods).toHaveLength(2);
+        expect(result.mods[0].repo).toBe('https://maven.pkg.github.com/CyclopsMC/packages');
+        expect(result.mods[0].headers).toEqual({ Authorization: `Bearer ${GITHUB_TOKEN_PLACEHOLDER}` });
+        expect(result.mods[1].repo).toBe('https://modmaven.dev');
+        expect(result.mods[1].headers).toBeUndefined();
+      });
+
+      it('should probe repos with auth headers when credentials are configured', async() => {
+        mockFetch.mockResolvedValueOnce(<any>{ ok: true });
+        await convertPomToModpack(POM_BASIC, SETTINGS_MULTI_REPO);
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.stringContaining('maven.pkg.github.com'),
+          expect.objectContaining({
+            method: 'HEAD',
+            headers: expect.objectContaining({ Authorization: `Bearer ${GITHUB_TOKEN_PLACEHOLDER}` }),
+          }),
+        );
+      });
+
+      it('should probe with no auth headers for repos without credentials', async() => {
+        mockFetch.mockResolvedValueOnce(<any>{ ok: false }); // Github probe fails
+        mockFetch.mockResolvedValueOnce(<any>{ ok: true }); // Modmaven probe succeeds
+        await convertPomToModpack(POM_WITH_CLASSIFIER, SETTINGS_MULTI_REPO);
+        // The second call (modmaven) should use empty headers
+        const secondCall = mockFetch.mock.calls[1];
+        expect(secondCall[1]).toEqual(expect.objectContaining({ method: 'HEAD', headers: {}}));
       });
     });
   });

@@ -1,4 +1,5 @@
 import { promisify } from 'node:util';
+import fetch from 'node-fetch';
 import { parseString } from 'xml2js';
 
 const parseStringPromise = promisify(parseString);
@@ -46,6 +47,70 @@ interface ISettingsXmlDoc {
 
 /** Default Maven repository URL, used when no settings.xml is provided. */
 const DEFAULT_MAVEN_REPO = 'https://repo.maven.apache.org/maven2';
+
+/**
+ * Build the URL for a Maven artifact JAR in a repository.
+ */
+export function buildMavenArtifactUrl(
+  groupId: string,
+  artifactId: string,
+  version: string,
+  classifier: string | undefined,
+  repoUrl: string,
+): string {
+  const groupPath = groupId.replaceAll('.', '/');
+  const suffix = classifier ? `-${classifier}` : '';
+  const fileName = `${artifactId}-${version}${suffix}.jar`;
+  const base = repoUrl.endsWith('/') ? repoUrl : `${repoUrl}/`;
+  return `${base}${groupPath}/${artifactId}/${version}/${fileName}`;
+}
+
+/**
+ * Check if a Maven artifact exists in a repository by sending an HTTP HEAD request.
+ * Returns true if the server responds with a 2xx status, false otherwise.
+ */
+export async function artifactExistsInRepo(
+  groupId: string,
+  artifactId: string,
+  version: string,
+  classifier: string | undefined,
+  repoUrl: string,
+  headers?: Record<string, string>,
+): Promise<boolean> {
+  const url = buildMavenArtifactUrl(groupId, artifactId, version, classifier, repoUrl);
+  try {
+    const response = await fetch(url, { method: 'HEAD', headers: headers ?? {}});
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Build Authorization headers for a server entry.
+ * Returns a Bearer header for placeholder passwords, or a Basic header for literal credentials.
+ * Returns an empty object if no password is configured.
+ */
+function buildAuthHeaders(
+  server: { id: string; username?: string; password?: string } | undefined,
+): Record<string, string> {
+  if (!server?.password) {
+    return {};
+  }
+  const headers: Record<string, string> = {};
+  // If the password is an environment variable placeholder (e.g. ${GITHUB_TOKEN}),
+  // use Bearer authentication to avoid having to base64-encode at generation time.
+  if (/^\$\{[^}]+\}$/u.test(server.password)) {
+    headers.Authorization = `Bearer ${server.password}`;
+  } else {
+    // Literal credentials: encode as Basic auth
+    const credentials = Buffer
+      .from(`${server.username ?? 'token'}:${server.password}`)
+      .toString('base64');
+    headers.Authorization = `Basic ${credentials}`;
+  }
+  return headers;
+}
 
 export interface IModpackMod {
   type: 'maven';
@@ -149,8 +214,28 @@ export async function convertPomToModpack(
         `${groupId}:${artifactId}:${version}:${classifier}` :
         `${groupId}:${artifactId}:${version}`;
 
-      // Determine repo: use the first active repo as default
-      const repo = repos[0] ?? { id: 'central', url: DEFAULT_MAVEN_REPO };
+      // Determine repo: when multiple repos are configured, probe each one in order
+      // and use the first that has the artifact (mirrors Maven's repository resolution).
+      // When only one repo is configured, skip probing and use it directly.
+      let repo = repos[0] ?? { id: 'central', url: DEFAULT_MAVEN_REPO };
+      if (repos.length > 1) {
+        for (const candidateRepo of repos) {
+          const candidateServer = serverMap.get(candidateRepo.id);
+          const probeHeaders = buildAuthHeaders(candidateServer);
+          const found = await artifactExistsInRepo(
+            groupId,
+            artifactId,
+            version,
+            classifier,
+            candidateRepo.url,
+            probeHeaders,
+          );
+          if (found) {
+            repo = candidateRepo;
+            break;
+          }
+        }
+      }
 
       const mod: IModpackMod = {
         type: 'maven',
@@ -161,20 +246,7 @@ export async function convertPomToModpack(
       // If the repo has a server entry with credentials, add auth headers
       const server = serverMap.get(repo.id);
       if (server?.password) {
-        // If the password is an environment variable placeholder (e.g. ${GITHUB_TOKEN}),
-        // use Bearer authentication to avoid having to base64-encode at generation time.
-        const passwordIsPlaceholder = /^\$\{[^}]+\}$/u.test(server.password);
-        const authHeaders: Record<string, string> = {};
-        if (passwordIsPlaceholder) {
-          authHeaders.Authorization = `Bearer ${server.password}`;
-        } else {
-          // Literal credentials: encode as Basic auth
-          const credentials = Buffer
-            .from(`${server.username ?? 'token'}:${server.password}`)
-            .toString('base64');
-          authHeaders.Authorization = `Basic ${credentials}`;
-        }
-        mod.headers = authHeaders;
+        mod.headers = buildAuthHeaders(server);
       }
 
       mods.push(mod);
