@@ -5,7 +5,6 @@ import * as fs from 'node:fs';
 import * as Path from 'node:path';
 import { dirname, join, sep } from 'node:path';
 import { promisify } from 'node:util';
-import download from 'mvn-artifact-download';
 import { ncp } from 'ncp';
 import fetch from 'node-fetch';
 import rimraf from 'rimraf';
@@ -137,13 +136,7 @@ export class ModLoader {
         await this.downloadFile(url, fileName, modsDir);
       } else if (mod.type === 'maven') {
         process.stdout.write(`  - ${mod.artifact} from ${mod.repo}...\n`);
-        let name: string;
-        if (mod.headers && Object.keys(mod.headers).length > 0) {
-          // Authenticated download: construct URL manually and use fetch with headers
-          name = await this.downloadMavenArtifact(mod.artifact, mod.repo, modsDir, mod.headers);
-        } else {
-          name = await download(mod.artifact, modsDir, mod.repo);
-        }
+        const name = await this.downloadMavenArtifact(mod.artifact, mod.repo, modsDir, mod.headers);
         // Rename file if needed
         if ('name' in mod) {
           fs.renameSync(name, join(modsDir, mod.name));

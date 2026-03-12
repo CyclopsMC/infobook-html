@@ -46,7 +46,7 @@ interface ISettingsXmlDoc {
 }
 
 /** Default Maven repository URL, used when no settings.xml is provided. */
-const DEFAULT_MAVEN_REPO = 'https://repo.maven.apache.org/maven2';
+const DEFAULT_MAVEN_REPO = 'https://repo.maven.apache.org/maven2/';
 
 /**
  * Build the URL for a Maven artifact JAR in a repository.
@@ -181,7 +181,8 @@ export async function convertPomToModpack(
         if (profile.repositories?.[0]?.repository) {
           for (const repo of profile.repositories[0].repository) {
             const repoId = repo.id[0];
-            const repoUrl = repo.url[0].replace(/\/$/u, '');
+            const rawUrl = repo.url[0];
+            const repoUrl = rawUrl.endsWith('/') ? rawUrl : `${rawUrl}/`;
             repoMap.set(repoId, { id: repoId, url: repoUrl });
           }
         }
