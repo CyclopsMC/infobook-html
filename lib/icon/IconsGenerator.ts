@@ -27,8 +27,6 @@ export class IconsGenerator {
   private readonly workDir: string;
   private readonly minecraftVersion: string;
   private readonly neoforgeVersion: string;
-  private readonly githubToken: string;
-  private readonly iconExporterArtifact: string;
   private readonly iconExporterVersion: string | undefined;
   private readonly headlessMcVersion: string;
   private readonly launchTimeoutMs: number;
@@ -52,8 +50,6 @@ export class IconsGenerator {
     this.workDir = args.workDir;
     this.minecraftVersion = args.minecraftVersion;
     this.neoforgeVersion = args.neoforgeVersion;
-    this.githubToken = args.githubToken || process.env.GITHUB_TOKEN || '';
-    this.iconExporterArtifact = args.iconExporterArtifact || `iconexporter-${args.minecraftVersion}-neoforge`;
     this.iconExporterVersion = args.iconExporterVersion;
     this.headlessMcVersion = args.headlessMcVersion || '2.8.0';
     this.launchTimeoutMs = args.launchTimeoutMs || (15 * 60 * 1000); // 15 minutes
@@ -103,10 +99,9 @@ export class IconsGenerator {
   }
 
   /**
-   * Download the IconExporter mod.
-   * If an explicit version is configured, downloads from GitHub Maven packages (requires auth).
-   * Otherwise, automatically fetches the latest version for the configured Minecraft version
-   * from Modrinth (no authentication required).
+   * Download the IconExporter mod from Modrinth.
+   * If an explicit version is configured, fetches that specific version; otherwise fetches the
+   * latest version for the configured Minecraft version. No authentication is required.
    */
   public async downloadIconExporter(): Promise<void> {
     const jarPath = join(this.workDir, IconsGenerator.ICONEXPORTER_JAR);
@@ -116,33 +111,23 @@ export class IconsGenerator {
     }
 
     if (this.iconExporterVersion) {
-      // Explicit version specified: download from GitHub Maven packages
-      const groupPath = 'org/cyclops/iconexporter';
-      const url = `https://maven.pkg.github.com/CyclopsMC/packages/${groupPath}/${this.iconExporterArtifact}/${this.iconExporterVersion}/${this.iconExporterArtifact}-${this.iconExporterVersion}.jar`;
-
-      const headers: Record<string, string> = {};
-      if (this.githubToken) {
-        headers.Authorization = `token ${this.githubToken}`;
-      }
-
-      await this.downloadFile(url, jarPath, headers);
+      process.stdout.write(`Fetching IconExporter ${this.iconExporterVersion} for Minecraft ${this.minecraftVersion} from Modrinth...\n`);
     } else {
-      // Auto-detect: fetch the latest version from Modrinth (no authentication required)
       process.stdout.write(`Fetching latest IconExporter version for Minecraft ${this.minecraftVersion} from Modrinth...\n`);
-      const { url: downloadUrl, filename } = await this.fetchLatestIconExporterFromModrinth();
-      process.stdout.write(`Found IconExporter: ${filename}\n`);
-      await this.downloadFile(downloadUrl, jarPath);
     }
-
+    const { url: downloadUrl, filename } = await this.fetchIconExporterFromModrinth(this.iconExporterVersion);
+    process.stdout.write(`Found IconExporter: ${filename}\n`);
+    await this.downloadFile(downloadUrl, jarPath);
     process.stdout.write(`Downloaded IconExporter to ${jarPath}\n`);
   }
 
   /**
-   * Fetch the latest IconExporter release for the configured Minecraft version and the
-   * NeoForge loader from Modrinth.
+   * Fetch an IconExporter release from Modrinth for the configured Minecraft version and the
+   * NeoForge loader. If a specific version number is provided, that version is matched;
+   * otherwise the latest (newest) version is returned.
    * Returns the primary file's download URL and filename.
    */
-  public async fetchLatestIconExporterFromModrinth(): Promise<{ url: string; filename: string }> {
+  public async fetchIconExporterFromModrinth(version?: string): Promise<{ url: string; filename: string }> {
     const gameVersions = JSON.stringify([this.minecraftVersion]);
     const loaders = JSON.stringify(['neoforge']);
     const apiUrl = `${IconsGenerator.MODRINTH_API_BASE}/project/${IconsGenerator.ICONEXPORTER_MODRINTH_SLUG}/version` +
@@ -158,11 +143,24 @@ export class IconsGenerator {
       throw new Error(`No IconExporter versions found on Modrinth for Minecraft ${this.minecraftVersion} with NeoForge`);
     }
 
-    // Modrinth returns versions newest-first
-    const latest = versions[0];
-    const primaryFile = latest.files.find((f) => f.primary) || latest.files[0];
+    let matched: IModrinthVersion;
+    if (version) {
+      // Modrinth version_number is typically "{mcVersion}-{modVersion}" (e.g. "1.21.1-1.4.0-174").
+      // Match either an exact version_number or the canonical "<mcVersion>-<version>" form.
+      const canonicalVersionNumber = `${this.minecraftVersion}-${version}`;
+      const found = versions.find((v) => v.version_number === version || v.version_number === canonicalVersionNumber);
+      if (!found) {
+        throw new Error(`IconExporter version "${version}" not found on Modrinth for Minecraft ${this.minecraftVersion} with NeoForge`);
+      }
+      matched = found;
+    } else {
+      // Modrinth returns versions newest-first
+      matched = versions[0];
+    }
+
+    const primaryFile = matched.files.find((f) => f.primary) || matched.files[0];
     if (!primaryFile) {
-      throw new Error(`No files found for IconExporter version ${latest.version_number}`);
+      throw new Error(`No files found for IconExporter version ${matched.version_number}`);
     }
 
     return { url: primaryFile.url, filename: primaryFile.filename };
@@ -624,12 +622,8 @@ export class IconsGenerator {
    */
   public async downloadHmcSpecifics(modsDir: string): Promise<void> {
     process.stdout.write('Downloading hmc-specifics...\n');
-    const headers: Record<string, string> = {};
-    if (this.githubToken) {
-      headers.Authorization = `token ${this.githubToken}`;
-    }
     const apiUrl = `https://api.github.com/repos/${IconsGenerator.HMC_SPECIFICS_REPO}/releases/latest`;
-    const apiResponse = await fetch(apiUrl, {headers});
+    const apiResponse = await fetch(apiUrl);
     if (!apiResponse.ok) {
       throw new Error(`Failed to fetch hmc-specifics release info: ${apiResponse.status} ${apiResponse.statusText}`);
     }
@@ -718,18 +712,7 @@ export interface IIconsGeneratorArgs {
    */
   neoforgeVersion: string;
   /**
-   * GitHub token for downloading from GitHub Packages.
-   * Falls back to GITHUB_TOKEN environment variable.
-   * Only required when an explicit iconExporterVersion is provided (uses GitHub Maven).
-   */
-  githubToken?: string;
-  /**
-   * Maven artifact ID for IconExporter (default: iconexporter-{minecraftVersion}-neoforge).
-   * Only used when an explicit iconExporterVersion is provided.
-   */
-  iconExporterArtifact?: string;
-  /**
-   * Version of the IconExporter artifact to download (e.g., "1.4.0-174").
+   * Version of the IconExporter artifact to pin (e.g., "1.4.0-174").
    * If not provided, the latest version for the configured Minecraft version is
    * automatically fetched from Modrinth (no authentication required).
    */
