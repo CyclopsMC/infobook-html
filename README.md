@@ -16,7 +16,7 @@ This tool is the basis for the following mod-specific plugins:
 This tool allows Cyclops infobooks to be exported as an HTML website in four phases:
 
 1. Metadata generation: A preparation step for generating all required metadata that is needed for serializing the infobook to HTML.
-2. Icon generation: Exporting item and block icons to PNG files. 
+2. Icon generation: Exporting item and block icons to PNG files.
 3. HTML generation: Serialization to HTML based on the infook XML and metadata.
 4. Icon compression: Optionally compress icons within the output directory.
 
@@ -30,12 +30,12 @@ Before you can execute this phase, you need a `modpack.json` file with contents 
   "minecraft": "1.12.2",
   "forge": "14.23.5.2838",
   "mods": [
-	{
+    {
 	  "type": "curseforge",
 	  "project": "cyclops-core",
 	  "artifact": "CyclopsCore-1.12.2",
 	  "version": "1.4.0"
-	},
+    },
     {
 	  "type": "maven",
       "artifact": "org.cyclops.integrateddynamics:IntegratedDynamics:1.12.2-1.0.9-1317",
@@ -164,7 +164,7 @@ Next, the plugin can be loaded when generating HTML by adding the following to y
 {
   "plugins": [
     "path/to/instance.js"
-  ],
+  ]
 }
 ```
 

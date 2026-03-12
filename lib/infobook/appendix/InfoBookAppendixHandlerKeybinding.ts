@@ -1,32 +1,34 @@
-import {compileFile as compilePug, compileTemplate} from "pug";
-import {ResourceHandler} from "../../resource/ResourceHandler";
-import {ISerializeContext} from "../../serialize/HtmlInfoBookSerializer";
-import {IInfoAppendix} from "../IInfoAppendix";
-import {IInfoBookAppendixHandler} from "./IInfoBookAppendixHandler";
+import { join } from 'node:path';
+import type { compileTemplate } from 'pug';
+import { compileFile as compilePug } from 'pug';
+import type { ResourceHandler } from '../../resource/ResourceHandler';
+import type { ISerializeContext } from '../../serialize/HtmlInfoBookSerializer';
+import type { IInfoAppendix } from '../IInfoAppendix';
+import type { IInfoBookAppendixHandler } from './IInfoBookAppendixHandler';
 
 /**
  * Handles keybindings appendices.
  */
 export class InfoBookAppendixHandlerKeybinding implements IInfoBookAppendixHandler {
-
   private readonly resourceHandler: ResourceHandler;
   private readonly templateKeybinding: compileTemplate;
 
-  constructor(resourceHandler: ResourceHandler) {
+  public constructor(resourceHandler: ResourceHandler) {
     this.resourceHandler = resourceHandler;
-    this.templateKeybinding = compilePug(__dirname + '/../../../template/appendix/keybinding.pug');
+    this.templateKeybinding = compilePug(
+      join(__dirname, '..', '..', '..', 'template', 'appendix', 'keybinding.pug'),
+    );
   }
 
   public createAppendix(data: any): IInfoAppendix {
-    const id = data._;
+    const id: string = <string>data._;
     const key = this.resourceHandler.getKeybinding(id);
     return {
-      getName: (context) => this.resourceHandler.getTranslation(`infobook.cyclopscore.keybinding`, context.language),
+      getName: context => this.resourceHandler.getTranslation(`infobook.cyclopscore.keybinding`, context.language),
       toHtml: async(context: ISerializeContext) => {
         const name = this.resourceHandler.getTranslation(id, context.language);
         return this.templateKeybinding({ name, key });
       },
     };
   }
-
 }

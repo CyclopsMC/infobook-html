@@ -2,14 +2,14 @@
   "name": "cyclops-infobook-html",
   "version": "5.1.0",
   "description": "Output Cyclops infobooks as HTML",
-  "main": "index.js",
+  "author": "Ruben Taelman <rubensworks@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/CyclopsMC/infobook-html#readme",
   "repository": "git@github.com:CyclopsMC/infobook-html.git",
   "bugs": {
     "url": "https://github.com/CyclopsMC/infobook-html/issues"
   },
-  "homepage": "https://github.com/CyclopsMC/infobook-html#readme",
-  "author": "Ruben Taelman <rubensworks@gmail.com>",
-  "license": "MIT",
+  "main": "index.js",
   "bin": {
     "generate-cyclops-infobook-html": "bin/generate-infobook-html.js",
     "generate-mod-metadata": "bin/generate-mod-metadata.js",
@@ -17,14 +17,14 @@
     "compress-icons": "bin/compress-icons.js"
   },
   "files": [
+    "assets/**/*",
     "bin/**/*.d.ts",
     "bin/**/*.js",
+    "index.d.ts",
+    "index.js",
     "lib/**/*.d.ts",
     "lib/**/*.js",
-    "template/**/*.pug",
-    "assets/**/*",
-    "index.d.ts",
-    "index.js"
+    "template/**/*.pug"
   ],
   "pre-commit": [
     "build",
@@ -51,23 +51,11 @@
     "collectCoverage": true,
     "testEnvironment": "node"
   },
-  "devDependencies": {
-    "@types/jest": "^30.0.0",
-    "@types/minimist": "^1.2.0",
-    "coveralls": "^3.0.3",
-    "jest": "^30.0.0",
-    "manual-git-changelog": "^1.0.1",
-    "pre-commit": "^1.2.2",
-    "ts-jest": "^29.0.0",
-    "tslint": "^6.0.0",
-    "tslint-eslint-rules": "^5.4.0",
-    "typescript": "^5.0.0"
-  },
   "scripts": {
     "test": "jest ${1}",
     "test-watch": "jest ${1} --watch",
     "coveralls": "jest --coverage && cat ./coverage/lcov.info | coveralls",
-    "lint": "tslint index.ts lib/**/*.ts test/**/*.ts bin/**/*.ts --exclude '**/*.d.ts'",
+    "lint": "eslint . --cache",
     "build": "tsc",
     "build-watch": "tsc --watch",
     "validate": "npm ls",
@@ -79,25 +67,37 @@
     "generate:compress": "node bin/compress-icons.js output"
   },
   "dependencies": {
+    "@types/minimist": "^1.2.0",
     "@types/mkdirp": "^0.5.2",
     "@types/ncp": "^2.0.1",
-    "@types/node": "^13.1.0",
     "@types/node-fetch": "^2.5.0",
     "@types/pug": "^2.0.4",
     "@types/rimraf": "^3.0.0",
     "@types/xml2js": "^0.4.4",
     "@types/yauzl": "^2.9.1",
-    "@types/minimist": "^1.2.0",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
     "mvn-artifact-download": "^5.0.0",
-    "optipng-bin": "^9.0.0",
     "ncp": "^2.0.0",
     "node-fetch": "^2.6.0",
+    "optipng-bin": "^9.0.0",
     "pug": "^3.0.0",
     "rimraf": "^3.0.0",
     "xml2js": "^0.4.19",
     "yauzl": "^2.10.0"
+  },
+  "devDependencies": {
+    "@rubensworks/eslint-config": "^3.1.0",
+    "@types/jest": "^30.0.0",
+    "@types/minimist": "^1.2.0",
+    "@types/node": "^22.19.15",
+    "coveralls": "^3.0.3",
+    "eslint": "^8.57.0",
+    "jest": "^30.0.0",
+    "manual-git-changelog": "^1.0.1",
+    "pre-commit": "^1.2.2",
+    "ts-jest": "^29.0.0",
+    "typescript": "^5.0.0"
   },
   "resolutions": {
     "@types/istanbul-reports": "3.0.0"

@@ -1,4 +1,4 @@
-import {IInfoAppendix} from "../IInfoAppendix";
+import type { IInfoAppendix } from '../IInfoAppendix';
 
 /**
  * Creates appendices of a specific type.
@@ -11,6 +11,6 @@ export interface IInfoBookAppendixHandler {
    * @param {string} modId The owning mod.
    * @returns {IInfoAppendix} A new appendix instance.
    */
-  createAppendix(data: any, modId: string): IInfoAppendix;
+  createAppendix: (data: any, modId: string) => IInfoAppendix;
 
 }

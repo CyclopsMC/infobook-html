@@ -1,4 +1,4 @@
-import {IInfoAppendix} from "./IInfoAppendix";
+import type { IInfoAppendix } from './IInfoAppendix';
 
 /**
  * Datastructure for an info book section.

@@ -1,23 +1,29 @@
-import {compileFile as compilePug, compileTemplate} from "pug";
-import {HtmlInfoBookSerializer, ISerializeContext} from "../../serialize/HtmlInfoBookSerializer";
-import {IFileWriter} from "../IFileWriter";
-import {IInfoAppendix} from "../IInfoAppendix";
+import { join } from 'node:path';
+import type { compileTemplate } from 'pug';
+import { compileFile as compilePug } from 'pug';
+import type { HtmlInfoBookSerializer, ISerializeContext } from '../../serialize/HtmlInfoBookSerializer';
+import type { IFileWriter } from '../IFileWriter';
+import type { IInfoAppendix } from '../IInfoAppendix';
 
 /**
  * An appendix with an add
  */
 export class InfoBookAppendixAd implements IInfoAppendix {
-
   public readonly skipWrapper: boolean = true;
 
   private readonly templateTagIndex: compileTemplate;
 
-  constructor() {
-    this.templateTagIndex = compilePug(__dirname + '/../../../template/appendix/ad.pug');
+  public constructor() {
+    this.templateTagIndex = compilePug(join(__dirname, '..', '..', '..', 'template', 'appendix', 'ad.pug'));
   }
 
-  public async toHtml(context: ISerializeContext, fileWriter: IFileWriter, serializer: HtmlInfoBookSerializer): Promise<string> {
+  public async toHtml(
+    context: ISerializeContext,
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    fileWriter: IFileWriter,
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    serializer: HtmlInfoBookSerializer,
+  ): Promise<string> {
     return this.templateTagIndex(context.googleAdsense);
   }
-
 }

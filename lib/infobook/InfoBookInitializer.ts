@@ -1,22 +1,21 @@
-import {XmlInfoBookParser} from "../parse/XmlInfoBookParser";
-import {ResourceHandler} from "../resource/ResourceHandler";
-import {IInfoBookAppendixHandler} from "./appendix/IInfoBookAppendixHandler";
-import {InfoBookAppendixTagIndex} from "./appendix/InfoBookAppendixTagIndex";
-import {IInfoBook} from "./IInfoBook";
-import {IInfoSection} from "./IInfoSection";
+import { XmlInfoBookParser } from '../parse/XmlInfoBookParser';
+import type { ResourceHandler } from '../resource/ResourceHandler';
+import type { IInfoBookAppendixHandler } from './appendix/IInfoBookAppendixHandler';
+import { InfoBookAppendixTagIndex } from './appendix/InfoBookAppendixTagIndex';
+import type { IInfoBook } from './IInfoBook';
+import type { IInfoSection } from './IInfoSection';
 
 /**
  * InfoBookInitializer is a datastructure for holding information on an info book so that it can be constructed.
  */
 export class InfoBookInitializer {
-
   private readonly modId: string;
   private readonly sectionsFile: string;
-  private readonly injectSections: {[targetSection: string]: { sectionsFile: string, modId: string }[]};
+  private readonly injectSections: Record<string, { sectionsFile: string; modId: string }[]>;
 
   private readonly parser: XmlInfoBookParser;
 
-  constructor(args: IInfoBookArgs) {
+  public constructor(args: IInfoBookArgs) {
     if (!args.modId) {
       throw new Error('Missing modId field for infobook construction');
     }
@@ -51,9 +50,9 @@ export class InfoBookInitializer {
     }
 
     // Create tag index section
-    const nameTranslationKey = 'info_book.' + this.modId + '.tag_index';
+    const nameTranslationKey = `info_book.${this.modId}.tag_index`;
     const indexSection: IInfoSection = {
-      appendix: [new InfoBookAppendixTagIndex(resourceHandler)],
+      appendix: [ new InfoBookAppendixTagIndex(resourceHandler) ],
       modId: this.modId,
       nameTranslationKey,
       paragraphTranslationKeys: [],
@@ -71,15 +70,14 @@ export class InfoBookInitializer {
    * @param {string} type A type string.
    * @param {IInfoBookAppendixHandler} handler An appendix handler.
    */
-  public registerAppendixHandler(type: string, handler: IInfoBookAppendixHandler) {
+  public registerAppendixHandler(type: string, handler: IInfoBookAppendixHandler): void {
     this.parser.registerAppendixHandler(type, handler);
   }
-
 }
 
 export interface IInfoBookArgs {
   modId: string;
   sectionsFile: string;
   resources: string[];
-  injectSections?: {[targetSection: string]: { sectionsFile: string, modId: string }[]};
+  injectSections?: Record<string, { sectionsFile: string; modId: string }[]>;
 }

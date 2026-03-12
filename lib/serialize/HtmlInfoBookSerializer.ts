@@ -1,23 +1,23 @@
-import {createReadStream, promises as fs} from "fs";
-import mkdirp = require("mkdirp");
-import {ncp} from "ncp";
-import {basename, join} from "path";
-import {compileFile as compilePug, compileTemplate} from "pug";
-import {promisify} from "util";
-import {InfoBookAppendixAd} from "../infobook/appendix/InfoBookAppendixAd";
-import {FileWriter} from "../infobook/FileWriter";
-import {IFileWriter} from "../infobook/IFileWriter";
-import {IFluid} from "../infobook/IFluid";
-import {IInfoBook} from "../infobook/IInfoBook";
-import {IInfoSection} from "../infobook/IInfoSection";
-import {IItem} from "../infobook/IItem";
-import {ResourceHandler} from "../resource/ResourceHandler";
+import { createReadStream, promises as fs } from 'node:fs';
+import { basename, join } from 'node:path';
+import { promisify } from 'node:util';
+import mkdirp from 'mkdirp';
+import { ncp } from 'ncp';
+import type { compileTemplate } from 'pug';
+import { compileFile as compilePug } from 'pug';
+import { InfoBookAppendixAd } from '../infobook/appendix/InfoBookAppendixAd';
+import { FileWriter } from '../infobook/FileWriter';
+import type { IFileWriter } from '../infobook/IFileWriter';
+import type { IFluid } from '../infobook/IFluid';
+import type { IInfoBook } from '../infobook/IInfoBook';
+import type { IInfoSection } from '../infobook/IInfoSection';
+import type { IItem } from '../infobook/IItem';
+import type { ResourceHandler } from '../resource/ResourceHandler';
 
 /**
  * Serializes an infobook to a collection of HTML files.
  */
 export class HtmlInfoBookSerializer {
-
   public readonly templateItem: compileTemplate;
   private readonly templateIndex: compileTemplate;
   private readonly templateSection: compileTemplate;
@@ -25,14 +25,14 @@ export class HtmlInfoBookSerializer {
 
   private fileWriter: IFileWriter;
 
-  constructor() {
-    this.templateIndex = compilePug(__dirname + '/../../template/index.pug');
-    this.templateSection = compilePug(__dirname + '/../../template/section.pug');
-    this.appendixWrapper = compilePug(__dirname + '/../../template/appendix/appendix_base.pug');
-    this.templateItem = compilePug(__dirname + '/../../template/appendix/item.pug');
+  public constructor() {
+    this.templateIndex = compilePug(join(__dirname, '..', '..', 'template', 'index.pug'));
+    this.templateSection = compilePug(join(__dirname, '..', '..', 'template', 'section.pug'));
+    this.appendixWrapper = compilePug(join(__dirname, '..', '..', 'template', 'appendix', 'appendix_base.pug'));
+    this.templateItem = compilePug(join(__dirname, '..', '..', 'template', 'appendix', 'item.pug'));
   }
 
-  public async serialize(infobook: IInfoBook, context: ISerializeContext, assetsPaths: string[]) {
+  public async serialize(infobook: IInfoBook, context: ISerializeContext, assetsPaths: string[]): Promise<void> {
     context = {
       ...context,
       basePath: context.path,
@@ -56,32 +56,37 @@ export class HtmlInfoBookSerializer {
     }
 
     // Serialize assets
-    await promisify(ncp)(__dirname + '/../../assets/', join(context.path, 'assets'));
+    await promisify(ncp)(join(__dirname, '..', '..', 'assets'), join(context.path, 'assets'));
     for (const assetsPath of assetsPaths) {
       await promisify(ncp)(assetsPath, join(context.path, 'assets'));
     }
   }
 
-  public async serializeSectionIndex(infobook: IInfoBook, contextRoot: ISerializeContext,
-                                     language: string, langPath: string): Promise<ISectionIndex> {
+  public async serializeSectionIndex(
+    infobook: IInfoBook,
+    contextRoot: ISerializeContext,
+    language: string,
+    langPath: string,
+  ): Promise<ISectionIndex> {
     const sectionIndex: ISectionIndex = {
       linkedPagesList: [],
       tags: {},
       urlIndex: {},
     };
-    let pageIndex: number = 0;
+    let pageIndex = 0;
     await this.serializeSection(infobook.rootSection, {
       ...contextRoot,
       language,
       path: langPath,
-    }, async ({ index, section, sectionTitle, fileUrl, breadcrumbs }) => {
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    }, async({ index, section, sectionTitle, fileUrl, breadcrumbs }) => {
       if (!index) {
         sectionIndex.urlIndex[fileUrl] = pageIndex++;
-        const name = breadcrumbs.slice(1).map((b) => b.name).join(' / ');
+        const name = breadcrumbs.slice(1).map(b => b.name).join(' / ');
         sectionIndex.linkedPagesList.push({ name, url: fileUrl });
         for (let tag of section.tags) {
-          if (tag.indexOf(':') < 0) {
-            tag = contextRoot.modId + ':' + tag;
+          if (!tag.includes(':')) {
+            tag = `${contextRoot.modId}:${tag}`;
           }
           sectionIndex.tags[tag] = fileUrl;
         }
@@ -90,18 +95,23 @@ export class HtmlInfoBookSerializer {
     return sectionIndex;
   }
 
-  public async serializeSectionFiles(infobook: IInfoBook, contextRoot: ISerializeContext,
-                                     language: string, langPath: string, sectionIndex: ISectionIndex) {
+  public async serializeSectionFiles(
+    infobook: IInfoBook,
+    contextRoot: ISerializeContext,
+    language: string,
+    langPath: string,
+    sectionIndex: ISectionIndex,
+  ): Promise<void> {
     await this.serializeSection(infobook.rootSection, {
       ...contextRoot,
       language,
       path: langPath,
       sectionIndex,
-    }, async ({ index, breadcrumbs, context, section, sectionTitle, subSectionDatas, filePath, fileUrl }) => {
+    }, async({ index, breadcrumbs, context, section, sectionTitle, subSectionDatas, filePath, fileUrl }) => {
       // Create links to this page in other languages
-      const languages: { url: string, name: string }[] = [];
+      const languages: { url: string; name: string }[] = [];
       for (const name of contextRoot.resourceHandler.getLanguages()) {
-        const baseFilePath = filePath.substr(join(contextRoot.basePath, this.getLanguagePath(language)).length);
+        const baseFilePath = filePath.slice(join(contextRoot.basePath, this.getLanguagePath(language)).length);
         const languageFilePath = join(contextRoot.basePath, this.getLanguagePath(name), baseFilePath);
         const url = this.filePathToUrl(languageFilePath, contextRoot.basePath, context.baseUrl);
         languages.push({ name, url });
@@ -112,7 +122,7 @@ export class HtmlInfoBookSerializer {
         const fileContents = this.templateIndex({
           ...context,
           breadcrumbs,
-          headSuffix: context.headSuffixGetters.map((g) => g(context)).join(''),
+          headSuffix: context.headSuffixGetters.map(g => g(context)).join(''),
           languages,
           sectionTitle,
           subSectionDatas,
@@ -121,10 +131,12 @@ export class HtmlInfoBookSerializer {
       } else {
         // Determine next/previous page based on the index
         const pageIndex = sectionIndex.urlIndex[fileUrl];
-        const nextPage = pageIndex < sectionIndex.linkedPagesList.length
-          ? sectionIndex.linkedPagesList[pageIndex + 1] : null;
-        const previousPage = pageIndex > 0
-          ? sectionIndex.linkedPagesList[pageIndex - 1] : null;
+        const nextPage = pageIndex < sectionIndex.linkedPagesList.length ?
+          sectionIndex.linkedPagesList[pageIndex + 1] :
+          null;
+        const previousPage = pageIndex > 0 ?
+          sectionIndex.linkedPagesList[pageIndex - 1] :
+          null;
 
         // Prepend ad appendix if enabled
         const appendices = section.appendix;
@@ -151,14 +163,14 @@ export class HtmlInfoBookSerializer {
         const fileContents = this.templateSection({
           ...context,
           breadcrumbs,
-          headSuffix: context.headSuffixGetters.map((g) => g(context)).join(''),
+          headSuffix: context.headSuffixGetters.map(g => g(context)).join(''),
           languages,
           nextPage,
           previousPage,
           sectionAppendices,
           sectionParagraphs: section.paragraphTranslationKeys
-            .map((key) => context.resourceHandler.getTranslation(key, context.language))
-            .map((value) => this.formatString(value)),
+            .map(key => context.resourceHandler.getTranslation(key, context.language))
+            .map(value => this.formatString(value)),
           sectionTitle,
         });
         await fs.writeFile(filePath, fileContents);
@@ -166,12 +178,14 @@ export class HtmlInfoBookSerializer {
     });
   }
 
-  public async serializeSection(section: IInfoSection, context: ISerializeContext,
-                                onSection: (args: ISectionCallbackArgs) => Promise<void>)
-    : Promise<{ filePath: string, sectionTitle: string }> {
+  public async serializeSection(
+    section: IInfoSection,
+    context: ISerializeContext,
+    onSection: (args: ISectionCallbackArgs) => Promise<void>,
+  ): Promise<{ filePath: string; sectionTitle: string }> {
     const sectionTitle = this.formatString(context.resourceHandler
       .getTranslation(section.nameTranslationKey, context.language));
-    const breadcrumbs = context.breadcrumbs.concat([{ name: sectionTitle }]);
+    const breadcrumbs = [ ...context.breadcrumbs, { name: sectionTitle }];
 
     // Go in a subfolder when we are handling a different mod
     if (section.modId !== context.modId) {
@@ -187,21 +201,20 @@ export class HtmlInfoBookSerializer {
       // Navigation section
 
       // Serialize subsections
-      const subSectionDatas: { url: string, sectionTitle: string }[] = [];
+      const subSectionDatas: { url: string; sectionTitle: string }[] = [];
       const fileUrl = this.filePathToUrl(context.path, context.basePath, context.baseUrl);
-      const subBreadcrumbs = context.breadcrumbs.concat([{
+      const subBreadcrumbs = [ ...context.breadcrumbs, {
         name: sectionTitle,
         url: fileUrl,
-      }]);
+      }];
       for (const subSection of section.subSections) {
-        const subSectionData = await this.serializeSection(subSection,
-          {
-            ...context,
-            breadcrumbs: subBreadcrumbs,
-            path: join(context.path, subSection.nameTranslationKey
-              .substr(subSection.nameTranslationKey.lastIndexOf('.') + 1)),
-            root: false,
-          }, onSection);
+        const subSectionData = await this.serializeSection(subSection, {
+          ...context,
+          breadcrumbs: subBreadcrumbs,
+          path: join(context.path, subSection.nameTranslationKey
+            .slice(subSection.nameTranslationKey.lastIndexOf('.') + 1)),
+          root: false,
+        }, onSection);
         subSectionDatas.push({
           ...subSectionData,
           url: this.filePathToUrl(subSectionData.filePath, context.basePath, context.baseUrl),
@@ -212,29 +225,34 @@ export class HtmlInfoBookSerializer {
       await onSection({ index: true, breadcrumbs, context, sectionTitle, section, subSectionDatas, filePath, fileUrl });
 
       return { filePath: context.path, sectionTitle };
-    } else {
-      // Leaf section
-      const directory = context.path.substr(0, context.path.lastIndexOf('/'));
-      await this.ensureDirExists(directory);
-
-      // Handle leaf file
-      const filePath = context.path + '.html';
-      const fileUrl = this.filePathToUrl(filePath, context.basePath, context.baseUrl);
-
-      await onSection(
-        { index: false, breadcrumbs, context, sectionTitle, section, subSectionDatas: [], filePath, fileUrl });
-
-      return { filePath, sectionTitle };
     }
+    // Leaf section
+    const directory = context.path.slice(0, Math.max(0, context.path.lastIndexOf('/')));
+    await this.ensureDirExists(directory);
+
+    // Handle leaf file
+    const filePath = `${context.path}.html`;
+    const fileUrl = this.filePathToUrl(filePath, context.basePath, context.baseUrl);
+
+    await onSection(
+      { index: false, breadcrumbs, context, sectionTitle, section, subSectionDatas: [], filePath, fileUrl },
+    );
+
+    return { filePath, sectionTitle };
   }
 
-  public createResourceLink(resourceHandler: ResourceHandler, context: ISerializeContext, resource: string,
-                            translationKey: string): { link: string, linkTarget: string } {
+  public createResourceLink(
+    resourceHandler: ResourceHandler,
+    context: ISerializeContext,
+    resource: string,
+    translationKey: string,
+  ): { link: string; linkTarget: string } {
     let link;
     let linkTarget;
     if (resource.startsWith('minecraft:')) {
-      link = 'https://minecraft.gamepedia.com/' + resourceHandler.getTranslation(
-        translationKey, 'en_us').replace(/ /g, '_');
+      const translated = resourceHandler.getTranslation(translationKey, 'en_us');
+      // eslint-disable-next-line max-len
+      link = `https://minecraft.gamepedia.com/${translated.replaceAll(' ', '_')}`;
       linkTarget = '_blank';
     } else if (context.sectionIndex.tags[resource]) {
       link = context.sectionIndex.tags[resource];
@@ -243,9 +261,14 @@ export class HtmlInfoBookSerializer {
     return { link, linkTarget };
   }
 
-  public async createItemDisplay(resourceHandler: ResourceHandler, context: ISerializeContext,
-                           fileWriter: IFileWriter, item: IItem, slot: boolean,
-                           annotation: string = ''): Promise<string> {
+  public async createItemDisplay(
+    resourceHandler: ResourceHandler,
+    context: ISerializeContext,
+    fileWriter: IFileWriter,
+    item: IItem,
+    slot: boolean,
+    annotation = '',
+  ): Promise<string> {
     if (item.item === 'minecraft:air') {
       return slot ? '<div class="item item-slot">&nbsp;</div>' : '<div class="item">&nbsp;</div>';
     }
@@ -254,7 +277,7 @@ export class HtmlInfoBookSerializer {
     if (!icon) {
       throw new Error(`Could not find an icon for item ${JSON.stringify(item)}`);
     }
-    const iconUrl = await fileWriter.write('icon/' + basename(icon), () => createReadStream(icon));
+    const iconUrl = await fileWriter.write(`icon/${basename(icon)}`, () => createReadStream(icon));
 
     const key = resourceHandler.getItemTranslationKey(item);
     if (!key) {
@@ -274,20 +297,24 @@ export class HtmlInfoBookSerializer {
     });
   }
 
-  public async createFluidDisplay(resourceHandler: ResourceHandler, context: ISerializeContext,
-                            fileWriter: IFileWriter, fluid: IFluid, slot: boolean): Promise<string> {
+  public async createFluidDisplay(
+    resourceHandler: ResourceHandler,
+    context: ISerializeContext,
+    fileWriter: IFileWriter,
+    fluid: IFluid,
+    slot: boolean,
+  ): Promise<string> {
     const icon = resourceHandler.getFluidIconFile(fluid.fluid);
     if (!icon) {
       throw new Error(`Could not find an icon for fluid ${JSON.stringify(fluid)}`);
     }
-    const iconUrl = await fileWriter.write('icon/' + basename(icon), () => createReadStream(icon));
+    const iconUrl = await fileWriter.write(`icon/${basename(icon)}`, () => createReadStream(icon));
 
     const key = resourceHandler.getFluidTranslationKey(fluid);
     if (!key) {
       throw new Error(`Could not find translation key for fluid ${JSON.stringify(fluid)}`);
     }
-    const { link, linkTarget } = this.createResourceLink(resourceHandler, context, this.tagFluid(context, fluid.fluid),
-      key);
+    const { link, linkTarget } = this.createResourceLink(resourceHandler, context, this.tagFluid(context, fluid.fluid), key);
 
     return this.templateItem({
       ...context,
@@ -304,8 +331,7 @@ export class HtmlInfoBookSerializer {
     return fluidName;
   }
 
-  public getLanguagePath(language: string, path?: string): string {
-    path = path || '';
+  public getLanguagePath(language: string, path = ''): string {
     return language === 'en_us' ? path : join(path, '_lang', language);
   }
 
@@ -319,41 +345,41 @@ export class HtmlInfoBookSerializer {
    */
   public formatString(value: string): string {
     // Convert '&' to '§'
-    value = value.replace(/&/g, '§');
+    value = value.replaceAll('&', '§');
 
     // Formats to HTML
-    value = value.replace(/§l§n([^§]*)§r/g, '<strong><u>$1</u></strong>');
-    value = value.replace(/§l([^§]*)§r/g, '<strong>$1</strong>');
-    value = value.replace(/§n([^§]*)§r/g, '<u>$1</u>');
-    value = value.replace(/§o([^§]*)§r/g, '<em>$1</em>');
-    value = value.replace(/§N/g, '<br />');
+    value = value.replaceAll(/§l§n([^§]*)§r/gu, '<strong><u>$1</u></strong>');
+    value = value.replaceAll(/§l([^§]*)§r/gu, '<strong>$1</strong>');
+    value = value.replaceAll(/§n([^§]*)§r/gu, '<u>$1</u>');
+    value = value.replaceAll(/§o([^§]*)§r/gu, '<em>$1</em>');
+    value = value.replaceAll('§N', '<br />');
 
     // Colors to HTML
-    value = value.replace(/§r([^§]*)§0/g, '<span style="color: #000000">$1</span>');
-    value = value.replace(/§1([^§]*)§0/g, '<span style="color: #0000AA">$1</span>');
-    value = value.replace(/§2([^§]*)§0/g, '<span style="color: #00AA00">$1</span>');
-    value = value.replace(/§3([^§]*)§0/g, '<span style="color: #00AAAA">$1</span>');
-    value = value.replace(/§4([^§]*)§0/g, '<span style="color: #AA0000">$1</span>');
-    value = value.replace(/§5([^§]*)§0/g, '<span style="color: #AA00AA">$1</span>');
-    value = value.replace(/§6([^§]*)§0/g, '<span style="color: #FFAA00">$1</span>');
-    value = value.replace(/§7([^§]*)§0/g, '<span style="color: #AAAAAA">$1</span>');
-    value = value.replace(/§8([^§]*)§0/g, '<span style="color: #555555">$1</span>');
-    value = value.replace(/§9([^§]*)§0/g, '<span style="color: #5555FF">$1</span>');
-    value = value.replace(/§a([^§]*)§0/g, '<span style="color: #55FF55">$1</span>');
-    value = value.replace(/§b([^§]*)§0/g, '<span style="color: #55FFFF">$1</span>');
-    value = value.replace(/§c([^§]*)§0/g, '<span style="color: #FF5555">$1</span>');
-    value = value.replace(/§d([^§]*)§0/g, '<span style="color: #FF55FF">$1</span>');
-    value = value.replace(/§e([^§]*)§0/g, '<span style="color: #FFFF55">$1</span>');
-    value = value.replace(/§f([^§]*)§0/g, '<span style="color: #FFFFFF">$1</span>');
+    value = value.replaceAll(/§r([^§]*)§0/gu, '<span style="color: #000000">$1</span>');
+    value = value.replaceAll(/§1([^§]*)§0/gu, '<span style="color: #0000AA">$1</span>');
+    value = value.replaceAll(/§2([^§]*)§0/gu, '<span style="color: #00AA00">$1</span>');
+    value = value.replaceAll(/§3([^§]*)§0/gu, '<span style="color: #00AAAA">$1</span>');
+    value = value.replaceAll(/§4([^§]*)§0/gu, '<span style="color: #AA0000">$1</span>');
+    value = value.replaceAll(/§5([^§]*)§0/gu, '<span style="color: #AA00AA">$1</span>');
+    value = value.replaceAll(/§6([^§]*)§0/gu, '<span style="color: #FFAA00">$1</span>');
+    value = value.replaceAll(/§7([^§]*)§0/gu, '<span style="color: #AAAAAA">$1</span>');
+    value = value.replaceAll(/§8([^§]*)§0/gu, '<span style="color: #555555">$1</span>');
+    value = value.replaceAll(/§9([^§]*)§0/gu, '<span style="color: #5555FF">$1</span>');
+    value = value.replaceAll(/§a([^§]*)§0/gu, '<span style="color: #55FF55">$1</span>');
+    value = value.replaceAll(/§b([^§]*)§0/gu, '<span style="color: #55FFFF">$1</span>');
+    value = value.replaceAll(/§c([^§]*)§0/gu, '<span style="color: #FF5555">$1</span>');
+    value = value.replaceAll(/§d([^§]*)§0/gu, '<span style="color: #FF55FF">$1</span>');
+    value = value.replaceAll(/§e([^§]*)§0/gu, '<span style="color: #FFFF55">$1</span>');
+    value = value.replaceAll(/§f([^§]*)§0/gu, '<span style="color: #FFFFFF">$1</span>');
 
     return value;
   }
 
-  protected async ensureDirExists(dirPath: string) {
+  protected async ensureDirExists(dirPath: string): Promise<void> {
     let fstat;
     try {
       fstat = await fs.stat(dirPath);
-    } catch (e) {
+    } catch {
       await promisify(mkdirp)(dirPath);
     }
     if (fstat && !fstat.isDirectory() && fstat.isFile()) {
@@ -361,26 +387,25 @@ export class HtmlInfoBookSerializer {
     }
   }
 
-  protected filePathToUrl(filePath: string, basePath: string, baseUrl: string) {
+  protected filePathToUrl(filePath: string, basePath: string, baseUrl: string): string {
     let url = filePath.replace(basePath, baseUrl);
     const last = basename(url);
-    if (!url.endsWith('/') && last.indexOf('.') < 0) {
-      url = url + '/';
+    if (!url.endsWith('/') && !last.includes('.')) {
+      url += '/';
     }
     return url;
   }
-
 }
 
 export interface ISerializeContext {
   baseUrl: string;
   basePath?: string;
-  breadcrumbs?: { url?: string, name: string }[];
+  breadcrumbs?: { url?: string; name: string }[];
   language?: string;
   path: string;
   modId: string;
   resourceHandler: ResourceHandler;
-  colors: {[key: string]: string};
+  colors: Record<string, string>;
   headSuffixGetters: ((context: ISerializeContext) => string)[];
   sectionIndex?: ISectionIndex;
   root: boolean;
@@ -389,17 +414,17 @@ export interface ISerializeContext {
   bookName: string;
   mods: string[];
   googleAnalytics: string;
-  googleAdsense: { client: string, format: string, slot: string };
+  googleAdsense: { client: string; format: string; slot: string };
   icon: string;
 }
 
 export interface ISectionCallbackArgs {
   index: boolean;
-  breadcrumbs?: { url?: string, name: string }[];
+  breadcrumbs?: { url?: string; name: string }[];
   context: ISerializeContext;
   sectionTitle: string;
   section: IInfoSection;
-  subSectionDatas: { url: string, sectionTitle: string }[];
+  subSectionDatas: { url: string; sectionTitle: string }[];
   filePath: string;
   fileUrl: string;
 }
@@ -408,13 +433,13 @@ export interface ISectionIndex {
   /**
    * The array of pages, with defined order.
    */
-  linkedPagesList: { name: string, url: string }[];
+  linkedPagesList: { name: string; url: string }[];
   /**
    * Mapping from url to page index within linkedPagesList.
    */
-  urlIndex: {[url: string]: number};
+  urlIndex: Record<string, number>;
   /**
    * Mapping from tag to page URL.
    */
-  tags: {[tag: string]: string};
+  tags: Record<string, string>;
 }

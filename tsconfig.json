@@ -1,19 +1,21 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "module": "commonjs",
+    "target": "es6",
     "lib": [
       "dom",
-      "es6"
+      "es6",
+      "es2021"
     ],
-    "target": "es6",
+    "module": "commonjs",
     "noImplicitAny": true,
-    "removeComments": false,
-    "preserveConstEnums": true,
-    "sourceMap": true,
-    "inlineSources": true,
+    "esModuleInterop": true,
     "declaration": true,
     "importHelpers": false,
+    "inlineSources": true,
+    "preserveConstEnums": true,
+    "removeComments": false,
+    "sourceMap": true,
     "skipLibCheck": true
   },
   "include": [
