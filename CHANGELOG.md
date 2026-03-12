@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v5.2.1"></a>
+## [v5.2.1](https://github.com/CyclopsMC/infobook-html/compare/v5.2.0...v5.2.1) - 2026-03-12
+
+### Fixed
+* [Probe multiple repos per dependency via HTTP HEAD in PomConverter (#48)](https://github.com/CyclopsMC/infobook-html/commit/ebc612ba01e821d75307e545a3243d289474ada8)
+
 <a name="v5.2.0"></a>
 ## [v5.2.0](https://github.com/CyclopsMC/infobook-html/compare/v5.1.0...v5.2.0) - 2026-03-12
 
