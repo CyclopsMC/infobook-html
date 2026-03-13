@@ -21,6 +21,11 @@
       "automerge": true,
       "automergeType": "branch",
       "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(-(?<build>\\d+))?$"
+    },
+    {
+      "matchManagers": ["maven"],
+      "matchPackagePrefixes": ["org.cyclops."],
+      "groupName": "Cyclops packages"
     }
   ],
   "github-actions": {
