@@ -1,6 +1,15 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v5.2.3"></a>
+## [v5.2.3](https://github.com/CyclopsMC/infobook-html/compare/v5.2.2...v5.2.3) - 2026-05-30
+
+### Changed
+* [Bump headlessmc version to 2.9.0](https://github.com/CyclopsMC/infobook-html/commit/edbcc05ac7680129f8a7f692c86126e7338e35f6)
+
+### Fixed
+* [Update launch command to include neoforge version](https://github.com/CyclopsMC/infobook-html/commit/839ad6910d795bb06662b01534031eef347afa3f)
+
 <a name="v5.2.2"></a>
 ## [v5.2.2](https://github.com/CyclopsMC/infobook-html/compare/v5.2.1...v5.2.2) - 2026-03-12
 
