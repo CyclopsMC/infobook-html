@@ -332,7 +332,7 @@ export class IconsGenerator {
               sendCommand('offline true');
               // Allow a moment for offline mode to register
               setTimeout(() => {
-                sendCommand(`launch neoforge:${this.minecraftVersion} -offline --jvm "-Djava.awt.headless=true"`);
+                sendCommand(`launch neoforge:${this.minecraftVersion}:${this.neoforgeVersion} -offline --jvm "-Djava.awt.headless=true"`);
                 transitionTo('game_launching');
               }, 1000);
             }
