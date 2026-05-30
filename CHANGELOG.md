@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v5.2.4"></a>
+## [v5.2.4](https://github.com/CyclopsMC/infobook-html/compare/v5.2.3...v5.2.4) - 2026-05-30
+
+### Fixed
+* [Bump yauzl to fix halting bug in generation](https://github.com/CyclopsMC/infobook-html/commit/6dbb79840d1a34a5e78abeb67ad006c2f896497a)
+
 <a name="v5.2.3"></a>
 ## [v5.2.3](https://github.com/CyclopsMC/infobook-html/compare/v5.2.2...v5.2.3) - 2026-05-30
 
