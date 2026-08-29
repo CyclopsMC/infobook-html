@@ -38,6 +38,40 @@ describe('IconsGenerator', () => {
     });
   });
 
+  describe('writeModLoaderConfig', () => {
+    const configPath = (): string => join(workDir, 'game', 'config', 'fml.toml');
+
+    it('should size NeoForge\'s early window for the required GUI scale', async() => {
+      await generator.writeModLoaderConfig();
+
+      const contents = await fs.promises.readFile(configPath(), 'utf8');
+      const options = generator.getRequiredGameOptions();
+      expect(contents).toContain(`earlyWindowWidth = ${options.overrideWidth}\n`);
+      expect(contents).toContain(`earlyWindowHeight = ${options.overrideHeight}\n`);
+    });
+
+    it('should overwrite the sizes in an existing config and preserve everything else', async() => {
+      await fs.promises.mkdir(join(workDir, 'game', 'config'), { recursive: true });
+      await fs.promises.writeFile(configPath(), [
+        '#Early window width',
+        'earlyWindowWidth = 854',
+        '#Early window height',
+        'earlyWindowHeight = 480',
+        'earlyWindowControl = true',
+        '',
+      ].join('\n'));
+
+      await generator.writeModLoaderConfig();
+
+      const lines = (await fs.promises.readFile(configPath(), 'utf8')).trim().split('\n');
+      expect(lines).toContain('#Early window width');
+      expect(lines).toContain('earlyWindowControl = true');
+      expect(lines).toContain('earlyWindowWidth = 1920');
+      expect(lines).toContain('earlyWindowHeight = 1080');
+      expect(lines.filter(line => line.startsWith('earlyWindowWidth'))).toHaveLength(1);
+    });
+  });
+
   describe('writeGameOptions', () => {
     const optionsPath = (): string => join(workDir, 'game', 'options.txt');
 

@@ -234,6 +234,7 @@ export class IconsGenerator {
     }
 
     await this.writeGameOptions();
+    await this.writeModLoaderConfig();
   }
 
   /**
@@ -260,33 +261,72 @@ export class IconsGenerator {
    * so that game directories that were restored from a cache are updated as well.
    */
   public async writeGameOptions(): Promise<void> {
-    const gameDir = join(this.workDir, IconsGenerator.hmcGameSubdir);
-    if (!fs.existsSync(gameDir)) {
-      await fs.promises.mkdir(gameDir, { recursive: true });
+    const optionsPath = join(this.workDir, IconsGenerator.hmcGameSubdir, 'options.txt');
+    await this.mergeIntoConfigFile(optionsPath, this.getRequiredGameOptions(), ':');
+    process.stdout.write(`Wrote game options to ${optionsPath} ` +
+      `(GUI scale ${IconsGenerator.iconExportGuiScale} at ${IconsGenerator.windowWidth}x${IconsGenerator.windowHeight})\n`);
+  }
+
+  /**
+   * The mod loader options that the icon export requires.
+   *
+   * NeoForge shows its own loading window and hands that same window over to Minecraft,
+   * so Minecraft's `overrideWidth`/`overrideHeight` options never get to size the window.
+   * The early window is therefore what determines whether the requested GUI scale is reachable.
+   */
+  public getRequiredModLoaderOptions(): Record<string, string> {
+    return {
+      earlyWindowWidth: String(IconsGenerator.windowWidth),
+      earlyWindowHeight: String(IconsGenerator.windowHeight),
+    };
+  }
+
+  /**
+   * Write the mod loader's config file with all options that are required for a correct icon export.
+   * Any option that is not required by the export is left untouched.
+   */
+  public async writeModLoaderConfig(): Promise<void> {
+    const configPath = join(this.workDir, IconsGenerator.hmcGameSubdir, 'config', 'fml.toml');
+    await this.mergeIntoConfigFile(configPath, this.getRequiredModLoaderOptions(), ' = ');
+    process.stdout.write(`Wrote mod loader config to ${configPath} ` +
+      `(window ${IconsGenerator.windowWidth}x${IconsGenerator.windowHeight})\n`);
+  }
+
+  /**
+   * Merge the given key-value entries into a line-based config file.
+   * Entries that are already present are overwritten in-place, and all other lines are preserved,
+   * so that game directories that were restored from a cache are updated as well.
+   */
+  public async mergeIntoConfigFile(
+    filePath: string,
+    entries: Record<string, string>,
+    separator: string,
+  ): Promise<void> {
+    const fileDir = join(filePath, '..');
+    if (!fs.existsSync(fileDir)) {
+      await fs.promises.mkdir(fileDir, { recursive: true });
     }
-    const optionsPath = join(gameDir, 'options.txt');
 
     let lines: string[] = [];
-    if (fs.existsSync(optionsPath)) {
-      lines = (await fs.promises.readFile(optionsPath, 'utf8')).split('\n');
-      // Drop trailing empty lines, so that appended options don't end up after a blank line
+    if (fs.existsSync(filePath)) {
+      lines = (await fs.promises.readFile(filePath, 'utf8')).split('\n');
+      // Drop trailing empty lines, so that appended entries don't end up after a blank line
       while (lines.length > 0 && lines.at(-1).trim().length === 0) {
         lines.pop();
       }
     }
 
-    for (const [ key, value ] of Object.entries(this.getRequiredGameOptions())) {
-      const index = lines.findIndex(line => line.startsWith(`${key}:`));
+    for (const [ key, value ] of Object.entries(entries)) {
+      const matcher = new RegExp(`^\\s*${key}\\s*${separator.trim()}`, 'u');
+      const index = lines.findIndex(line => matcher.test(line));
       if (index >= 0) {
-        lines[index] = `${key}:${value}`;
+        lines[index] = `${key}${separator}${value}`;
       } else {
-        lines.push(`${key}:${value}`);
+        lines.push(`${key}${separator}${value}`);
       }
     }
 
-    await fs.promises.writeFile(optionsPath, `${lines.join('\n')}\n`);
-    process.stdout.write(`Wrote game options to ${optionsPath} ` +
-      `(GUI scale ${IconsGenerator.iconExportGuiScale} at ${IconsGenerator.windowWidth}x${IconsGenerator.windowHeight})\n`);
+    await fs.promises.writeFile(filePath, `${lines.join('\n')}\n`);
   }
 
   /**
