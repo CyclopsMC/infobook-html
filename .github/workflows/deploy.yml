@@ -76,19 +76,25 @@ jobs:
         run: npm run generate:compress
       - name: Restore unchanged icons and track Minecraft version 🔄
         run: |
+          # Bump this whenever the icon rendering itself changes, so that the icons that are
+          # already deployed on gh-pages are replaced by freshly rendered ones.
+          ICONS_REVISION=2
+
           # Read the current Minecraft version from modpack.json
           MC_VERSION=$(python3 -c "import json; print(json.load(open('modpack.json'))['minecraft'])")
-          echo "Current Minecraft version: $MC_VERSION"
+          # Icons only have to be re-rendered when the Minecraft version or the rendering changed
+          ICONS_VERSION="${MC_VERSION} icons-r${ICONS_REVISION}"
+          echo "Current icons version: $ICONS_VERSION"
 
           # Try to fetch gh-pages (may not exist on the very first deployment)
           PREV_VERSION=""
           if git fetch origin gh-pages --depth=1 2>/dev/null; then
             PREV_VERSION=$(git cat-file blob origin/gh-pages:minecraft-version.txt 2>/dev/null || echo "")
           fi
-          echo "Previous Minecraft version: '${PREV_VERSION}'"
+          echo "Previous icons version: '${PREV_VERSION}'"
 
-          if [ "$MC_VERSION" = "$PREV_VERSION" ]; then
-            echo "Minecraft version unchanged — restoring existing icons from gh-pages (only new icons will be added)"
+          if [ "$ICONS_VERSION" = "$PREV_VERSION" ]; then
+            echo "Icons version unchanged — restoring existing icons from gh-pages (only new icons will be added)"
             RESTORED=0
             SKIPPED=0
             while IFS= read -r icon_path; do
@@ -102,12 +108,12 @@ jobs:
             done < <(git ls-tree -r --name-only origin/gh-pages -- 'assets/icon/' 2>/dev/null || true)
             echo "Restored $RESTORED existing icons from gh-pages; $SKIPPED icons from gh-pages no longer present in new export"
           else
-            echo "Minecraft version changed from '${PREV_VERSION}' to '${MC_VERSION}' — using all freshly generated icons"
+            echo "Icons version changed from '${PREV_VERSION}' to '${ICONS_VERSION}' — using all freshly generated icons"
           fi
 
-          # Write the current Minecraft version into output/ so it is tracked on gh-pages
-          # and future deployments can detect whether the Minecraft version has changed.
-          echo "$MC_VERSION" > output/minecraft-version.txt
+          # Write the current icons version into output/ so it is tracked on gh-pages
+          # and future deployments can detect whether the icons have to be re-rendered.
+          echo "$ICONS_VERSION" > output/minecraft-version.txt
           echo "Written output/minecraft-version.txt"
       - name: Deploy 🚀
         if: github.ref == 'refs/heads/master'

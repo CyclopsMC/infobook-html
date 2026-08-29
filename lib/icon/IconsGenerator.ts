@@ -18,6 +18,31 @@ export class IconsGenerator {
   private static readonly hmcConfigSubdir = 'HeadlessMC';
   private static readonly iconExportSubdir = 'icon-exports-x64';
   private static readonly defaultIconSize = 64;
+  /**
+   * The Minecraft GUI scale to export icons at.
+   *
+   * IconExporter renders every icon at `iconSize / guiScale` GUI units, which it does by applying
+   * a `scale(f, f, 1)` to the pose stack, with `f = (iconSize / guiScale) / 16`.
+   * That scaling is non-uniform as soon as `f != 1`, and Minecraft's PoseStack reacts to a
+   * non-uniform scale by scaling the normal matrix by `(1/f, 1/f, 1)` (and marking the normals as
+   * untrusted, so they are re-normalized afterwards). This squashes the X and Y components of every
+   * vertex normal, which flattens the diffuse lighting of 3D (block) models: exported block icons
+   * then come out ~30% darker than the same block looks in the vanilla inventory,
+   * while flat (2D) item icons are unaffected.
+   *
+   * Exporting at a GUI scale of exactly `iconSize / 16` keeps `f == 1`, so the pose scaling stays
+   * uniform, normals are left untouched, and icons match vanilla's inventory rendering.
+   */
+  private static readonly iconExportGuiScale = IconsGenerator.defaultIconSize / 16;
+  /**
+   * The window size to run the game at.
+   *
+   * Minecraft clamps the configured GUI scale to the largest scale at which the window still holds
+   * 320x240 GUI pixels, so a GUI scale of N requires a window of at least 320N x 240N pixels.
+   * This must also fit on the (virtual) display, e.g. the `1920x1080` Xvfb screen from the README.
+   */
+  private static readonly windowWidth = 1920;
+  private static readonly windowHeight = 1080;
   private static readonly hmcSpecificsRepo = 'headlesshq/hmc-specifics';
   private static readonly modrinthApiBase = 'https://api.modrinth.com/v2';
   private static readonly iconExporterModrinthSlug = 'icon-exporter';
@@ -208,11 +233,60 @@ export class IconsGenerator {
       await this.downloadHmcSpecifics(modsDir);
     }
 
-    // Write options.txt to disable accessibility screen and pauseOnLostFocus
-    const optionsPath = join(gameDir, 'options.txt');
-    if (!fs.existsSync(optionsPath)) {
-      await fs.promises.writeFile(optionsPath, 'pauseOnLostFocus:false\nonboardAccessibility:false\n');
+    await this.writeGameOptions();
+  }
+
+  /**
+   * The game options that the icon export requires.
+   * These are enforced on every run, any other option is left untouched.
+   */
+  public getRequiredGameOptions(): Record<string, string> {
+    return {
+      // Keep rendering when the (headless) window loses focus
+      pauseOnLostFocus: 'false',
+      // Don't show the accessibility onboarding screen on first launch
+      onboardAccessibility: 'false',
+      // Fullscreen ignores the window size overrides below
+      fullscreen: 'false',
+      guiScale: String(IconsGenerator.iconExportGuiScale),
+      overrideWidth: String(IconsGenerator.windowWidth),
+      overrideHeight: String(IconsGenerator.windowHeight),
+    };
+  }
+
+  /**
+   * Write the game's options.txt with all options that are required for a correct icon export.
+   * Options that are already present are overwritten in-place, and all other options are preserved,
+   * so that game directories that were restored from a cache are updated as well.
+   */
+  public async writeGameOptions(): Promise<void> {
+    const gameDir = join(this.workDir, IconsGenerator.hmcGameSubdir);
+    if (!fs.existsSync(gameDir)) {
+      await fs.promises.mkdir(gameDir, { recursive: true });
     }
+    const optionsPath = join(gameDir, 'options.txt');
+
+    let lines: string[] = [];
+    if (fs.existsSync(optionsPath)) {
+      lines = (await fs.promises.readFile(optionsPath, 'utf8')).split('\n');
+      // Drop trailing empty lines, so that appended options don't end up after a blank line
+      while (lines.length > 0 && lines.at(-1).trim().length === 0) {
+        lines.pop();
+      }
+    }
+
+    for (const [ key, value ] of Object.entries(this.getRequiredGameOptions())) {
+      const index = lines.findIndex(line => line.startsWith(`${key}:`));
+      if (index >= 0) {
+        lines[index] = `${key}:${value}`;
+      } else {
+        lines.push(`${key}:${value}`);
+      }
+    }
+
+    await fs.promises.writeFile(optionsPath, `${lines.join('\n')}\n`);
+    process.stdout.write(`Wrote game options to ${optionsPath} ` +
+      `(GUI scale ${IconsGenerator.iconExportGuiScale} at ${IconsGenerator.windowWidth}x${IconsGenerator.windowHeight})\n`);
   }
 
   /**

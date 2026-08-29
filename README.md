@@ -87,6 +87,12 @@ $ sudo apt-get install -y xvfb
 $ xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" generate-icons
 ```
 
+The screen must be at least `1280x960`, as the game is launched at a GUI scale of 4
+(icon size 64 divided by the 16 GUI pixels an item slot occupies).
+At any other GUI scale, the Icon Exporter mod scales the pose stack non-uniformly to reach the
+requested icon size, which squashes vertex normals and makes exported block icons come out
+significantly darker than they look in the inventory.
+
 ### 3. HTML Generation
 
 Before you start this phase, make sure the following files and directories are present:
