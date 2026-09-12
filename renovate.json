@@ -8,6 +8,12 @@
     {
       "matchHost": "https://maven.pkg.github.com/CyclopsMC/packages",
       "token": "{{ secrets.RENOVATE_GITHUB_COM_TOKEN }}"
+    },
+    {
+      "description": "Backstop only. The registryUrls rule below is what actually keeps Central out of the lookup path, since the Maven datasource raises an ExternalHostError on a Central 429 regardless of these flags.",
+      "matchHost": "repo.maven.apache.org",
+      "abortOnError": false,
+      "abortIgnoreStatusCodes": [429]
     }
   ],
   "packageRules": [
@@ -23,8 +29,14 @@
       "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(-(?<build>\\d+))?$"
     },
     {
+      "description": "Cyclops mods are only published to our GitHub Packages registry",
       "matchManagers": ["maven"],
-      "matchPackagePrefixes": ["org.cyclops."],
+      "matchPackageNames": ["org.cyclops.{/,}**"],
+      "registryUrls": ["https://maven.pkg.github.com/CyclopsMC/packages"]
+    },
+    {
+      "matchManagers": ["maven"],
+      "matchPackageNames": ["org.cyclops.{/,}**"],
       "groupName": "Cyclops packages"
     }
   ],
