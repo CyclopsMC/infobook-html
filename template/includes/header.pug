@@ -1,17 +1,25 @@
-header
-    h1(property="schema:name")=modName + ' - ' + bookName
+mixin brand
+    if bookIcon || icon
+        img(class="site-book-icon", src=(bookIcon || icon), alt="")
+    span
+        span(class="site-mod")=modName
+        span(class="site-book")=bookName
 
-div(class="languages")
-    ul
-        each lang in languages
-            li
-                a(href=lang.url) !{lang.name}
+header(class="site-header")
+    meta(property="schema:name", content=modName + ' - ' + bookName)
+    if breadcrumbs && breadcrumbs.length > 0 && breadcrumbs[0].url
+        a(class="site-brand", href=breadcrumbs[0].url)
+            +brand
+    else
+        div(class="site-brand")
+            +brand
 
-div(class="breadcrumbs")
-    ul
-        each val in breadcrumbs
-            if val.url
+    details(class="languages")
+        summary=language
+        ul
+            each lang in languages
                 li
-                    a(href=val.url) !{val.name}
-            else
-                li !{val.name}
+                    if lang.name === language
+                        a(href=lang.url, aria-current="page") !{lang.name}
+                    else
+                        a(href=lang.url) !{lang.name}

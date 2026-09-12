@@ -8,11 +8,15 @@ html(lang=language)
 
         div(class="main-outer")
             section(class="main")
-                h2 !{sectionTitle}
+                include includes/breadcrumbs.pug
+                h1 !{sectionTitle}
+                hr(class="ornament")
                 each val in sectionParagraphs
                     p !{val}
-                each val in sectionAppendices
-                    div(class="appendix-wrapper") !{val}
+                if sectionAppendices.length > 0
+                    div(class="appendices")
+                        each val in sectionAppendices
+                            div(class="appendix-wrapper") !{val}
                 include includes/main-footer.pug
 
         include includes/footer.pug

@@ -1,3 +1,5 @@
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 style(type="text/css")
     .
         :root {
@@ -8,14 +10,14 @@ style(type="text/css")
             --color-main-background: #{colors.main_background};
             --color-outer-background: #{colors.outer_background};
         }
-<link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet" type="text/css" />
-<link href="https://fonts.googleapis.com/css?family=Droid+Sans&display=swap" rel="stylesheet" type="text/css" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" type="text/css" />
 <link rel="stylesheet" href="#{baseUrl}assets/styles.css">
 <meta name="description" content="Web-version of the #{bookName} book, from the #{modName} mod for Minecraft" />
 <link rel="foaf:maker schema:author" href="https://www.rubensworks.net/#me" />
-if icon
-    <meta property="og:image foaf:img foaf:logo schema:image" href="#{icon}"/>
-    <link rel="shortcut icon" type="image/png" href="#{icon}" />
+if icon || bookIcon
+    <meta property="og:image foaf:img foaf:logo schema:image" href="#{icon || bookIcon}"/>
+    <link rel="shortcut icon" type="image/png" href="#{icon || bookIcon}" />
 if googleAnalytics
     include google-analytics.pug
 .

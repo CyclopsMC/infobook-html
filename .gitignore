@@ -15,3 +15,4 @@ output
 headlessmc
 .eslintcache
 !eslint.config.js
+!assets/main.js
