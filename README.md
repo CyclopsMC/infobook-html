@@ -115,6 +115,7 @@ Before you start this phase, make sure the following files and directories are p
     "outer_background": "#09171f"
   },
   "icon": "https://media.forgecdn.net/attachments/70/844/logo.png",
+  "bookIconItem": "integrateddynamics:on_the_dynamics_of_integration",
   "modId": "integrateddynamics",
   "modName": "Integrated Dynamics",
   "modUrl": "https://www.curseforge.com/minecraft/mc-mods/integrated-dynamics",
@@ -142,6 +143,16 @@ Before you start this phase, make sure the following files and directories are p
   "recipePredefineds": {}
 }
 ```
+
+Some of these options deserve a note:
+
+* `colors`: The palette the stylesheet derives all of its colors from,
+  so that the generated pages match the look of the book inside the game.
+* `icon`: The URL of the favicon and the Open Graph image.
+* `bookIconItem`: Optional id of the item of which the exported icon is shown
+  next to the book name in the header of every page,
+  which is usually the book itself. It falls back to `icon` when it is not set,
+  and `icon` falls back to it when `icon` is not set.
 
 This phase can be started by executing `generate-cyclops-infobook-html config.json /output`.
 Afterwards, the contents of `/output` can be hosted on any Web server.

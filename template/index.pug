@@ -8,11 +8,13 @@ html(lang=language)
 
         div(class="main-outer")
             section(class="main")
-                h2 !{sectionTitle}
-                ul
-                each val in subSectionDatas
-                    li
-                        a(href=val.url) !{val.sectionTitle}
+                include includes/breadcrumbs.pug
+                h1 !{sectionTitle}
+                hr(class="ornament")
+                ul(class="toc")
+                    each val in subSectionDatas
+                        li
+                            a(href=val.url) !{val.sectionTitle}
                 include includes/main-footer.pug
 
         include includes/footer.pug

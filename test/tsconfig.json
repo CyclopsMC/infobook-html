@@ -5,6 +5,7 @@
       "es2021"
     ],
     "module": "commonjs",
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "esModuleInterop": true
   }
 }

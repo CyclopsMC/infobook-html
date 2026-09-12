@@ -18,6 +18,45 @@ import type { ResourceHandler } from '../resource/ResourceHandler';
  * Serializes an infobook to a collection of HTML files.
  */
 export class HtmlInfoBookSerializer {
+  /**
+   * The Minecraft color formatting codes, and the colors they correspond to.
+   *
+   * Based on https://minecraft.gamepedia.com/Formatting_codes
+   *
+   * The '§r' code resets the formatting, which falls back to the default black text color.
+   */
+  public static readonly colorCodes: { code: string; name: string; color: string }[] = [
+    { code: 'r', name: '0', color: '#000000' },
+    { code: '1', name: '1', color: '#0000AA' },
+    { code: '2', name: '2', color: '#00AA00' },
+    { code: '3', name: '3', color: '#00AAAA' },
+    { code: '4', name: '4', color: '#AA0000' },
+    { code: '5', name: '5', color: '#AA00AA' },
+    { code: '6', name: '6', color: '#FFAA00' },
+    { code: '7', name: '7', color: '#AAAAAA' },
+    { code: '8', name: '8', color: '#555555' },
+    { code: '9', name: '9', color: '#5555FF' },
+    { code: 'a', name: 'a', color: '#55FF55' },
+    { code: 'b', name: 'b', color: '#55FFFF' },
+    { code: 'c', name: 'c', color: '#FF5555' },
+    { code: 'd', name: 'd', color: '#FF55FF' },
+    { code: 'e', name: 'e', color: '#FFFF55' },
+    { code: 'f', name: 'f', color: '#FFFFFF' },
+  ];
+
+  /**
+   * Regular expressions for replacing color codes with colored spans.
+   *
+   * Each span carries both a class and a custom property, so that stylesheets can tune the
+   * in-game colors for readability on the page background by redefining '--mc-*',
+   * while the in-game color remains as fallback.
+   */
+  protected static readonly colorReplacers: { regex: RegExp; replacement: string }[] =
+    HtmlInfoBookSerializer.colorCodes.map(({ code, name, color }) => ({
+      regex: new RegExp(`§${code}([^§]*)§0`, 'gu'),
+      replacement: `<span class="mc mc-${name}" style="color: var(--mc-${name}, ${color})">$1</span>`,
+    }));
+
   public readonly templateItem: compileTemplate;
   private readonly templateIndex: compileTemplate;
   private readonly templateSection: compileTemplate;
@@ -43,6 +82,9 @@ export class HtmlInfoBookSerializer {
     await this.ensureDirExists(context.path);
     await this.ensureDirExists(join(context.path, 'assets'));
     await this.ensureDirExists(join(context.path, 'assets', 'icon'));
+
+    // Resolve the icon that is shown next to the book name in the header of every page
+    context = { ...context, bookIcon: await this.resolveBookIcon(context) };
 
     // Create a .nojekyll file to ensure _lang directories are served via GitHub pages.
     await fs.writeFile(join(context.path, '.nojekyll'), '');
@@ -360,24 +402,33 @@ export class HtmlInfoBookSerializer {
     value = value.replaceAll('§N', '<br />');
 
     // Colors to HTML
-    value = value.replaceAll(/§r([^§]*)§0/gu, '<span style="color: #000000">$1</span>');
-    value = value.replaceAll(/§1([^§]*)§0/gu, '<span style="color: #0000AA">$1</span>');
-    value = value.replaceAll(/§2([^§]*)§0/gu, '<span style="color: #00AA00">$1</span>');
-    value = value.replaceAll(/§3([^§]*)§0/gu, '<span style="color: #00AAAA">$1</span>');
-    value = value.replaceAll(/§4([^§]*)§0/gu, '<span style="color: #AA0000">$1</span>');
-    value = value.replaceAll(/§5([^§]*)§0/gu, '<span style="color: #AA00AA">$1</span>');
-    value = value.replaceAll(/§6([^§]*)§0/gu, '<span style="color: #FFAA00">$1</span>');
-    value = value.replaceAll(/§7([^§]*)§0/gu, '<span style="color: #AAAAAA">$1</span>');
-    value = value.replaceAll(/§8([^§]*)§0/gu, '<span style="color: #555555">$1</span>');
-    value = value.replaceAll(/§9([^§]*)§0/gu, '<span style="color: #5555FF">$1</span>');
-    value = value.replaceAll(/§a([^§]*)§0/gu, '<span style="color: #55FF55">$1</span>');
-    value = value.replaceAll(/§b([^§]*)§0/gu, '<span style="color: #55FFFF">$1</span>');
-    value = value.replaceAll(/§c([^§]*)§0/gu, '<span style="color: #FF5555">$1</span>');
-    value = value.replaceAll(/§d([^§]*)§0/gu, '<span style="color: #FF55FF">$1</span>');
-    value = value.replaceAll(/§e([^§]*)§0/gu, '<span style="color: #FFFF55">$1</span>');
-    value = value.replaceAll(/§f([^§]*)§0/gu, '<span style="color: #FFFFFF">$1</span>');
+    for (const { regex, replacement } of HtmlInfoBookSerializer.colorReplacers) {
+      value = value.replaceAll(regex, replacement);
+    }
 
     return value;
+  }
+
+  /**
+   * Determine the URL of the icon that is shown next to the book name in the page header.
+   *
+   * This is the icon of the item in {@link ISerializeContext#bookIconItem} if it is set and exported,
+   * and the {@link ISerializeContext#icon} URL otherwise.
+   *
+   * @param {ISerializeContext} context The serialization context.
+   * @returns {Promise<string>} The book icon URL, which can be undefined if neither is available.
+   */
+  protected async resolveBookIcon(context: ISerializeContext): Promise<string | undefined> {
+    if (context.bookIconItem) {
+      const icon = context.resourceHandler.getItemIconFile(context.bookIconItem);
+      if (icon) {
+        return await this.fileWriter.write(`icon/${basename(icon)}`, () => createReadStream(icon));
+      }
+      process.stderr.write(
+        `Could not find an icon for bookIconItem '${context.bookIconItem}', falling back to the icon option\n`,
+      );
+    }
+    return context.icon;
   }
 
   protected async ensureDirExists(dirPath: string): Promise<void> {
@@ -421,6 +472,15 @@ export interface ISerializeContext {
   googleAnalytics: string;
   googleAdsense: { client: string; format: string; slot: string };
   icon: string;
+  /**
+   * Optional id of the item (such as 'mymod:my_book') of which the exported icon
+   * is shown next to the book name in the page header.
+   */
+  bookIconItem?: string;
+  /**
+   * The resolved URL of the book icon, which is determined during serialization.
+   */
+  bookIcon?: string;
 }
 
 export interface ISectionCallbackArgs {
