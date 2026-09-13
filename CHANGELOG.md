@@ -1,6 +1,15 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v6.1.0"></a>
+## [v6.1.0](https://github.com/CyclopsMC/infobook-html/compare/v6.0.0...v6.1.0) - 2026-09-13
+
+### Added
+* [Add client-side search to the generated books (#56)](https://github.com/CyclopsMC/infobook-html/commit/84b530c9d22f799fa3ceda1e030751def17f95b5)
+
+### Changed
+* [Scale the book on large screens (#57)](https://github.com/CyclopsMC/infobook-html/commit/b0e3ab4b2139ae678c6a1d5cdc8956bd1c28adb4)
+
 <a name="v6.0.0"></a>
 ## [v6.0.0](https://github.com/CyclopsMC/infobook-html/compare/v5.2.4...v6.0.0) - 2026-09-13
 
