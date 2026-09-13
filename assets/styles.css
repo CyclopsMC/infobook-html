@@ -845,3 +845,38 @@ footer a:hover {
         text-align: center;
     }
 }
+
+/* ---------- Large screens ---------- */
+
+/*
+ * On a large display the book would otherwise sit as a small island: the sheet
+ * is capped at 920px, and everything in this stylesheet is sized in pixels and
+ * tuned at laptop width, item icons and inventory slot borders included.
+ *
+ * Scaling only the type would pull that apart, leaving 32px icons beside larger
+ * text. Zooming grows all of it by the same factor, so the page keeps the
+ * proportions it was designed with, and the line length in characters does not
+ * change because the text and the sheet grow together.
+ *
+ * These queries are measured in CSS pixels, so a display that is already scaled
+ * by the operating system reports the smaller viewport and lands on the smaller
+ * step. A browser without zoom support renders the page as it does otherwise.
+ */
+
+@media (min-width: 1700px) {
+    body {
+        zoom: 1.25;
+    }
+}
+
+@media (min-width: 2400px) {
+    body {
+        zoom: 1.6;
+    }
+}
+
+@media (min-width: 3200px) {
+    body {
+        zoom: 2;
+    }
+}
