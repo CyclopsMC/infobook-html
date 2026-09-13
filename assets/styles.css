@@ -845,3 +845,23 @@ footer a:hover {
         text-align: center;
     }
 }
+
+/* ---------- Large screens ---------- */
+
+@media (min-width: 1700px) {
+    body {
+        zoom: 1.25;
+    }
+}
+
+@media (min-width: 2400px) {
+    body {
+        zoom: 1.6;
+    }
+}
+
+@media (min-width: 3200px) {
+    body {
+        zoom: 2;
+    }
+}
