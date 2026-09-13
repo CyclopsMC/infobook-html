@@ -130,6 +130,14 @@ code {
     line-height: 1.2;
 }
 
+.site-tools {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: none;
+    min-width: 0;
+}
+
 /* Language picker: works without JavaScript. */
 .languages {
     position: relative;
@@ -761,6 +769,70 @@ ul.alternatives-updating li:not(.item-variant-selected) {
     margin: 4px 0;
 }
 
+/* ---------- Search ---------- */
+
+/*
+ * The search interface is provided by the Pagefind components, which are styled
+ * through these custom properties. The modal is dressed as a page of the book,
+ * and the trigger as a button on the cover next to the language picker.
+ *
+ * The components give their own rules ID-level specificity so that they survive
+ * unpredictable host styles, so anything not covered by a property here has to be
+ * left as it is. The trigger is the exception: it sits outside the modal, and the
+ * rules below are specific enough to reach it.
+ */
+:root {
+    --pf-font: var(--font-body);
+    --pf-background: var(--page);
+    --pf-text: var(--ink);
+    --pf-text-secondary: var(--ink-muted);
+    --pf-text-muted: var(--ink-muted);
+    --pf-border: var(--page-line);
+    --pf-border-focus: var(--color-border);
+    --pf-border-radius: 8px;
+    --pf-hover: color-mix(in srgb, var(--color-border-muted) 45%, transparent);
+    --pf-skeleton: var(--page-muted);
+    --pf-skeleton-shine: var(--page);
+    --pf-mark: var(--color-h);
+    --pf-outline-focus: var(--color-border);
+    --pf-modal-backdrop: color-mix(in srgb, var(--cover) 75%, transparent);
+    --pf-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.55);
+    --pf-input-font-size: 16px;
+}
+
+/* The trigger sits on the dark cover, so it follows the language picker instead
+   of the light styling the component uses inside the modal. */
+pagefind-modal-trigger {
+    --pf-icon-search: url("data:image/svg+xml,%3Csvg width='18' height='18' viewBox='0 0 18 18' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.7549 11.255H11.9649L11.6849 10.985C12.6649 9.845 13.2549 8.365 13.2549 6.755C13.2549 3.165 10.3449 0.255005 6.75488 0.255005C3.16488 0.255005 0.254883 3.165 0.254883 6.755C0.254883 10.345 3.16488 13.255 6.75488 13.255C8.36488 13.255 9.84488 12.665 10.9849 11.685L11.2549 11.965V12.755L16.2549 17.745L17.7449 16.255L12.7549 11.255ZM6.75488 11.255C4.26488 11.255 2.25488 9.245 2.25488 6.755C2.25488 4.26501 4.26488 2.255 6.75488 2.255C9.24488 2.255 11.2549 4.26501 11.2549 6.755C11.2549 9.245 9.24488 11.255 6.75488 11.255Z' fill='%23ffffff'/%3E%3C/svg%3E%0A");
+}
+
+pagefind-modal-trigger .pf-trigger-btn {
+    height: auto;
+    padding: 6px 10px;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 6px;
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 13px;
+}
+
+pagefind-modal-trigger .pf-trigger-btn:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+pagefind-modal-trigger .pf-trigger-text {
+    color: #fff;
+}
+
+pagefind-modal-trigger .pf-trigger-key {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.8);
+}
+
 /* ---------- Footer ---------- */
 
 footer {
@@ -807,6 +879,15 @@ footer a:hover {
     .languages ul {
         grid-template-columns: repeat(2, auto);
         max-height: 50vh;
+    }
+
+    pagefind-modal-trigger .pf-trigger-text,
+    pagefind-modal-trigger .pf-trigger-shortcut {
+        display: none;
+    }
+
+    pagefind-modal-trigger .pf-trigger-btn {
+        padding: 6px 8px;
     }
 
     .main-outer {
