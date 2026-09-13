@@ -1,14 +1,16 @@
 doctype html
-html(lang=language)
+html(lang=languageTag)
     head
         include includes/head.pug
         title=modName + ' - ' + bookName + ' - ' + sectionTitle
     body(vocab=baseUrl)
         include includes/header.pug
+        include includes/search.pug
 
         div(class="main-outer")
-            section(class="main")
-                include includes/breadcrumbs.pug
+            section(class="main", data-pagefind-body)
+                div(data-pagefind-ignore)
+                    include includes/breadcrumbs.pug
                 h1 !{sectionTitle}
                 hr(class="ornament")
                 each val in sectionParagraphs
@@ -17,6 +19,7 @@ html(lang=language)
                     div(class="appendices")
                         each val in sectionAppendices
                             div(class="appendix-wrapper") !{val}
-                include includes/main-footer.pug
+                div(data-pagefind-ignore)
+                    include includes/main-footer.pug
 
         include includes/footer.pug

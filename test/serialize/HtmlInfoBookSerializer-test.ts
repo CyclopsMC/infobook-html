@@ -87,6 +87,24 @@ describe('HtmlInfoBookSerializer', () => {
     });
   });
 
+  describe('toLanguageTag', () => {
+    it('should turn a Minecraft language code into a language tag', () => {
+      expect(HtmlInfoBookSerializer.toLanguageTag('en_us')).toBe('en-US');
+      expect(HtmlInfoBookSerializer.toLanguageTag('pt_br')).toBe('pt-BR');
+      expect(HtmlInfoBookSerializer.toLanguageTag('zh_cn')).toBe('zh-CN');
+    });
+
+    it('should handle three letter languages', () => {
+      expect(HtmlInfoBookSerializer.toLanguageTag('fil_ph')).toBe('fil-PH');
+    });
+
+    it('should leave codes without a region untouched', () => {
+      expect(HtmlInfoBookSerializer.toLanguageTag('enws')).toBe('enws');
+      expect(HtmlInfoBookSerializer.toLanguageTag('lzh')).toBe('lzh');
+      expect(HtmlInfoBookSerializer.toLanguageTag('')).toBe('');
+    });
+  });
+
   describe('getLanguagePath', () => {
     it('should keep en_us at the root', () => {
       expect(serializer.getLanguagePath('en_us')).toBe('');

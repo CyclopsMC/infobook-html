@@ -14,12 +14,15 @@ header(class="site-header")
         div(class="site-brand")
             +brand
 
-    details(class="languages")
-        summary=language
-        ul
-            each lang in languages
-                li
-                    if lang.name === language
-                        a(href=lang.url, aria-current="page") !{lang.name}
-                    else
-                        a(href=lang.url) !{lang.name}
+    div(class="site-tools")
+        if search
+            pagefind-modal-trigger(placeholder="Search")
+        details(class="languages")
+            summary=language
+            ul
+                each lang in languages
+                    li
+                        if lang.name === language
+                            a(href=lang.url, aria-current="page") !{lang.name}
+                        else
+                            a(href=lang.url) !{lang.name}
