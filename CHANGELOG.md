@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v6.0.0"></a>
+## [v6.0.0](https://github.com/CyclopsMC/infobook-html/compare/v5.2.4...v6.0.0) - 2026-09-13
+
+### BREAKING CHANGES
+* [Restyle the generated infobooks and make them work on mobile](https://github.com/CyclopsMC/infobook-html/commit/28b8ce76b2a9b00e75fe7e1cbf9edf4c35a24685)
+    This is only a visual breaking change.
+
 <a name="v5.2.4"></a>
 ## [v5.2.4](https://github.com/CyclopsMC/infobook-html/compare/v5.2.3...v5.2.4) - 2026-05-30
 
