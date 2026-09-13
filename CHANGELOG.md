@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v6.1.2"></a>
+## [v6.1.2](https://github.com/CyclopsMC/infobook-html/compare/v6.1.1...v6.1.2) - 2026-09-13
+
+### Fixed
+* [Fix background gradient](https://github.com/CyclopsMC/infobook-html/commit/d9c9b3571a7ab186881752e04f9f09dcf71f3f3c)
+
 <a name="v6.1.1"></a>
 ## [v6.1.1](https://github.com/CyclopsMC/infobook-html/compare/v6.1.0...v6.1.1) - 2026-09-13
 
