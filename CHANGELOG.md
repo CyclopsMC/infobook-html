@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v6.1.1"></a>
+## [v6.1.1](https://github.com/CyclopsMC/infobook-html/compare/v6.1.0...v6.1.1) - 2026-09-13
+
+### Fixed
+* [Shrink the search trigger on small screens](https://github.com/CyclopsMC/infobook-html/commit/c4b01821872249f03aaf56942a21f4e1d6229d62)
+
 <a name="v6.1.0"></a>
 ## [v6.1.0](https://github.com/CyclopsMC/infobook-html/compare/v6.0.0...v6.1.0) - 2026-09-13
 
