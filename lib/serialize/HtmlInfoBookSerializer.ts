@@ -147,6 +147,7 @@ export class HtmlInfoBookSerializer {
     await this.serializeSection(infobook.rootSection, {
       ...contextRoot,
       language,
+      languageTag: HtmlInfoBookSerializer.toLanguageTag(language),
       path: langPath,
       sectionIndex,
     }, async({ index, breadcrumbs, context, section, sectionTitle, subSectionDatas, filePath, fileUrl }) => {
@@ -383,6 +384,23 @@ export class HtmlInfoBookSerializer {
   }
 
   /**
+   * Convert a Minecraft language code into a BCP 47 language tag for the lang attribute.
+   *
+   * Minecraft separates the language and the region with an underscore, such as 'en_us',
+   * which is not a valid language tag, and stops consumers such as screen readers
+   * and the search indexer from recognising the language.
+   *
+   * Codes that do not have this shape, such as 'enws', are left untouched.
+   *
+   * @param {string} language A Minecraft language code.
+   * @returns {string} The corresponding language tag.
+   */
+  public static toLanguageTag(language: string): string {
+    const match = /^([a-z]{2,3})_([a-z]{2})$/u.exec(language);
+    return match ? `${match[1]}-${match[2].toUpperCase()}` : language;
+  }
+
+  /**
    * Convert Minecraft formatting codes to HTML formats.
    *
    * Based on https://minecraft.gamepedia.com/Formatting_codes
@@ -476,6 +494,14 @@ export interface ISerializeContext {
    * Optional id of the item (such as 'mymod:my_book') of which the exported icon
    * is shown next to the book name in the page header.
    */
+  /**
+   * The BCP 47 language tag of the page being serialized, derived from the language.
+   */
+  languageTag?: string;
+  /**
+   * Whether the pages should offer the search interface.
+   */
+  search?: boolean;
   bookIconItem?: string;
   /**
    * The resolved URL of the book icon, which is determined during serialization.

@@ -116,6 +116,7 @@ Before you start this phase, make sure the following files and directories are p
   },
   "icon": "https://media.forgecdn.net/attachments/70/844/logo.png",
   "bookIconItem": "integrateddynamics:on_the_dynamics_of_integration",
+  "search": true,
   "modId": "integrateddynamics",
   "modName": "Integrated Dynamics",
   "modUrl": "https://www.curseforge.com/minecraft/mc-mods/integrated-dynamics",
@@ -153,11 +154,49 @@ Some of these options deserve a note:
   next to the book name in the header of every page,
   which is usually the book itself. It falls back to `icon` when it is not set,
   and `icon` falls back to it when `icon` is not set.
+* `search`: Set to `false` to leave out the search interface. See below.
 
 This phase can be started by executing `generate-cyclops-infobook-html config.json /output`.
 Afterwards, the contents of `/output` can be hosted on any Web server.
 
-### 4. Icon Compression
+### 4. Search
+
+After the pages have been written, they are indexed for search with
+[Pagefind](https://pagefind.app/), which writes the index into `output/pagefind/`.
+Every page then offers a search dialog, opened from the header or with `Ctrl`/`Cmd` + `K`.
+
+The index is split per language and into chunks, so a reader only downloads the parts
+needed to answer their query, and search keeps working on a plain static host.
+Pages are indexed in the language of their `lang` attribute, so readers search
+the book in the language they are reading it in.
+
+Only the page itself is indexed: the navigation, breadcrumbs and page buttons are
+left out, so results are about content rather than the chrome around it.
+
+Indexing adds roughly 5 KB per page to the output, most of it the excerpt shown
+with each result. For a book of 1000 pages across all its languages that is about
+6 MB. It can be tuned in `config.json`:
+
+```json
+{
+  "search": false
+}
+```
+
+```json
+{
+  "search": {
+    "glob": "**/*.html",
+    "excludeSelectors": [".my-noisy-widget"]
+  }
+}
+```
+
+* `false` leaves out both the index and the search interface.
+* `glob` restricts which files are indexed, relative to the output directory.
+* `excludeSelectors` drops parts of the page from the indexed text.
+
+### 5. Icon Compression
 
 Using the `compress-icons` command, icons within the `output/` directory will be compressed.
 This is recommended when deploying the output to a web server.

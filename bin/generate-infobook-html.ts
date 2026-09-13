@@ -15,6 +15,7 @@ import type { IInfobookPlugin } from '../lib/infobook/IInfobookPlugin';
 import type { IInfoBookArgs } from '../lib/infobook/InfoBookInitializer';
 import { InfoBookInitializer } from '../lib/infobook/InfoBookInitializer';
 import { ResourceLoader } from '../lib/resource/ResourceLoader';
+import { SearchIndexer } from '../lib/search/SearchIndexer';
 import type { ISerializeContext } from '../lib/serialize/HtmlInfoBookSerializer';
 import { HtmlInfoBookSerializer } from '../lib/serialize/HtmlInfoBookSerializer';
 
@@ -138,6 +139,9 @@ async function create(): Promise<void> {
   if (!path.endsWith('/')) {
     path += '/';
   }
+  // Search is enabled unless the config turns it off
+  const search: ISearchConfig | false = config.search === false ? false : <ISearchConfig>config.search || {};
+
   const infoBookSerializer = new HtmlInfoBookSerializer();
   await infoBookSerializer.serialize(infoBook, {
     ...<ISerializeContext><unknown>config,
@@ -146,7 +150,22 @@ async function create(): Promise<void> {
     path,
     resourceHandler: resourceLoader.getResourceHandler(),
     root: true,
+    search: search !== false,
   }, assetsPaths);
+
+  // Index the generated pages, so that the pages can be searched without a server
+  if (search !== false) {
+    const { pageCount } = await new SearchIndexer().index(path, {
+      excludeSelectors: search.excludeSelectors,
+      glob: search.glob,
+    });
+    process.stdout.write(`Indexed ${pageCount} pages for search\n`);
+  }
+}
+
+interface ISearchConfig {
+  glob?: string;
+  excludeSelectors?: string[];
 }
 
 create().catch((e) => {
